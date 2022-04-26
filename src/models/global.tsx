@@ -5,6 +5,7 @@ import { useEffect, useReducer } from "react";
 import moment from "moment";
 
 const initState = {
+  loginAccount: {},
   nodeList: [],
   isDay:
     moment().format("YYYY-MM-DD HH:mm:ss") <

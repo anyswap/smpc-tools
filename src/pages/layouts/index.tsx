@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Logo from "@/pages/img/logo.png";
 import { history, useModel, getLocale, setLocale } from "umi";
 // import { setLocale, getLocale, history, getAllLocales, useIntl, useModel } from 'umi';
@@ -12,9 +12,13 @@ import "./style.less";
 const Index = (props) => {
   // console.info('his', history)location
   // console.info(111, getLocale)
-  const { isDay, globalDispatch } = useModel(
+  const { isDay, globalDispatch, loginAccount } = useModel(
     "global",
-    ({ isDay, globalDispatch }) => ({ isDay, globalDispatch })
+    ({ isDay, globalDispatch, loginAccount }) => ({
+      isDay,
+      globalDispatch,
+      loginAccount,
+    })
   );
   const [local, SetLocalAntd] = useState(enUS);
   const nav = [
@@ -24,10 +28,10 @@ const Index = (props) => {
     },
     {
       name: "审批",
-      url: "/approvalList",
+      url: "/approval",
     },
     {
-      name: "创建组",
+      name: "创建共管账户",
       url: "/createGrounp",
     },
   ];
@@ -36,6 +40,9 @@ const Index = (props) => {
     setLocale(type, false);
     SetLocalAntd({ "en-Us": enUS, "zh-CN": zhCN }[type]);
   };
+  useEffect(() => {
+    if (!loginAccount.enode) history.push("/");
+  }, []);
 
   return (
     <ConfigProvider locale={enUS}>

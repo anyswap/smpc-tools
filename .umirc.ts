@@ -24,8 +24,8 @@ export default defineConfig({
           component: "@/pages/getEnode",
         },
         {
-          path: "/approvalList",
-          component: "@/pages/approvalList",
+          path: "/approval",
+          component: "@/pages/approval",
         },
         {
           path: "/createGrounp",

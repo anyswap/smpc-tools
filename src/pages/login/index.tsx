@@ -1,4 +1,4 @@
-import { Input, Form, Select, Button } from "antd";
+import { Input, Form, Select, Button, message } from "antd";
 import React, { useEffect } from "react";
 import { LeftOutlined } from "@ant-design/icons";
 import { history, useModel, getLocale, setLocale, useIntl } from "umi";
@@ -16,15 +16,30 @@ interface nodeListItem {
 
 const Index = () => {
   const [form] = Form.useForm();
-  const { nodeList, isDay } = useModel("global", ({ isDay, nodeList }) => ({
-    isDay,
-    nodeList,
-  }));
-  const onFinish = (v: { node: string }) => {
-    console.info(v);
-    console.info(1111, v.node);
-    web3.setProvider(v.node);
-    history.push("/getEnode");
+  const { nodeList, isDay, globalDispatch } = useModel(
+    "global",
+    ({ isDay, nodeList, globalDispatch }) => ({
+      isDay,
+      nodeList,
+      globalDispatch,
+    })
+  );
+  const onFinish = async (v: { node: string }) => {
+    try {
+      web3.setProvider(v.node);
+      const res = await web3.smpc.getEnode();
+      console.info("res", res);
+      globalDispatch({
+        loginAccount: {
+          rpc: v.node,
+          enode: res.Data.Enode,
+        },
+      });
+      history.push("/getEnode");
+    } catch (err) {
+      console.info("errerr", err);
+      message.error("检查节点");
+    }
   };
 
   return (
@@ -67,12 +82,18 @@ const Index = () => {
           >
             <Select
               placeholder="请输入"
-              options={nodeList
-                .filter((item: nodeListItem) => item.rpc.includes("http://"))
-                .map((item: nodeListItem) => ({
-                  label: item.rpc,
-                  value: item.rpc,
-                }))}
+              options={[
+                ...nodeList
+                  .filter((item: nodeListItem) => item.rpc.includes("http://"))
+                  .map((item: nodeListItem) => ({
+                    label: item.rpc,
+                    value: item.rpc,
+                  })),
+                {
+                  label: "http://47.111.179.118:5911",
+                  value: "http://47.111.179.118:5911",
+                },
+              ]}
             />
           </Form.Item>
           <Form.Item>

@@ -1,6 +1,13 @@
 .create-grounp {
-  display: flex;
   height: calc(100vh - 300px);
+  width: 400px;
+  margin: 50px auto;
+  .ant-btn-primary {
+    margin-right: 12px;
+  }
+  // .ant-form{
+  //   margin-top: 30px;
+  // }
   .left {
     flex: 1;
     padding-right: 3%;
@@ -9,5 +16,10 @@
   .right {
     padding-left: 3%;
     flex: 2;
+  }
+}
+.dark {
+  .ant-form-item-label > label {
+    color: white;
   }
 }

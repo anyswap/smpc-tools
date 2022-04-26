@@ -26,8 +26,8 @@ export function getRoutes() {
           exact: true,
         },
         {
-          path: "/approvalList",
-          component: require("@/pages/approvalList").default,
+          path: "/approval",
+          component: require("@/pages/approval").default,
           exact: true,
         },
         {
