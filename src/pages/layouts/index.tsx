@@ -55,6 +55,7 @@ const Index = (props) => {
               {nav.map((item) => {
                 return (
                   <div
+                    key={item.url}
                     className={
                       history.location.pathname === item.url ? "active" : ""
                     }
