@@ -1,0 +1,16 @@
+.get-enode {
+  height: calc(60vh - 100px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  & > div {
+    display: inline-block;
+  }
+  textarea {
+    margin-top: 25px;
+    height: 100px;
+    &[disabled] {
+      cursor: text;
+    }
+  }
+}

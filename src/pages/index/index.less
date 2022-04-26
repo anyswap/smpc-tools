@@ -1,0 +1,132 @@
+.index {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  .name {
+    font-size: 33px;
+    .left {
+      color: #2762e0;
+    }
+  }
+  .text {
+    margin-top: 5px;
+    font-size: 19px;
+    color: #252525;
+    line-height: 26px;
+  }
+  .buttons {
+    margin-top: 89px;
+    span {
+      width: 159px;
+      font-size: 26px;
+      line-height: 70px;
+      display: inline-block;
+      cursor: pointer;
+    }
+    .left {
+      color: white;
+      background: url(../../pages/img/login.png) 100% no-repeat;
+      &:hover {
+        color: #1b55d1;
+        background: url(../../pages/img/loginHover.png) 100% no-repeat;
+      }
+    }
+    .right {
+      color: #1b55d1;
+      background: url(../../pages/img/register.png) 100% no-repeat;
+      &:hover {
+        color: white;
+        background: url(../../pages/img/registerHover.png) 100% no-repeat;
+      }
+    }
+  }
+  .ant-btn {
+    margin-top: 20px;
+  }
+  &.dark {
+    .text {
+      color: white;
+    }
+    .name {
+      .right {
+        color: white;
+      }
+    }
+  }
+}
+.index_drawer {
+  .ant-drawer-body {
+    padding: 40px 25px;
+    .select-node {
+      overflow: scroll;
+      max-height: calc(100vh - 520px);
+      .ant-checkbox-group-item {
+        width: 95%;
+        margin: 5px 0;
+      }
+    }
+    .ant-btn {
+      margin-top: 20px;
+    }
+    // .title{
+    //   font-size: 22px;
+    //   .left{
+    //     margin-left: 15px;
+    //     color: #2762E0
+    //   }
+    //   .right{
+    //     color: #979797;
+    //   }
+    // }
+    // .back{
+    //   cursor: pointer;
+    //   margin: 42px 0 35px;
+    //   font-size: 16px;
+    //   color: #4D4D4D;
+    // }
+    // .action{
+    //   font-size: 40px;
+    //   color: #252525 ;
+    //   margin-bottom: 35px;
+    // }
+  }
+  &.dark .ant-drawer-body {
+    background: #152131;
+    .ant-input:focus,
+    .ant-input-focused {
+      border-color: #2f9ae0;
+      color: #bbc0c5;
+    }
+    .ant-form-item-label > label {
+      color: #ced0e3;
+    }
+    .ant-checkbox + span {
+      color: #666666;
+    }
+  }
+}
+
+/* 滚动条凹槽的颜色，还可以设置边框属性 */
+::-webkit-scrollbar-track-piece {
+  background-color: #f8f8f8;
+}
+
+/* 滚动条的宽度 */
+::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+}
+
+/* 滚动条的设置 */
+::-webkit-scrollbar-thumb {
+  background-color: #dddddd;
+  background-clip: padding-box;
+  min-height: 28px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #bbb;
+}

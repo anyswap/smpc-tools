@@ -1,0 +1,85 @@
+.layouts {
+  min-height: 100vh;
+
+  .head {
+    height: 70px;
+    background: #f1f1f1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    & > .left {
+      display: flex;
+      img {
+        margin: -5px 10px 0 0;
+      }
+      .logo {
+        font-size: 24px;
+        line-height: 70px;
+        width: 300px;
+        padding-left: 15px;
+      }
+      .name {
+        display: inline-block;
+        color: #252525;
+        .name1 {
+          margin-right: 5px;
+          color: #1b55d1;
+        }
+      }
+      .nav {
+        div {
+          display: inline-block;
+          font-size: 14px;
+          font-weight: 500;
+          color: #252525;
+          border-bottom: 1px solid rgba(0, 0, 0, 0);
+          line-height: 69px;
+          padding: 0 26px;
+          cursor: pointer;
+          &.active,
+          &:hover {
+            color: #1b55d1;
+            border-bottom: 1px solid #1b55d1;
+            background-color: rgba(39, 98, 224, 0.1);
+          }
+        }
+      }
+    }
+    & > .right {
+      margin-right: 15px;
+      img {
+        cursor: pointer;
+      }
+      .ant-select-selector {
+        background-color: rgba(0, 0, 0, 0);
+        border: none;
+      }
+    }
+  }
+  &.dark {
+    background-color: #152131;
+    color: #ced0e3;
+    .head {
+      background: #1a2940;
+      & > .left {
+        .name2 {
+          color: white;
+        }
+        .nav {
+          & > div {
+            color: white;
+          }
+        }
+      }
+      & > .right {
+        .ant-select-selector {
+          color: #999;
+        }
+      }
+    }
+  }
+}
+.container {
+  width: 1440px;
+  margin: 15px auto;
+}

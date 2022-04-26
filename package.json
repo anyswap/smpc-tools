@@ -1,0 +1,59 @@
+{
+  "private": true,
+  "scripts": {
+    "start": "umi dev",
+    "build": "umi build",
+    "postinstall": "umi generate tmp",
+    "prettier": "prettier --write '**/*.{js,jsx,tsx,ts,less,md,json}'",
+    "test": "umi-test",
+    "test:coverage": "umi-test --coverage"
+  },
+  "gitHooks": {
+    "pre-commit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,jsx,less,md,json}": [
+      "prettier --write"
+    ],
+    "*.ts?(x)": [
+      "prettier --parser=typescript --write"
+    ]
+  },
+  "dependencies": {
+    "@ant-design/pro-layout": "^6.5.0",
+    "@binance-chain/bsc-connector": "^1.0.0",
+    "@clover-network/clover-connector": "^1.0.0",
+    "@ethersproject/address": "^5.6.0",
+    "@ethersproject/contracts": "^5.6.0",
+    "@ethersproject/experimental": "^5.0.1",
+    "@ethersproject/networks": "^5.6.2",
+    "@ethersproject/providers": "^5.6.4",
+    "@ethersproject/solidity": "^5.6.0",
+    "@web3-react/walletlink-connector": "^6.2.14",
+    "antd": "^4.19.5",
+    "moment": "^2.29.3",
+    "react": "17.x",
+    "react-dom": "17.x",
+    "umi": "^3.5.23",
+    "react-device-detect": "^1.6.2",
+    "ethers": "^5.6.1",
+    "web3": "^1.7.0",
+    "web3modal": "^1.9.5"
+  },
+  "devDependencies": {
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "@umijs/preset-react": "1.x",
+    "@umijs/test": "^3.5.23",
+    "lint-staged": "^10.0.7",
+    "prettier": "^2.2.0",
+    "typescript": "^4.1.2",
+    "yorkie": "^2.0.0",
+    "@web3-react/core": "^6.0.9",
+    "@web3-react/injected-connector": "^6.0.7",
+    "@web3-react/walletconnect-connector": "^7.0.2-alpha.0",
+    "@web3-react/abstract-connector": "^6.0.7",
+    "anyswap-sdk": "^3.0.11"
+  },
+  "__npminstall_done": false
+}
