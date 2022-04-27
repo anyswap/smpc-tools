@@ -5,6 +5,7 @@ import { useEffect, useReducer } from "react";
 import moment from "moment";
 
 const initState = {
+  address: "",
   loginAccount: {},
   nodeList: [],
   isDay:

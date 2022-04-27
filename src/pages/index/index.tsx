@@ -10,6 +10,8 @@ import { reducer } from "@/utils";
 import "./index.less";
 import { useModel, history } from "umi";
 
+// import { useActiveWeb3React } from '@/constants/hooks'
+
 const initState = {
   visible: false,
 };
@@ -17,7 +19,10 @@ const initState = {
 const Index = () => {
   // const isDay = (moment().format('YYYY-MM-DD HH:mm:ss') < moment().format('YYYY-MM-DD 21:00:00')) &&
   //   (moment().format('YYYY-MM-DD HH:mm:ss') > moment().format('YYYY-MM-DD 05:00:00'));
-  const { isDay } = useModel("global", ({ isDay }) => ({ isDay }));
+  const { isDay, globalDispatch } = useModel(
+    "global",
+    ({ isDay, globalDispatch }) => ({ isDay, globalDispatch })
+  );
   console.info("isDay", isDay);
   const [state, dispatch] = useReducer(reducer, initState);
   const { visible } = state;
@@ -26,6 +31,13 @@ const Index = () => {
     // const instance = await SUPPORTED_WALLETS.METAMASK.connector
     mmWeb3.enable().then((res: Array<string>) => {
       console.info("res", res);
+
+      // const { library } = useActiveWeb3React();
+      // library?.send('eth_sign', res).then(aaa => {
+      //   console.info('aaaaa', aaa)
+      // })
+
+      globalDispatch({ address: res });
       history.push("/login");
     });
   };

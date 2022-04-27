@@ -4,7 +4,7 @@ import { LeftOutlined } from "@ant-design/icons";
 import ModalHead from "@/component/modalHead";
 import { useModel } from "umi";
 import Logo_png from "@/pages/img/logo.svg";
-import web3 from "@/assets/js/web3.js";
+import web3 from "@/assets/js/web3.ts";
 
 interface nodeListItem {
   name: string;

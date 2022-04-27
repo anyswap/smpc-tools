@@ -7,7 +7,7 @@ const Web3 = require("web3");
  * @description 基本信息设置
  */
 
-let web3;
+let web3: any;
 // try {
 //   web3 = new Web3(new Web3.providers.HttpProvider(config.serverRPC))
 // } catch (error) {
@@ -18,6 +18,13 @@ web3 = new Web3();
 web3.extend({
   property: "smpc",
   methods: [
+    {
+      name: "createGroup",
+      call: "smpc_createGroup",
+      params: 2,
+      inputFormatter: [null, null],
+      outputFormatter: null,
+    },
     {
       name: "reqDcrmAddr",
       call: "smpc_reqDcrmAddr",

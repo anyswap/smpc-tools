@@ -2,9 +2,10 @@ import { reducer } from "@/utils";
 import { Input, Form, Select, Button, Modal, Collapse } from "antd";
 import React, { useReducer } from "react";
 import { useModel } from "umi";
+import web3 from "@/assets/js/web3.ts";
 import "./style.less";
 
-const options = [1, 2, 3, 4, 5];
+const options = [2, 3, 4, 5, 6, 7];
 const initState = {
   admin: [],
   visible: false,
@@ -31,6 +32,16 @@ const Index = () => {
       admin: arr,
     });
     reset();
+  };
+  const createGroup = async () => {
+    console.info(form.getFieldsValue());
+    web3.setProvider(loginAccount.rpc);
+    const length = admin.length;
+    const res = await web3.smpc.createGroup(
+      `${length}/${length}`,
+      Object.values(form.getFieldsValue())
+    );
+    console.info("res", res);
   };
   console.info("admin", admin);
   return (
@@ -70,6 +81,7 @@ const Index = () => {
         visible={visible}
         title="创建确认"
         onCancel={() => dispatch({ visible: false })}
+        onOk={createGroup}
       >
         <h3>
           模式: {admin.length}/{admin.length}

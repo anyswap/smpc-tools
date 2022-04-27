@@ -2,7 +2,7 @@ import { Input, Form, Select, Button, message } from "antd";
 import React, { useEffect } from "react";
 import { LeftOutlined } from "@ant-design/icons";
 import { history, useModel, getLocale, setLocale, useIntl } from "umi";
-import web3 from "@/assets/js/web3.js";
+import web3 from "@/assets/js/web3.ts";
 import ModalHead from "@/component/modalHead";
 import Logo_png from "@/pages/img/logo.svg";
 import "./style.less";
@@ -16,15 +16,21 @@ interface nodeListItem {
 
 const Index = () => {
   const [form] = Form.useForm();
-  const { nodeList, isDay, globalDispatch } = useModel(
+  const { nodeList, isDay, globalDispatch, address } = useModel(
     "global",
-    ({ isDay, nodeList, globalDispatch }) => ({
+    ({ isDay, nodeList, globalDispatch, address }) => ({
       isDay,
       nodeList,
       globalDispatch,
+      address,
     })
   );
   const onFinish = async (v: { node: string }) => {
+    // const hash = web3.utils.sha3('xxx');
+    // const accounts = await web3.eth.getAccounts()
+    // const signature = await web3.eth.personal.sign(hash, address[0])
+    // console.info('accounts', accounts)
+    // console.info('signature', signature)
     try {
       web3.setProvider(v.node);
       const res = await web3.smpc.getEnode();
@@ -90,8 +96,8 @@ const Index = () => {
                     value: item.rpc,
                   })),
                 {
-                  label: "http://47.111.179.118:5911",
-                  value: "http://47.111.179.118:5911",
+                  label: "http://81.69.176.223:5916",
+                  value: "http://81.69.176.223:5916",
                 },
               ]}
             />
