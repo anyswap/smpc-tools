@@ -4,8 +4,8 @@ import "@@/core/devScripts";
 import { plugin } from "./core/plugin";
 import "./core/pluginRegister";
 import { createHistory } from "./core/history";
-import { ApplyPluginsType } from "D:/Works/dcrm/smpc-tools/node_modules/_@umijs_runtime@3.5.23@@umijs/runtime";
-import { renderClient } from "D:/Works/dcrm/smpc-tools/node_modules/_@umijs_renderer-react@3.5.23@@umijs/renderer-react";
+import { ApplyPluginsType } from "/Users/yangangang/Desktop/gitHouse/smpc-tools/node_modules/_@umijs_runtime@3.5.23@@umijs/runtime";
+import { renderClient } from "/Users/yangangang/Desktop/gitHouse/smpc-tools/node_modules/_@umijs_renderer-react@3.5.23@@umijs/renderer-react";
 import { getRoutes } from "./core/routes";
 
 import { _onCreate } from "./plugin-locale/locale";

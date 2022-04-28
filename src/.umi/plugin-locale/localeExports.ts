@@ -3,11 +3,11 @@ import {
   createIntl,
   IntlShape,
   MessageDescriptor,
-} from "D:/Works/dcrm/smpc-tools/node_modules/_react-intl@3.12.1@react-intl";
+} from "/Users/yangangang/Desktop/gitHouse/smpc-tools/node_modules/_react-intl@3.12.1@react-intl";
 import { ApplyPluginsType } from "umi";
 import { event, LANG_CHANGE_EVENT } from "./locale";
 // @ts-ignore
-import warning from "D:/Works/dcrm/smpc-tools/node_modules/_warning@4.0.3@warning/warning.js";
+import warning from "/Users/yangangang/Desktop/gitHouse/smpc-tools/node_modules/_warning@4.0.3@warning/warning.js";
 
 import { plugin } from "../core/plugin";
 
@@ -32,16 +32,16 @@ export {
   defineMessages,
   injectIntl,
   useIntl,
-} from "D:/Works/dcrm/smpc-tools/node_modules/_react-intl@3.12.1@react-intl";
+} from "/Users/yangangang/Desktop/gitHouse/smpc-tools/node_modules/_react-intl@3.12.1@react-intl";
 
 let g_intl: IntlShape;
 
 const useLocalStorage = true;
 
 import enUS0 from "antd/es/locale/en_US";
-import lang_enUS0 from "D:/Works/dcrm/smpc-tools/src/locales/en-US.ts";
+import lang_enUS0 from "/Users/yangangang/Desktop/gitHouse/smpc-tools/src/locales/en-US.ts";
 import zhCN0 from "antd/es/locale/zh_CN";
-import lang_zhCN0 from "D:/Works/dcrm/smpc-tools/src/locales/zh-CN.ts";
+import lang_zhCN0 from "/Users/yangangang/Desktop/gitHouse/smpc-tools/src/locales/zh-CN.ts";
 
 export const localeInfo: { [key: string]: any } = {
   "en-US": {

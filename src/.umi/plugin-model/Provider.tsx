@@ -1,7 +1,7 @@
 // @ts-nocheck
 import React from "react";
-import initialState from "D:/Works/dcrm/smpc-tools/src/.umi/plugin-initial-state/models/initialState";
-import model0 from "D:/Works/dcrm/smpc-tools/src/models/global";
+import initialState from "/Users/yangangang/Desktop/gitHouse/smpc-tools/src/.umi/plugin-initial-state/models/initialState";
+import model0 from "/Users/yangangang/Desktop/gitHouse/smpc-tools/src/models/global";
 // @ts-ignore
 import Dispatcher from "./helpers/dispatcher";
 // @ts-ignore
