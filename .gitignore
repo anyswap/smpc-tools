@@ -106,3 +106,5 @@ dist
 # umi
 .umi
 .umi-production
+
+/src/.umi/*
