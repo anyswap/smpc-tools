@@ -9,27 +9,33 @@ export default defineConfig({
   routes: [
     {
       path: "/",
-      component: "@/pages/index/index.tsx",
-    },
-    {
-      path: "/login",
-      component: "@/pages/login/index.tsx",
-    },
-    {
-      path: "/",
-      component: "@/pages/layouts/index",
+      component: "@/pages/app.tsx",
       routes: [
         {
-          path: "/getEnode",
-          component: "@/pages/getEnode",
+          path: "/",
+          component: "@/pages/index/index.tsx",
         },
         {
-          path: "/approval",
-          component: "@/pages/approval",
+          path: "/login",
+          component: "@/pages/login/index.tsx",
         },
         {
-          path: "/createGrounp",
-          component: "@/pages/createGrounp",
+          path: "/",
+          component: "@/pages/layouts/index",
+          routes: [
+            {
+              path: "/getEnode",
+              component: "@/pages/getEnode",
+            },
+            {
+              path: "/approval",
+              component: "@/pages/approval",
+            },
+            {
+              path: "/createGrounp",
+              component: "@/pages/createGrounp",
+            },
+          ],
         },
       ],
     },

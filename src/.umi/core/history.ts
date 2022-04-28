@@ -2,7 +2,7 @@
 import {
   createBrowserHistory,
   History,
-} from "/Users/yangangang/Desktop/gitHouse/smpc-tools/node_modules/_@umijs_runtime@3.5.23@@umijs/runtime";
+} from "D:/Works/dcrm/smpc-tools/node_modules/_@umijs_runtime@3.5.23@@umijs/runtime";
 
 let options = {
   basename: "/",

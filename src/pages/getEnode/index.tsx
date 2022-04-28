@@ -1,14 +1,17 @@
 import { Button, Input, message } from "antd";
 import React, { useState } from "react";
 import { ArrowRightOutlined } from "@ant-design/icons";
-import web3 from "@/assets/js/web3.ts";
+import web3 from "@/assets/js/web3";
 import "./style.less";
 import { useModel } from "umi";
 
+import { useActiveWeb3React } from "@/hooks";
+
 const Index = () => {
+  const { account, library } = useActiveWeb3React();
   const { address } = useModel("global", ({ address }) => ({ address }));
   const [enode, setEnode] = useState("");
-
+  console.log(account);
   const onSearch = async (v: string) => {
     const is = await library?.send("eth_sign", [address]);
     console.info("isssss", is);

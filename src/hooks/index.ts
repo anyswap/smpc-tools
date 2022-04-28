@@ -4,10 +4,10 @@ import { useWeb3React as useWeb3ReactCore } from "@web3-react/core";
 import { Web3ReactContextInterface } from "@web3-react/core/dist/types";
 import { useEffect, useState } from "react";
 import { isMobile } from "react-device-detect";
-import { injected } from "../../connectors";
-import { NetworkContextName } from "../../constants";
-import { chainInfo } from "../../config/chainConfig";
-import { ENV_NODE_CONFIG } from "../../config/constant";
+import { injected } from "../connectors";
+import { NetworkContextName } from "../constants";
+import { chainInfo } from "../config/chainConfig";
+import { ENV_NODE_CONFIG } from "../config/constant";
 // import { useConnectedWallet } from '@terra-money/wallet-provider'
 
 export function useActiveWeb3React(): Web3ReactContextInterface<Web3Provider> & {

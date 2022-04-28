@@ -5,7 +5,7 @@ import { AbstractConnector } from "@web3-react/abstract-connector";
 import {
   injected,
   walletconnect,
-  walletlink,
+  // walletlink,
   // bsc,
   // clover
 } from "../connectors";
@@ -73,22 +73,22 @@ export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
     color: "#4196FC",
     mobile: true,
   },
-  WALLET_LINK: {
-    connector: walletlink,
-    name: "Coinbase Wallet",
-    iconName: "coinbaseWalletIcon.svg",
-    description: "Use Coinbase Wallet app on mobile device",
-    href: null,
-    color: "#315CF5",
-  },
-  BITKEEP: {
-    connector: injected,
-    name: "BitKeep",
-    iconName: "BitKeep.png",
-    description: "Easy-to-use browser extension.",
-    href: null,
-    color: "#E8831D",
-  },
+  // WALLET_LINK: {
+  //   connector: walletlink,
+  //   name: "Coinbase Wallet",
+  //   iconName: "coinbaseWalletIcon.svg",
+  //   description: "Use Coinbase Wallet app on mobile device",
+  //   href: null,
+  //   color: "#315CF5",
+  // },
+  // BITKEEP: {
+  //   connector: injected,
+  //   name: "BitKeep",
+  //   iconName: "BitKeep.png",
+  //   description: "Easy-to-use browser extension.",
+  //   href: null,
+  //   color: "#E8831D",
+  // },
   // Binance: {
   //   connector: bsc,
   //   name: 'Binance',

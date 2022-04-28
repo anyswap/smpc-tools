@@ -29,7 +29,8 @@ const INITBRIDGE = getInitBridgeChain(
 const config: ConFig = {
   ...netConfig,
   ...INITBRIDGE,
-  appURL: "https://netapi.anyswap.net",
+  // appURL: "https://netapi.anyswap.net",
+  appURL: "https://testnetapi.multichain.tools",
   env,
   version,
   ENV_NODE_CONFIG,

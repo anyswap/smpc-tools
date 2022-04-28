@@ -2,11 +2,10 @@ import { Input, Form, Select, Button, message } from "antd";
 import React, { useEffect } from "react";
 import { LeftOutlined } from "@ant-design/icons";
 import { history, useModel, getLocale, setLocale, useIntl } from "umi";
-import web3 from "@/assets/js/web3.ts";
-import ModalHead from "@/component/modalHead";
+import web3 from "@/assets/js/web3";
+// import ModalHead from "@/component/modalHead";
 import Logo_png from "@/pages/img/logo.svg";
 import "./style.less";
-import useInterval from "@/constants/hooks/useInterval";
 
 interface nodeListItem {
   name: string;

@@ -1,4 +1,4 @@
-import React, { useReducer } from "react";
+import React, { useCallback, useEffect, useReducer } from "react";
 import moment from "moment";
 import { Button } from "antd";
 import LogoW from "@/pages/img/logo-white.svg";
@@ -9,7 +9,8 @@ import { mmWeb3 } from "@/libs/wallet/metamask.js";
 import { reducer } from "@/utils";
 import "./index.less";
 import { useModel, history } from "umi";
-
+import { useActiveWeb3React } from "@/hooks";
+import { injected } from "@/connectors";
 // import { useActiveWeb3React } from '@/constants/hooks'
 
 const initState = {
@@ -19,6 +20,9 @@ const initState = {
 const Index = () => {
   // const isDay = (moment().format('YYYY-MM-DD HH:mm:ss') < moment().format('YYYY-MM-DD 21:00:00')) &&
   //   (moment().format('YYYY-MM-DD HH:mm:ss') > moment().format('YYYY-MM-DD 05:00:00'));
+  const { account, library, activate } = useActiveWeb3React();
+  // console.log(account)
+  // console.log(library)
   const { isDay, globalDispatch } = useModel(
     "global",
     ({ isDay, globalDispatch }) => ({ isDay, globalDispatch })
@@ -27,20 +31,30 @@ const Index = () => {
   const [state, dispatch] = useReducer(reducer, initState);
   const { visible } = state;
 
-  const enable = async () => {
-    // const instance = await SUPPORTED_WALLETS.METAMASK.connector
-    mmWeb3.enable().then((res: Array<string>) => {
-      console.info("res", res);
-
-      // const { library } = useActiveWeb3React();
-      // library?.send('eth_sign', res).then(aaa => {
-      //   console.info('aaaaa', aaa)
-      // })
-
-      globalDispatch({ address: res });
+  useEffect(() => {
+    if (account) {
       history.push("/login");
-    });
-  };
+    }
+  }, [account]);
+
+  // const enable = async () => {
+  const enable = useCallback(() => {
+    if (!account && injected && activate) {
+      activate(injected);
+    }
+    // const instance = await SUPPORTED_WALLETS.METAMASK.connector
+    // mmWeb3.enable().then((res: Array<string>) => {
+    //   console.info("res", res);
+
+    //   // const { library } = useActiveWeb3React();
+    //   // library?.send('eth_sign', res).then(aaa => {
+    //   //   console.info('aaaaa', aaa)
+    //   // })
+
+    //   globalDispatch({ address: res });
+    //   history.push("/login");
+    // });
+  }, [account, activate]);
 
   return (
     <div

@@ -8,3 +8,14 @@ declare module "*.svg" {
   const url: string;
   export default url;
 }
+
+interface Window {
+  ethereum?: {
+    isMetaMask?: true;
+    on?: (...args: any[]) => void;
+    removeListener?: (...args: any[]) => void;
+  };
+  okexchain: any;
+  web3?: {};
+  returnCitySN?: {};
+}

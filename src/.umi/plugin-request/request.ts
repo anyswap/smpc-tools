@@ -1,6 +1,6 @@
 // @ts-nocheck
 /**
- * Base on https://github.com/umijs//Users/yangangang/Desktop/gitHouse/smpc-tools/node_modules/_umi-request@1.4.0@umi-request
+ * Base on https://github.com/umijs/D:/Works/dcrm/smpc-tools/node_modules/_umi-request@1.4.0@umi-request
  */
 import {
   extend,
@@ -13,7 +13,7 @@ import {
   RequestResponse,
   RequestInterceptor,
   ResponseInterceptor,
-} from "/Users/yangangang/Desktop/gitHouse/smpc-tools/node_modules/_umi-request@1.4.0@umi-request";
+} from "D:/Works/dcrm/smpc-tools/node_modules/_umi-request@1.4.0@umi-request";
 // @ts-ignore
 
 import { ApplyPluginsType } from "umi";
@@ -24,7 +24,7 @@ import { history, plugin } from "../core/umiExports";
 import { message, notification } from "@umijs/plugin-request/lib/ui";
 import useUmiRequest, {
   UseRequestProvider,
-} from "/Users/yangangang/Desktop/gitHouse/smpc-tools/node_modules/_@ahooksjs_use-request@2.8.15@@ahooksjs/use-request";
+} from "D:/Works/dcrm/smpc-tools/node_modules/_@ahooksjs_use-request@2.8.15@@ahooksjs/use-request";
 import {
   BaseOptions,
   BasePaginatedOptions,
@@ -40,7 +40,7 @@ import {
   PaginatedOptionsWithFormat,
   PaginatedParams,
   PaginatedResult,
-} from "/Users/yangangang/Desktop/gitHouse/smpc-tools/node_modules/_@ahooksjs_use-request@2.8.15@@ahooksjs/use-request/lib/types";
+} from "D:/Works/dcrm/smpc-tools/node_modules/_@ahooksjs_use-request@2.8.15@@ahooksjs/use-request/lib/types";
 
 type ResultWithData<T = any> = { data?: T; [key: string]: any };
 
