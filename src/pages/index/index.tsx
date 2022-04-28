@@ -42,18 +42,6 @@ const Index = () => {
     if (!account && injected && activate) {
       activate(injected);
     }
-    // const instance = await SUPPORTED_WALLETS.METAMASK.connector
-    // mmWeb3.enable().then((res: Array<string>) => {
-    //   console.info("res", res);
-
-    //   // const { library } = useActiveWeb3React();
-    //   // library?.send('eth_sign', res).then(aaa => {
-    //   //   console.info('aaaaa', aaa)
-    //   // })
-
-    //   globalDispatch({ address: res });
-    //   history.push("/login");
-    // });
   }, [account, activate]);
 
   return (
