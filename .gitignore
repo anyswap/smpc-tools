@@ -41,6 +41,11 @@ build/Release
 node_modules/
 jspm_packages/
 
+# umi
+/src/.umi
+/src/.umi-production
+
+
 # TypeScript v1 declaration files
 typings/
 
@@ -103,8 +108,11 @@ dist
 # TernJS port file
 .tern-port
 
+<<<<<<< HEAD
+=======
 # umi
 .umi
 .umi-production
 
 /src/.umi/*
+>>>>>>> 630cf768e6419d74630a005c71b90ed2cb3c9861
