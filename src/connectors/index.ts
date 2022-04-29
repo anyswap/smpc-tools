@@ -11,7 +11,7 @@ const NETWORK_URL = config.nodeRpc;
 export const NETWORK_CHAIN_ID: number = config.chainID ?? 1;
 
 const spportChain: any = {};
-const spportChainArr: any = [];
+const spportChainArr: any = [1];
 for (const chainID in config.chainInfo) {
   // for (const chainID of spportChainArr) {
   if (isNaN(Number(chainID))) continue;

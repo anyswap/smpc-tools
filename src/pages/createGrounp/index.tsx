@@ -1,14 +1,17 @@
 import { reducer } from "@/utils";
 import { Input, Form, Select, Button, Modal, Collapse } from "antd";
-import React, { useReducer } from "react";
+import { useActiveWeb3React } from "@/hooks";
+import React, { useReducer, useEffect } from "react";
 import { useModel } from "umi";
 import web3 from "@/assets/js/web3.ts";
+import { useSignEnode } from "@/hooks/useSigns";
 import "./style.less";
 
 const options = [2, 3, 4, 5, 6, 7];
 const initState = {
-  admin: [],
+  admin: [1, 2],
   visible: false,
+  tEnode: "",
 };
 
 const Index = () => {
@@ -16,12 +19,22 @@ const Index = () => {
   const { loginAccount } = useModel("global", ({ loginAccount }) => ({
     loginAccount,
   }));
-  console.info("loginAccount", loginAccount);
   const [state, dispatch] = useReducer(reducer, initState);
-  const { admin, visible } = state;
+  const { admin, visible, tEnode } = state;
+  const thisEnode = async () => {
+    web3.setProvider(localStorage.getItem("node"));
+    const res = await web3.smpc.getEnode();
+    dispatch({
+      tEnode: res.Data.Enode,
+    });
+    form.setFieldsValue({ enode1: res.Data.Enode });
+  };
+  useEffect(() => {
+    thisEnode();
+  }, []);
   const reset = () => {
     form.resetFields();
-    form.setFieldsValue({ enode1: loginAccount.enode });
+    form.setFieldsValue({ enode1: tEnode });
   };
   const typeChange = (v: number) => {
     let arr = [];
@@ -34,8 +47,7 @@ const Index = () => {
     reset();
   };
   const createGroup = async () => {
-    console.info(form.getFieldsValue());
-    web3.setProvider(loginAccount.rpc);
+    web3.setProvider(localStorage.getItem("node"));
     const length = admin.length;
     const res = await web3.smpc.createGroup(
       `${length}/${length}`,
@@ -43,7 +55,7 @@ const Index = () => {
     );
     console.info("res", res);
   };
-  console.info("admin", admin);
+
   return (
     <div className="create-grounp">
       <Form
@@ -54,6 +66,7 @@ const Index = () => {
         <Form.Item>
           <Select
             onChange={typeChange}
+            defaultValue={2}
             options={options.map((i) => ({
               label: `${i}/${i}模式`,
               value: i,
@@ -66,8 +79,9 @@ const Index = () => {
             label={`管理人${i}`}
             required
             rules={[{ required: true, message: "必填" }]}
+            key={i}
           >
-            <Input disabled={!index} />
+            <Input placeholder="请输入" disabled={i === 1} />
           </Form.Item>
         ))}
         <Form.Item style={{ textAlign: "right" }}>

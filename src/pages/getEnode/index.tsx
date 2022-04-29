@@ -9,30 +9,27 @@ import { useActiveWeb3React } from "@/hooks";
 
 import { useSignEnode } from "@/hooks/useSigns";
 
-const enodeStr =
-  "enode://0f6d81912a28947af1a959367571a698f086dcc9f23ed2c620eeaa77b35307414a4bbd3c4b5653a2f0642f50020cafb4f9829386926130bed028a874c0c06dde@78.46.149.241:48516";
-
 const Index = () => {
   const { account, library } = useActiveWeb3React();
-  const { address } = useModel("global", ({ address }) => ({ address }));
-  // const { loginAccount } = useModel("global", ({ loginAccount }) => ({ loginAccount.enode }));
+  const { address, loginAccount } = useModel(
+    "global",
+    ({ address, loginAccount }) => ({ address, loginAccount })
+  );
   const [enode, setEnode] = useState("");
-  console.log(account);
-  // console.log(loginAccount);
 
-  // const {execute} = useSignEnode(enode)
-  const { execute } = useSignEnode(enodeStr);
+  const { execute } = useSignEnode(loginAccount.enode);
 
   const onSearch = async (v: string) => {
-    const is = await library?.send("eth_sign", [address]);
-    console.info("isssss", is);
     setEnode("");
-    if (!v.trim()) return;
     try {
-      web3.setProvider(v);
-      const res = await web3.smpc.getEnode();
-      setEnode(res.Data.Enode);
+      if (execute) {
+        execute().then((res) => {
+          console.info("sig", res);
+          setEnode(loginAccount.enode);
+        });
+      }
     } catch (err) {
+      console.info("errerr", err);
       message.error("检查节点");
     }
   };
@@ -49,12 +46,13 @@ const Index = () => {
 
         <Button
           disabled={Boolean(enode)}
-          onClick={() => {
-            if (execute)
-              execute().then((res) => {
-                setEnode(enodeStr + res + account);
-              });
-          }}
+          onClick={onSearch}
+          // onClick={() => {
+          //   if (execute)
+          //     execute().then((res) => {
+          //       setEnode(enodeStr + res + account);
+          //     });
+          // }}
         >
           生成enode
         </Button>

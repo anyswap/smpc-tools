@@ -1,7 +1,14 @@
 import { Input, Form, Select, Button, message } from "antd";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { LeftOutlined } from "@ant-design/icons";
-import { history, useModel, getLocale, setLocale, useIntl } from "umi";
+import {
+  history,
+  useModel,
+  getLocale,
+  setLocale,
+  useIntl,
+  Redirect,
+} from "umi";
 import web3 from "@/assets/js/web3";
 // import ModalHead from "@/component/modalHead";
 import Logo_png from "@/pages/img/logo.svg";
@@ -14,32 +21,34 @@ interface nodeListItem {
 }
 
 const Index = () => {
+  const [inputNode, setInputNode] = useState("");
+  const [value, setValue] = useState("");
   const [form] = Form.useForm();
-  const { nodeList, isDay, globalDispatch, address } = useModel(
+  const { nodeList, isDay, globalDispatch, address, loginAccount } = useModel(
     "global",
-    ({ isDay, nodeList, globalDispatch, address }) => ({
+    ({ isDay, nodeList, globalDispatch, address, loginAccount }) => ({
       isDay,
       nodeList,
       globalDispatch,
       address,
+      loginAccount,
     })
   );
-  const onFinish = async (v: { node: string }) => {
-    // const hash = web3.utils.sha3('xxx');
-    // const accounts = await web3.eth.getAccounts()
-    // const signature = await web3.eth.personal.sign(hash, address[0])
-    // console.info('accounts', accounts)
-    // console.info('signature', signature)
+  useEffect(() => {
+    localStorage.removeItem("node");
+  }, []);
+  const onFinish = async () => {
+    if (!value) return;
     try {
-      web3.setProvider(v.node);
+      web3.setProvider(value);
       const res = await web3.smpc.getEnode();
-      console.info("res", res);
       globalDispatch({
         loginAccount: {
-          rpc: v.node,
+          rpc: value,
           enode: res.Data.Enode,
         },
       });
+      localStorage.setItem("node", value);
       history.push("/getEnode");
     } catch (err) {
       console.info("errerr", err);
@@ -50,6 +59,7 @@ const Index = () => {
   return (
     <div className={isDay ? "login" : "login dark"}>
       {/* {useIntl().formatMessage({ id: 'number' })} */}
+      {/* {loginAccount.enode && <Redirect to="/getEnode" />} */}
       <Select
         className="language"
         defaultValue={getLocale()}
@@ -83,26 +93,44 @@ const Index = () => {
             label="设置节点"
             required
             rules={[{ required: true, message: "至少选择一个" }]}
-            name="node"
           >
             <Select
               placeholder="请输入"
+              onChange={setValue}
+              value={value}
+              onSearch={setInputNode}
+              onInputKeyDown={(e) => {
+                if (e.keyCode !== 13) return;
+                if (
+                  nodeList.every(
+                    (item: nodeListItem) => item.rpc !== inputNode.trim()
+                  )
+                ) {
+                  globalDispatch({
+                    nodeList: [...nodeList, { rpc: inputNode }],
+                  });
+                }
+                form.setFieldsValue({
+                  node: inputNode,
+                });
+                setValue(inputNode);
+                return;
+              }}
+              showSearch
+              filterOption={() => true}
               options={[
                 ...nodeList
                   .filter((item: nodeListItem) => item.rpc.includes("http://"))
                   .map((item: nodeListItem) => ({
                     label: item.rpc,
                     value: item.rpc,
+                    key: item.rpc,
                   })),
-                {
-                  label: "http://81.69.176.223:5916",
-                  value: "http://81.69.176.223:5916",
-                },
               ]}
             />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" onClick={onFinish}>
               登录
             </Button>
           </Form.Item>
