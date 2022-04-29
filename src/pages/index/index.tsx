@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useReducer } from "react";
 import moment from "moment";
-import { Button } from "antd";
+import { Button, Select } from "antd";
 import LogoW from "@/pages/img/logo-white.svg";
 import LogoB from "@/pages/img/logo-black.svg";
 import CreateWallet from "./component/selectNode";
@@ -8,7 +8,7 @@ import ConnectWallet from "./component/connectWallet";
 import { mmWeb3 } from "@/libs/wallet/metamask.js";
 import { reducer } from "@/utils";
 import "./index.less";
-import { useModel, history } from "umi";
+import { history, useModel, getLocale, setLocale, useIntl } from "umi";
 import { useActiveWeb3React } from "@/hooks";
 import { injected } from "@/connectors";
 // import { useActiveWeb3React } from '@/constants/hooks'
@@ -61,8 +61,23 @@ const Index = () => {
       className={isDay ? "index" : "index dark"}
       style={{ background: isDay ? "none" : "#152131" }}
     >
+      <Select
+        className="language"
+        defaultValue={getLocale()}
+        onChange={(v) => setLocale(v, false)}
+        options={[
+          {
+            label: "中文简体",
+            value: "zh-CN",
+          },
+          {
+            label: "English",
+            value: "en-US",
+          },
+        ]}
+      />
       <div>
-        <img src={isDay ? LogoB : LogoW} width={120} />
+        <img src={isDay ? LogoB : LogoW} width={69} height={100} />
         <div className="name">
           <span className="left">密钥</span>
           <span className="right">管家</span>

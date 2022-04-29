@@ -42,8 +42,8 @@ node_modules/
 jspm_packages/
 
 # umi
-/src/.umi
-/src/.umi-production
+/src/.umi/
+/src/.umi-production/
 
 
 # TypeScript v1 declaration files
