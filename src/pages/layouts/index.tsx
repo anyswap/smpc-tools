@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Logo from "@/pages/img/logo.png";
 import { history, useModel, getLocale, setLocale } from "umi";
+import { useActiveWeb3React } from "@/hooks";
 // import { setLocale, getLocale, history, getAllLocales, useIntl, useModel } from 'umi';
 import { ConfigProvider, Select } from "antd";
 import enUS from "antd/lib/locale/en_US";
@@ -12,6 +13,7 @@ import "./style.less";
 const Index = (props) => {
   // console.info('his', history)location
   // console.info(111, getLocale)
+  const { account, library, activate } = useActiveWeb3React();
   const { isDay, globalDispatch, loginAccount } = useModel(
     "global",
     ({ isDay, globalDispatch, loginAccount }) => ({
@@ -40,9 +42,21 @@ const Index = (props) => {
     setLocale(type, false);
     SetLocalAntd({ "en-Us": enUS, "zh-CN": zhCN }[type]);
   };
+  // useEffect(() => {
+  //   if (!loginAccount.enode) history.push("/");
+  // }, []);
+
   useEffect(() => {
-    if (!loginAccount.enode) history.push("/");
-  }, []);
+    console.info("account", account);
+    if (!account) {
+      history.push("/");
+    }
+    if (!loginAccount.enode) {
+      history.push("/login");
+    }
+  }, [account, loginAccount]);
+
+  console.info("account", account);
 
   return (
     <ConfigProvider locale={enUS}>

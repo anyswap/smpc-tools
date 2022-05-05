@@ -21,26 +21,33 @@ const Sigs =
 
 const Index = () => {
   const { account, library } = useActiveWeb3React();
-  const { address } = useModel("global", ({ address }) => ({ address }));
-  // const { loginAccount } = useModel("global", ({ loginAccount }) => ({ loginAccount.enode }));
+  const { address, loginAccount } = useModel(
+    "global",
+    ({ address, loginAccount }) => ({ address, loginAccount })
+  );
   const [enode, setEnode] = useState("");
   console.log(account);
   // console.log(loginAccount);
 
   // const {execute} = useSignEnode(enode)
-  const { execute } = useSignEnode(enodeStr);
+  // const { execute } = useSignEnode(enodeStr);
   const { execute: reqSmpcAddr } = useReqSmpcAddress(gID, ThresHold, Sigs);
+  console.info("loginAccount", loginAccount.enode);
+  const { execute } = useSignEnode(loginAccount.enode);
 
   const onSearch = async (v: string) => {
-    const is = await library?.send("eth_sign", [address]);
-    console.info("isssss", is);
+    console.info("execute", execute);
     setEnode("");
-    if (!v.trim()) return;
     try {
-      web3.setProvider(v);
-      const res = await web3.smpc.getEnode();
-      setEnode(res.Data.Enode);
+      if (execute) {
+        execute().then((res) => {
+          setEnode(loginAccount.enode);
+          console.info(9999, res, account);
+          // setEnode(res.Data.Enode + res + account);
+        });
+      }
     } catch (err) {
+      console.info("errerr", err);
       message.error("检查节点");
     }
   };
@@ -57,12 +64,20 @@ const Index = () => {
 
         <Button
           // disabled={Boolean(enode)}
-          onClick={() => {
-            if (execute)
-              execute().then((res) => {
-                setEnode(enodeStr + res + account);
-              });
-          }}
+          // onClick={() => {
+          //   if (execute)
+          //     execute().then((res) => {
+          //       setEnode(enodeStr + res + account);
+          //     });
+          // }}
+          disabled={Boolean(enode)}
+          onClick={onSearch}
+          // onClick={() => {
+          //   if (execute)
+          //     execute().then((res) => {
+          //       setEnode(enodeStr + res + account);
+          //     });
+          // }}
         >
           生成enode
         </Button>
