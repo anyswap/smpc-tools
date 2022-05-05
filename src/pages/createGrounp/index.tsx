@@ -19,6 +19,8 @@ const Index = () => {
   const { loginAccount } = useModel("global", ({ loginAccount }) => ({
     loginAccount,
   }));
+  const { execute } = useSignEnode(loginAccount.enode);
+  console.info("execute", execute);
   const [state, dispatch] = useReducer(reducer, initState);
   const { admin, visible, tEnode } = state;
   const thisEnode = async () => {
@@ -46,8 +48,13 @@ const Index = () => {
     });
     reset();
   };
+  console.info("loginAccount", loginAccount);
   const createGroup = async () => {
-    web3.setProvider(localStorage.getItem("node"));
+    // execute && execute().then((res) => {
+    //   console.info('res', res)
+    // });
+    // web3.setProvider(localStorage.getItem("node"));
+    web3.setProvider(loginAccount.rpc);
     const length = admin.length;
     const res = await web3.smpc.createGroup(
       `${length}/${length}`,

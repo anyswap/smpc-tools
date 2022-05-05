@@ -47,7 +47,11 @@ const Index = (props) => {
   // }, []);
 
   useEffect(() => {
-    if (!account || !loginAccount.enode) {
+    console.info("account", account);
+    if (!account) {
+      history.push("/");
+    }
+    if (!loginAccount.enode) {
       history.push("/login");
     }
   }, [account, loginAccount]);

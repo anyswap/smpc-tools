@@ -10,6 +10,7 @@ import {
   Redirect,
 } from "umi";
 import web3 from "@/assets/js/web3";
+import { useActiveWeb3React } from "@/hooks";
 // import ModalHead from "@/component/modalHead";
 import Logo_png from "@/pages/img/logo.svg";
 import "./style.less";
@@ -23,7 +24,9 @@ interface nodeListItem {
 const Index = () => {
   const [inputNode, setInputNode] = useState("");
   const [value, setValue] = useState("");
+  const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
+  const { account, library, activate } = useActiveWeb3React();
   const { nodeList, isDay, globalDispatch, address, loginAccount } = useModel(
     "global",
     ({ isDay, nodeList, globalDispatch, address, loginAccount }) => ({
@@ -37,18 +40,28 @@ const Index = () => {
   useEffect(() => {
     localStorage.removeItem("node");
   }, []);
+
+  useEffect(() => {
+    console.info("account", account);
+    if (!account) {
+      history.push("/");
+    }
+  }, [account]);
+
   const onFinish = async () => {
     if (!value) return;
     try {
+      setLoading(true);
       web3.setProvider(value);
       const res = await web3.smpc.getEnode();
+      setLoading(false);
       globalDispatch({
         loginAccount: {
           rpc: value,
           enode: res.Data.Enode,
         },
       });
-      localStorage.setItem("node", value);
+      // localStorage.setItem("node", value);
       history.push("/getEnode");
     } catch (err) {
       console.info("errerr", err);
@@ -130,7 +143,7 @@ const Index = () => {
             />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" onClick={onFinish}>
+            <Button type="primary" onClick={onFinish} loading={loading}>
               登录
             </Button>
           </Form.Item>

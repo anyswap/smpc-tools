@@ -16,16 +16,18 @@ const Index = () => {
     ({ address, loginAccount }) => ({ address, loginAccount })
   );
   const [enode, setEnode] = useState("");
-
+  console.info("loginAccount", loginAccount.enode);
   const { execute } = useSignEnode(loginAccount.enode);
 
   const onSearch = async (v: string) => {
+    console.info("execute", execute);
     setEnode("");
     try {
       if (execute) {
         execute().then((res) => {
-          console.info("sig", res);
           setEnode(loginAccount.enode);
+          console.info(9999, res, account);
+          // setEnode(res.Data.Enode + res + account);
         });
       }
     } catch (err) {
