@@ -26,8 +26,8 @@ web3.extend({
       outputFormatter: null,
     },
     {
-      name: "reqDcrmAddr",
-      call: "smpc_reqDcrmAddr",
+      name: "reqSmpcAddr",
+      call: "smpc_reqSmpcAddr",
       params: 1,
       inputFormatter: [null],
       outputFormatter: null,
