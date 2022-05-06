@@ -5,6 +5,7 @@ import React, { useReducer, useEffect } from "react";
 import { useModel } from "umi";
 import web3 from "@/assets/js/web3.ts";
 import { useSignEnode } from "@/hooks/useSigns";
+import RegSmpcAddr from "./component/RegSmpcAddr";
 import "./style.less";
 
 const options = [2, 3, 4, 5, 6, 7];
@@ -12,6 +13,8 @@ const initState = {
   admin: [1, 2],
   visible: false,
   tEnode: "",
+  Gid: "",
+  Sgid: "",
 };
 
 const Index = () => {
@@ -20,23 +23,22 @@ const Index = () => {
     loginAccount,
   }));
   const { execute } = useSignEnode(loginAccount.enode);
-  console.info("execute", execute);
   const [state, dispatch] = useReducer(reducer, initState);
-  const { admin, visible, tEnode } = state;
+  const { admin, visible, tEnode, Gid, Sgid } = state;
   const thisEnode = async () => {
-    web3.setProvider(localStorage.getItem("node"));
-    const res = await web3.smpc.getEnode();
-    dispatch({
-      tEnode: res.Data.Enode,
-    });
-    form.setFieldsValue({ enode1: res.Data.Enode });
+    // web3.setProvider(loginAccount.rpc);
+    // const res = await web3.smpc.getEnode();
+    // dispatch({
+    //   tEnode: res.Data.Enode,
+    // });
+    form.setFieldsValue({ enode1: loginAccount.enode });
   };
   useEffect(() => {
     thisEnode();
   }, []);
   const reset = () => {
     form.resetFields();
-    form.setFieldsValue({ enode1: tEnode });
+    form.setFieldsValue({ enode1: loginAccount.enode });
   };
   const typeChange = (v: number) => {
     let arr = [];
@@ -48,7 +50,7 @@ const Index = () => {
     });
     reset();
   };
-  console.info("loginAccount", loginAccount);
+  console.info("statestatestate", state);
   const createGroup = async () => {
     // execute && execute().then((res) => {
     //   console.info('res', res)
@@ -56,13 +58,17 @@ const Index = () => {
     // web3.setProvider(localStorage.getItem("node"));
     web3.setProvider(loginAccount.rpc);
     const length = admin.length;
-    const res = await web3.smpc.createGroup(
+    const res = await web3.smpc.createSDKGroup(
       `${length}/${length}`,
-      Object.values(form.getFieldsValue())
+      // loginAccount.rpc,
+      Object.values(form.getFieldsValue()),
+      false
     );
+    dispatch(res.Data);
     console.info("res", res);
   };
-
+  console.info("Gid", Gid);
+  console.info("Sgid", Sgid);
   return (
     <div className="create-grounp">
       <Form
@@ -113,6 +119,13 @@ const Index = () => {
           </Collapse.Panel>
         </Collapse>
       </Modal>
+      {Gid && (
+        <RegSmpcAddr
+          Gid={Gid}
+          Sgid={Sgid}
+          ThresHold={`${admin.length}/${admin.length}`}
+        />
+      )}
     </div>
   );
 };

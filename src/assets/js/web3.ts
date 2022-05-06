@@ -91,8 +91,8 @@ web3.extend({
     {
       name: "createSDKGroup",
       call: "smpc_createSDKGroup",
-      params: 2,
-      inputFormatter: [null, null],
+      params: 3,
+      inputFormatter: [null, null, null],
       outputFormatter: null,
     },
     {

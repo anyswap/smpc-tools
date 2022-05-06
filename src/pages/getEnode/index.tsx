@@ -26,13 +26,12 @@ const Index = () => {
     ({ address, loginAccount }) => ({ address, loginAccount })
   );
   const [enode, setEnode] = useState("");
-  console.log(account);
   // console.log(loginAccount);
 
   // const {execute} = useSignEnode(enode)
   // const { execute } = useSignEnode(enodeStr);
-  const { execute: reqSmpcAddr } = useReqSmpcAddress(gID, ThresHold, Sigs);
-  console.info("loginAccount", loginAccount.enode);
+  // const { execute: reqSmpcAddr } = useReqSmpcAddress(gID, ThresHold, Sigs);
+  // console.info("loginAccount", loginAccount.enode);
   const { execute } = useSignEnode(loginAccount.enode);
 
   const onSearch = async (v: string) => {
@@ -42,7 +41,6 @@ const Index = () => {
       if (execute) {
         execute().then((res) => {
           setEnode(loginAccount.enode);
-          console.info(9999, res, account);
           // setEnode(res.Data.Enode + res + account);
         });
       }
@@ -81,7 +79,7 @@ const Index = () => {
         >
           生成enode
         </Button>
-        <Button
+        {/* <Button
           // disabled={Boolean(enode)}
           onClick={() => {
             if (reqSmpcAddr)
@@ -91,7 +89,7 @@ const Index = () => {
           }}
         >
           Req SMPC Address
-        </Button>
+        </Button> */}
         <Input.TextArea disabled value={enode} />
       </div>
     </div>
