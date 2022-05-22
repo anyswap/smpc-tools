@@ -16,6 +16,6 @@ interface Window {
     removeListener?: (...args: any[]) => void;
   };
   okexchain: any;
-  web3?: {};
+  web3?: any;
   returnCitySN?: {};
 }

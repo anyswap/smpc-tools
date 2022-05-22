@@ -20,6 +20,10 @@ export default defineConfig({
           component: "@/pages/login/index.tsx",
         },
         {
+          path: "/demo",
+          component: "@/pages/demo/index.tsx",
+        },
+        {
           path: "/",
           component: "@/pages/layouts/index",
           routes: [
