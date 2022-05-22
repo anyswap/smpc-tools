@@ -123,10 +123,13 @@ const Index = () => {
                     nodeList: [...nodeList, { rpc: inputNode }],
                   });
                 }
-                form.setFieldsValue({
-                  node: inputNode,
-                });
-                setValue(inputNode);
+                setTimeout(() => {
+                  form.setFieldsValue({
+                    node: inputNode,
+                  });
+                  setValue(inputNode);
+                }, 100);
+
                 return;
               }}
               showSearch

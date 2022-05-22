@@ -5,8 +5,8 @@ import { ethers } from "_ethers@5.6.4@ethers";
 
 import web3 from "@/assets/js/web3";
 
-const Tx = require("ethereumjs-tx");
-// import Tx from 'ethereumjs-tx'
+// const Tx = require("ethereumjs-tx");
+import Tx from "ethereumjs-tx";
 // console.log(Tx)
 export enum WrapType {
   NOT_APPLICABLE,
@@ -179,7 +179,8 @@ export function useReqSmpcAddress(
   const { account, library } = useActiveWeb3React();
   const { signMessage } = useSign();
   return useMemo(() => {
-    if (!library || !account || !gID || !ThresHold || !Sigs) return {};
+    // if (!library || !account || !gID || !ThresHold || !Sigs) return {};
+    if (!library || !account || !gID || !ThresHold) return {};
     return {
       execute: async () => {
         // const provider = new ethers.providers.Web3Provider(library.provider);
