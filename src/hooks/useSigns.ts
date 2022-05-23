@@ -15,6 +15,8 @@ export enum WrapType {
   NOCONNECT,
 }
 
+const CHAINID = "30400";
+
 const NOCONNECT = { wrapType: WrapType.NOCONNECT };
 
 export function eNodeCut(enode: any) {
@@ -60,12 +62,14 @@ export function useSign(): any {
               console.log(res);
               // return result;
               const rsv = res.indexOf("0x") === 0 ? res.replace("0x", "") : res;
-              const v = parseInt("0x" + rsv.substr(128));
+              let v = parseInt("0x" + rsv.substr(128));
+              v = Number(CHAINID) * 2 + 35 + Number(v) - 27;
               const result = {
                 rsv: res.result,
                 r: rsv.substr(0, 64),
                 s: rsv.substr(64, 64),
-                v: Number(v) - 27 === 0 ? "00" : "01",
+                // v: Number(v) - 27 === 0 ? "00" : "01",
+                v: web3.utils.toHex(v).replace("0x", ""),
               };
               resolve(result);
             })
@@ -204,12 +208,12 @@ export function useReqSmpcAddress(
         const rawTx: any = {
           from: account,
           value: "0x0",
-          // chainId: web3.utils.toHex(0),
+          chainId: web3.utils.toHex(CHAINID),
 
           // gas: '0x0',
           // gasPrice: "0x0",
-          // nonce: nonce,
-          nonce: "0x0",
+          nonce: nonce,
+          // nonce: "0x0",
           data: JSON.stringify(data),
         };
         console.log(rawTx);

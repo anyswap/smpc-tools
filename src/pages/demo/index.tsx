@@ -1,13 +1,15 @@
-import React, { useCallback, useMemo, useReducer } from "react";
+import React, { useCallback, useEffect, useMemo, useReducer } from "react";
 
 import web3 from "@/assets/js/web3";
-import { Button } from "antd";
+import { Button, Card, Form, Input } from "antd";
 import {
   useSignEnode,
   useCreateGroup,
   useReqSmpcAddress,
 } from "@/hooks/useSigns";
 import { useActiveWeb3React } from "@/hooks";
+
+const { TextArea } = Input;
 
 const USER_ONE = "userone";
 const USER_TWO = "usertwo";
@@ -63,12 +65,14 @@ function SignEnoode({
   title,
   user,
   enode,
+  signEnode,
   onGetEnode,
   onGetSignEnode,
 }: {
   title: any;
   user: any;
   enode: any;
+  signEnode: any;
   onGetEnode: (v: any) => void;
   onGetSignEnode: (v: any) => void;
 }) {
@@ -100,23 +104,43 @@ function SignEnoode({
   }, [execute, enode]);
   return (
     <>
-      <h3>{title}</h3>
-      <Button
-        onClick={() => {
-          getEnode();
-        }}
-        disabled={Boolean(enode)}
+      <Card
+        title={title + (useInfo?.rpc ? "(" + useInfo?.rpc + ")" : "")}
+        type="inner"
+        style={{ width: "100%" }}
       >
-        Get Enode
-      </Button>
-      <Button
-        onClick={() => {
-          validEnode();
-        }}
-        disabled={!Boolean(enode)}
-      >
-        Valid Enode
-      </Button>
+        <Button
+          onClick={() => {
+            getEnode();
+          }}
+          disabled={Boolean(enode)}
+        >
+          Get Enode
+        </Button>
+        <Button
+          onClick={() => {
+            validEnode();
+          }}
+          disabled={Boolean(!enode || signEnode)}
+        >
+          Valid Enode
+        </Button>
+        <Form
+          name="basic"
+          layout="vertical"
+          labelCol={{ span: 8 }}
+          wrapperCol={{ span: 16 }}
+          initialValues={{ remember: true }}
+          autoComplete="off"
+        >
+          <Form.Item label="Enode">
+            <Input value={enode} disabled />
+          </Form.Item>
+          <Form.Item label="Sign Enode">
+            <TextArea rows={4} value={signEnode} disabled />
+          </Form.Item>
+        </Form>
+      </Card>
     </>
   );
 }
@@ -178,7 +202,7 @@ function CreateAccount({
 
   const createGroup = useCallback(() => {
     console.log(enodeArr);
-    if (execute) {
+    if (execute && enodeArr.length === 2) {
       execute().then((res) => {
         console.log(res);
         onGetGID(res.info.Gid);
@@ -201,7 +225,7 @@ function CreateAccount({
         onClick={() => {
           createGroup();
         }}
-        disabled={Boolean(Gid)}
+        disabled={Boolean(Gid) || enodeArr.length < 2}
       >
         Create Group
       </Button>
@@ -209,16 +233,57 @@ function CreateAccount({
         onClick={() => {
           createAccount();
         }}
-        disabled={!Boolean(Gid)}
+        disabled={!Boolean(Gid) || Sigs.length < 2}
       >
         Create Account
       </Button>
+      <Form
+        name="basic"
+        layout="vertical"
+        labelCol={{ span: 8 }}
+        wrapperCol={{ span: 16 }}
+        initialValues={{ remember: true }}
+        autoComplete="off"
+      >
+        <Form.Item label="Gid">
+          <Input value={Gid} disabled />
+        </Form.Item>
+      </Form>
     </>
   );
 }
 
-function Approve() {
-  return <></>;
+function Approve({ user }: { user: any }) {
+  const { account } = useActiveWeb3React();
+  const useInfo = useMemo(() => {
+    if (initConfig?.[user]) {
+      return initConfig?.[user];
+    }
+    return undefined;
+  }, [user, initConfig]);
+  const getApproveList = useCallback(() => {
+    if (useInfo?.rpc && account) {
+      web3.setProvider(useInfo?.rpc);
+      web3.smpc.getCurNodeReqAddrInfo(account).then((res: any) => {
+        console.log(res);
+      });
+    }
+  }, [account, useInfo]);
+
+  useEffect(() => {
+    getApproveList();
+  }, [getApproveList, account, useInfo]);
+  return (
+    <>
+      <Button
+        onClick={() => {
+          getApproveList();
+        }}
+      >
+        Get Approve List
+      </Button>
+    </>
+  );
 }
 
 export default function Demo() {
@@ -233,60 +298,71 @@ export default function Demo() {
   // const {} = smpcState
   return (
     <>
-      <div className="container get-enode">
-        <SignEnoode
-          title="User One"
-          user={USER_ONE}
-          enode={smpcState?.[USER_ONE]?.enode}
-          onGetEnode={(enode) => {
-            dispatchSmpcState({
-              type: "INCREAT_ENODE",
-              user: USER_ONE,
-              enode,
-            });
-          }}
-          onGetSignEnode={(signEnode) => {
-            dispatchSmpcState({
-              type: "INCREAT_ENODE",
-              user: USER_ONE,
-              signEnode,
-            });
-          }}
-        />
-        <SignEnoode
-          title="User Two"
-          user={USER_TWO}
-          enode={smpcState?.[USER_TWO]?.enode}
-          onGetEnode={(enode) => {
-            dispatchSmpcState({
-              type: "INCREAT_ENODE",
-              user: USER_TWO,
-              enode,
-            });
-          }}
-          onGetSignEnode={(signEnode) => {
-            dispatchSmpcState({
-              type: "INCREAT_ENODE",
-              user: USER_TWO,
-              signEnode,
-            });
-          }}
-        />
-        <CreateAccount
-          user={USER_ONE}
-          enodeOne={smpcState?.[USER_ONE]?.enode}
-          enodeTwo={smpcState?.[USER_TWO]?.enode}
-          sigsOne={smpcState?.[USER_ONE]?.signEnode}
-          sigsTwo={smpcState?.[USER_TWO]?.signEnode}
-          Gid={smpcState?.gid}
-          onGetGID={(gid) => {
-            dispatchSmpcState({
-              type: "INCREAT_GID",
-              gid: gid,
-            });
-          }}
-        />
-        <Approve />
+      <div className="container">
+        <Card title={"Init"} style={{ width: "100%", marginBottom: 16 }}>
+          <SignEnoode
+            title="User One"
+            user={USER_ONE}
+            enode={smpcState?.[USER_ONE]?.enode}
+            signEnode={smpcState?.[USER_ONE]?.signEnode}
+            onGetEnode={(enode) => {
+              dispatchSmpcState({
+                type: "INCREAT_ENODE",
+                user: USER_ONE,
+                enode,
+              });
+            }}
+            onGetSignEnode={(signEnode) => {
+              dispatchSmpcState({
+                type: "INCREAT_ENODE",
+                user: USER_ONE,
+                signEnode,
+              });
+            }}
+          />
+          <SignEnoode
+            title="User Two"
+            user={USER_TWO}
+            enode={smpcState?.[USER_TWO]?.enode}
+            signEnode={smpcState?.[USER_TWO]?.signEnode}
+            onGetEnode={(enode) => {
+              dispatchSmpcState({
+                type: "INCREAT_ENODE",
+                user: USER_TWO,
+                enode,
+              });
+            }}
+            onGetSignEnode={(signEnode) => {
+              dispatchSmpcState({
+                type: "INCREAT_ENODE",
+                user: USER_TWO,
+                signEnode,
+              });
+            }}
+          />
+        </Card>
+        <Card
+          title={"Create Account"}
+          style={{ width: "100%", marginBottom: 16 }}
+        >
+          <CreateAccount
+            user={USER_ONE}
+            enodeOne={smpcState?.[USER_ONE]?.enode}
+            enodeTwo={smpcState?.[USER_TWO]?.enode}
+            sigsOne={smpcState?.[USER_ONE]?.signEnode}
+            sigsTwo={smpcState?.[USER_TWO]?.signEnode}
+            Gid={smpcState?.gid}
+            onGetGID={(gid) => {
+              dispatchSmpcState({
+                type: "INCREAT_GID",
+                gid: gid,
+              });
+            }}
+          />
+        </Card>
+        <Card title={"Approve"} style={{ width: "100%", marginBottom: 16 }}>
+          <Approve user={USER_TWO} />
+        </Card>
       </div>
     </>
   );

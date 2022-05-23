@@ -6,7 +6,9 @@ import moment from "moment";
 
 const initState = {
   address: "",
-  loginAccount: {},
+  loginAccount: {
+    enode: "111",
+  },
   nodeList: [],
   isDay:
     moment().format("YYYY-MM-DD HH:mm:ss") <
