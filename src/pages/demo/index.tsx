@@ -1,15 +1,23 @@
-import React, { useCallback, useEffect, useMemo, useReducer } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useState,
+} from "react";
 
 import web3 from "@/assets/js/web3";
-import { Button, Card, Form, Input } from "antd";
+import { Button, Card, Form, Input, List, Table } from "antd";
 import {
   useSignEnode,
   useCreateGroup,
   useReqSmpcAddress,
+  useApproveReqSmpcAddress,
 } from "@/hooks/useSigns";
 import { useActiveWeb3React } from "@/hooks";
 
 const { TextArea } = Input;
+const { Column, ColumnGroup } = Table;
 
 const USER_ONE = "userone";
 const USER_TWO = "usertwo";
@@ -255,12 +263,16 @@ function CreateAccount({
 
 function Approve({ user }: { user: any }) {
   const { account } = useActiveWeb3React();
+
+  const [approveList, setApproveList] = useState<any>([]);
+
   const useInfo = useMemo(() => {
     if (initConfig?.[user]) {
       return initConfig?.[user];
     }
     return undefined;
   }, [user, initConfig]);
+  const { execute } = useApproveReqSmpcAddress(useInfo?.rpc);
   const getApproveList = useCallback(() => {
     if (useInfo?.rpc && account) {
       web3.setProvider(useInfo?.rpc);
@@ -269,6 +281,17 @@ function Approve({ user }: { user: any }) {
       });
     }
   }, [account, useInfo]);
+
+  const approve = useCallback(
+    (key) => {
+      if (execute) {
+        execute(key).then((res) => {
+          console.log(res);
+        });
+      }
+    },
+    [execute]
+  );
 
   useEffect(() => {
     getApproveList();
@@ -282,6 +305,18 @@ function Approve({ user }: { user: any }) {
       >
         Get Approve List
       </Button>
+      <Table dataSource={approveList} style={{ marginTop: "10px" }}>
+        <Column title="Key" dataIndex="Key" key="Key" />
+        <Column
+          title="Action"
+          key="action"
+          render={(_: any, record: any) => (
+            <>
+              <Button>Agree</Button>
+            </>
+          )}
+        />
+      </Table>
     </>
   );
 }

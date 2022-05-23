@@ -183,8 +183,8 @@ export function useReqSmpcAddress(
   const { account, library } = useActiveWeb3React();
   const { signMessage } = useSign();
   return useMemo(() => {
-    // if (!library || !account || !gID || !ThresHold || !Sigs) return {};
-    if (!library || !account || !gID || !ThresHold) return {};
+    if (!library || !account || !gID || !ThresHold || !Sigs) return {};
+    // if (!library || !account || !gID || !ThresHold) return {};
     return {
       execute: async () => {
         // const provider = new ethers.providers.Web3Provider(library.provider);
@@ -248,4 +248,74 @@ export function useReqSmpcAddress(
       },
     };
   }, [account, library, gID, ThresHold, Sigs]);
+}
+
+export function useApproveReqSmpcAddress(rpc: string | undefined): {
+  execute?: undefined | ((Key: any) => Promise<any>);
+} {
+  const { account, library } = useActiveWeb3React();
+  const { signMessage } = useSign();
+  return useMemo(() => {
+    // if (!library || !account || !gID || !ThresHold || !Sigs) return {};
+    if (!library || !account) return {};
+    return {
+      execute: async (Key: any) => {
+        // const provider = new ethers.providers.Web3Provider(library.provider);
+        // const signer = provider.getSigner();
+        // web3.setProvider('http://47.114.115.33:5913/')
+        web3.setProvider(rpc);
+        const nonceResult = await web3.smpc.getReqAddrNonce(account);
+        let nonce = 0;
+        if (nonceResult.Status !== "Error") {
+          nonce = nonceResult.Data.result;
+        }
+        const data = {
+          TxType: "ACCEPTREQADDR",
+          Key: Key,
+          Accept: "AGREE", // DISAGREE
+          TimeStamp: Date.now().toString(),
+        };
+        const rawTx: any = {
+          from: account,
+          value: "0x0",
+          chainId: web3.utils.toHex(CHAINID),
+
+          // gas: '0x0',
+          // gasPrice: "0x0",
+          nonce: nonce,
+          // nonce: "0x0",
+          data: JSON.stringify(data),
+        };
+        console.log(rawTx);
+        const tx = new Tx(rawTx);
+        // const hash = "0x" + tx.hash().toString("hex");
+        let hash = Buffer.from(tx.hash(false)).toString("hex");
+        hash = hash.indexOf("0x") === 0 ? hash : "0x" + hash;
+        console.log(hash);
+        const result = await signMessage(hash);
+        rawTx.r = "0x" + result.r;
+        rawTx.s = "0x" + result.s;
+        rawTx.v = "0x" + result.v;
+        const tx1 = new Tx(rawTx);
+        console.log(rawTx);
+        console.log(tx1);
+        let signTx = tx1.serialize().toString("hex");
+        signTx = signTx.indexOf("0x") === 0 ? signTx : "0x" + signTx;
+        let cbData = await web3.smpc.reqSmpcAddr(signTx);
+        let resultData: any = {};
+        if (cbData && typeof cbData === "string") {
+          cbData = JSON.parse(cbData);
+        }
+        if (cbData.Status !== "Error") {
+          resultData = { msg: "Success", info: cbData.Data.result };
+        } else {
+          resultData = { msg: "Error", error: cbData.Tip };
+        }
+        console.log(signTx);
+        console.log(resultData);
+        console.log(result);
+        return resultData;
+      },
+    };
+  }, [account, library]);
 }
