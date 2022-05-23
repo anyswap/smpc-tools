@@ -41,6 +41,7 @@ let nonceLocal = 0;
 async function getNonce(account: any, rpc: any) {
   web3.setProvider(rpc);
   const nonceResult = await web3.smpc.getReqAddrNonce(account);
+  console.log(nonceResult);
   nonceLocal++;
   return nonceLocal;
 }

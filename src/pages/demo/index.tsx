@@ -365,6 +365,71 @@ function Approve({ rpc }: { rpc: any }) {
   );
 }
 
+function AccountList({ rpc }: { rpc: any }) {
+  const { account } = useActiveWeb3React();
+
+  const [accountList, setAccountList] = useState<any>([]);
+
+  const getAccountList = useCallback(() => {
+    if (rpc && account) {
+      web3.setProvider(rpc);
+      web3.smpc.getAccounts(account, "0").then(async (res: any) => {
+        console.log(res);
+        let arr = [],
+          arr1: any = [],
+          arr2 = [];
+        if (res.Status !== "Error") {
+          arr =
+            res.Data.result && res.Data.result.Group
+              ? res.Data.result.Group
+              : [];
+        }
+        for (let obj1 of arr) {
+          for (let obj2 of obj1.Accounts) {
+            if (!arr1.includes(obj2.PubKey)) {
+              // console.log(obj2)
+              let obj3 = {
+                publicKey: obj2.PubKey,
+                gID: obj1.GroupID,
+                mode: obj2.ThresHold,
+                name: obj2.PubKey.substr(2),
+                timestamp: obj2.TimeStamp,
+              };
+              arr2.push(obj3);
+              arr1.push(obj2.PubKey);
+            }
+          }
+        }
+        // return arr2
+        setAccountList(arr2);
+      });
+    }
+  }, [account, rpc]);
+
+  useEffect(() => {
+    getAccountList();
+  }, [getAccountList, account, rpc]);
+  return (
+    <>
+      <Button
+        onClick={() => {
+          getAccountList();
+        }}
+      >
+        Get Account List
+      </Button>
+      <Table dataSource={accountList} style={{ marginTop: "10px" }}>
+        <Column title="publicKey" dataIndex="publicKey" key="publicKey" />
+        <Column
+          title="Action"
+          key="action"
+          render={(_: any, record: any) => <></>}
+        />
+      </Table>
+    </>
+  );
+}
+
 export default function Demo() {
   const [smpcState, dispatchSmpcState] = useReducer(
     setStateReducer,
@@ -455,6 +520,12 @@ export default function Demo() {
         </Card>
         <Card title={"Approve"} style={{ width: "100%", marginBottom: 16 }}>
           <Approve rpc={smpcState?.[USER_TWO]?.rpc} />
+        </Card>
+        <Card
+          title={"Account List"}
+          style={{ width: "100%", marginBottom: 16 }}
+        >
+          <AccountList rpc={smpcState?.[USER_TWO]?.rpc} />
         </Card>
       </div>
     </>
