@@ -113,3 +113,5 @@ dist
 .umi-production
 
 /src/.umi/*
+/l2
+*.zip

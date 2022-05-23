@@ -29,7 +29,7 @@ const initConfig: any = {
     rpc: "http://81.69.176.223:5916",
   },
   [USER_TWO]: {
-    rpc: "http://93.104.213.123:5916",
+    rpc: "http://49.235.123.22:5927",
   },
 };
 
@@ -41,7 +41,7 @@ function getStateReducer() {
 function setStateReducer(state: any, action: any) {
   switch (action.type) {
     case "INCREAT_ENODE": {
-      const { enode, user, signEnode } = action;
+      const { enode, user, signEnode, rpc } = action;
       // console.log(state)
       // console.log(action)
       // console.log(enode)
@@ -50,6 +50,7 @@ function setStateReducer(state: any, action: any) {
         ...state,
         [user]: {
           ...(state[user] ? state[user] : {}),
+          rpc: rpc ? rpc : state?.[user]?.rpc,
           enode: enode ? enode : state?.[user]?.enode,
           signEnode: signEnode ? signEnode : state?.[user]?.signEnode,
         },
@@ -71,38 +72,30 @@ function setStateReducer(state: any, action: any) {
 
 function SignEnoode({
   title,
-  user,
+  rpc,
   enode,
   signEnode,
+  onGetRpc,
   onGetEnode,
   onGetSignEnode,
 }: {
   title: any;
-  user: any;
+  rpc: any;
   enode: any;
   signEnode: any;
+  onGetRpc: (v: any) => void;
   onGetEnode: (v: any) => void;
   onGetSignEnode: (v: any) => void;
 }) {
-  const { account } = useActiveWeb3React();
-  const useInfo = useMemo(() => {
-    if (initConfig?.[user]) {
-      return initConfig?.[user];
-    }
-    return undefined;
-  }, [user, initConfig]);
   const { execute } = useSignEnode(enode);
   const getEnode = useCallback(async () => {
-    // console.log(user)
-    // console.log(useInfo)
-    // console.log(smpcState)
-    if (useInfo) {
-      web3.setProvider(useInfo.rpc);
+    if (rpc) {
+      web3.setProvider(rpc);
       const res = await web3.smpc.getEnode();
       console.log(res.Data.Enode);
       onGetEnode(res.Data.Enode);
     }
-  }, [useInfo]);
+  }, [rpc]);
   const validEnode = useCallback(() => {
     if (execute) {
       execute().then((res) => {
@@ -112,27 +105,7 @@ function SignEnoode({
   }, [execute, enode]);
   return (
     <>
-      <Card
-        title={title + (useInfo?.rpc ? "(" + useInfo?.rpc + ")" : "")}
-        type="inner"
-        style={{ width: "100%" }}
-      >
-        <Button
-          onClick={() => {
-            getEnode();
-          }}
-          disabled={Boolean(enode)}
-        >
-          Get Enode
-        </Button>
-        <Button
-          onClick={() => {
-            validEnode();
-          }}
-          disabled={Boolean(!enode || signEnode)}
-        >
-          Valid Enode
-        </Button>
+      <Card title={title} type="inner" style={{ width: "100%" }}>
         <Form
           name="basic"
           layout="vertical"
@@ -141,8 +114,33 @@ function SignEnoode({
           initialValues={{ remember: true }}
           autoComplete="off"
         >
+          <Form.Item label="RPC">
+            <Input
+              value={rpc}
+              onChange={(e: any) => {
+                console.log(e);
+                onGetRpc(e.target.value);
+              }}
+            />
+            <Button
+              onClick={() => {
+                getEnode();
+              }}
+              disabled={Boolean(enode)}
+            >
+              Get Enode
+            </Button>
+          </Form.Item>
           <Form.Item label="Enode">
             <Input value={enode} disabled />
+            <Button
+              onClick={() => {
+                validEnode();
+              }}
+              disabled={Boolean(!enode || signEnode)}
+            >
+              Valid Enode
+            </Button>
           </Form.Item>
           <Form.Item label="Sign Enode">
             <TextArea rows={4} value={signEnode} disabled />
@@ -154,7 +152,7 @@ function SignEnoode({
 }
 
 function CreateAccount({
-  user,
+  rpc,
   enodeOne,
   enodeTwo,
   sigsOne,
@@ -162,7 +160,7 @@ function CreateAccount({
   Gid,
   onGetGID,
 }: {
-  user: any;
+  rpc: any;
   enodeOne: any;
   enodeTwo: any;
   sigsOne: any;
@@ -170,14 +168,6 @@ function CreateAccount({
   Gid: any;
   onGetGID: (v: any) => void;
 }) {
-  const { account } = useActiveWeb3React();
-  const useInfo = useMemo(() => {
-    if (initConfig?.[user]) {
-      return initConfig?.[user];
-    }
-    return undefined;
-  }, [user, initConfig]);
-
   const enodeArr = useMemo(() => {
     const arr = [];
     if (enodeOne) {
@@ -189,7 +179,7 @@ function CreateAccount({
     return arr;
   }, [enodeOne, enodeTwo]);
 
-  const { execute } = useCreateGroup(useInfo?.rpc, ThresHold, enodeArr);
+  const { execute } = useCreateGroup(rpc, ThresHold, enodeArr);
 
   const Sigs = useMemo(() => {
     const arr = [];
@@ -202,7 +192,7 @@ function CreateAccount({
     return arr;
   }, [sigsOne, sigsTwo]);
   const { execute: reqSmpcAddr } = useReqSmpcAddress(
-    useInfo?.rpc,
+    rpc,
     Gid,
     ThresHold,
     Sigs.join("|")
@@ -261,31 +251,70 @@ function CreateAccount({
   );
 }
 
-function Approve({ user }: { user: any }) {
+function Approve({ rpc }: { rpc: any }) {
   const { account } = useActiveWeb3React();
 
   const [approveList, setApproveList] = useState<any>([]);
 
-  const useInfo = useMemo(() => {
-    if (initConfig?.[user]) {
-      return initConfig?.[user];
+  const { execute } = useApproveReqSmpcAddress(rpc);
+  const getReqAddrStatus = async (key: any) => {
+    let data: any;
+    const result = await web3.smpc.getReqAddrStatus(key);
+    let cbData = result;
+    console.log(result);
+    if (result && typeof result === "string") {
+      cbData = JSON.parse(cbData);
     }
-    return undefined;
-  }, [user, initConfig]);
-  const { execute } = useApproveReqSmpcAddress(useInfo?.rpc);
+    if (cbData.Status !== "Error") {
+      let result =
+        cbData.Data && cbData.Data.result ? JSON.parse(cbData.Data.result) : "";
+      let status = result ? result.Status : "";
+      let hash = result && result.PubKey ? result.PubKey : "";
+      let list = result && result.AllReply ? result.AllReply : [];
+      data = {
+        msg: "Success",
+        status: status,
+        hash: hash,
+        info: list,
+        timestamp: result.TimeStamp,
+      };
+    } else {
+      data = {
+        msg: "Error",
+        status: "Failure",
+        hash: "",
+        error: cbData.Error,
+        info: [],
+      };
+    }
+    // resolve(data)
+    return data;
+  };
   const getApproveList = useCallback(() => {
-    if (useInfo?.rpc && account) {
-      web3.setProvider(useInfo?.rpc);
-      web3.smpc.getCurNodeReqAddrInfo(account).then((res: any) => {
+    if (rpc && account) {
+      web3.setProvider(rpc);
+      web3.smpc.getCurNodeReqAddrInfo(account).then(async (res: any) => {
         console.log(res);
+        const arr = [];
+        if (res.Data) {
+          for (const item of res.Data) {
+            const status = await getReqAddrStatus(item.Key);
+            arr.push({
+              ...item,
+              ...status,
+            });
+          }
+        }
+        console.log(arr);
+        setApproveList(arr);
       });
     }
-  }, [account, useInfo]);
+  }, [account, rpc]);
 
   const approve = useCallback(
-    (key) => {
+    (key, type) => {
       if (execute) {
-        execute(key).then((res) => {
+        execute(key, type).then((res) => {
           console.log(res);
         });
       }
@@ -295,7 +324,7 @@ function Approve({ user }: { user: any }) {
 
   useEffect(() => {
     getApproveList();
-  }, [getApproveList, account, useInfo]);
+  }, [getApproveList, account, rpc]);
   return (
     <>
       <Button
@@ -312,7 +341,22 @@ function Approve({ user }: { user: any }) {
           key="action"
           render={(_: any, record: any) => (
             <>
-              <Button>Agree</Button>
+              <Button
+                onClick={() => {
+                  console.log(record);
+                  approve(record.Key, "AGREE");
+                }}
+              >
+                Agree
+              </Button>
+              <Button
+                onClick={() => {
+                  console.log(record);
+                  approve(record.Key, "DISAGREE");
+                }}
+              >
+                Disagree
+              </Button>
             </>
           )}
         />
@@ -337,9 +381,16 @@ export default function Demo() {
         <Card title={"Init"} style={{ width: "100%", marginBottom: 16 }}>
           <SignEnoode
             title="User One"
-            user={USER_ONE}
+            rpc={smpcState?.[USER_ONE]?.rpc}
             enode={smpcState?.[USER_ONE]?.enode}
             signEnode={smpcState?.[USER_ONE]?.signEnode}
+            onGetRpc={(rpc) => {
+              dispatchSmpcState({
+                type: "INCREAT_ENODE",
+                user: USER_ONE,
+                rpc,
+              });
+            }}
             onGetEnode={(enode) => {
               dispatchSmpcState({
                 type: "INCREAT_ENODE",
@@ -357,9 +408,16 @@ export default function Demo() {
           />
           <SignEnoode
             title="User Two"
-            user={USER_TWO}
+            rpc={smpcState?.[USER_TWO]?.rpc}
             enode={smpcState?.[USER_TWO]?.enode}
             signEnode={smpcState?.[USER_TWO]?.signEnode}
+            onGetRpc={(rpc) => {
+              dispatchSmpcState({
+                type: "INCREAT_ENODE",
+                user: USER_TWO,
+                rpc,
+              });
+            }}
             onGetEnode={(enode) => {
               dispatchSmpcState({
                 type: "INCREAT_ENODE",
@@ -381,7 +439,7 @@ export default function Demo() {
           style={{ width: "100%", marginBottom: 16 }}
         >
           <CreateAccount
-            user={USER_ONE}
+            rpc={smpcState?.[USER_ONE]?.rpc}
             enodeOne={smpcState?.[USER_ONE]?.enode}
             enodeTwo={smpcState?.[USER_TWO]?.enode}
             sigsOne={smpcState?.[USER_ONE]?.signEnode}
@@ -396,7 +454,7 @@ export default function Demo() {
           />
         </Card>
         <Card title={"Approve"} style={{ width: "100%", marginBottom: 16 }}>
-          <Approve user={USER_TWO} />
+          <Approve rpc={smpcState?.[USER_TWO]?.rpc} />
         </Card>
       </div>
     </>

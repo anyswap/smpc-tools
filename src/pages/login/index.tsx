@@ -69,6 +69,10 @@ const Index = () => {
     }
   };
 
+  const goDemo = () => {
+    history.push("/demo");
+  };
+
   return (
     <div className={isDay ? "login" : "login dark"}>
       {/* {useIntl().formatMessage({ id: 'number' })} */}
@@ -148,6 +152,11 @@ const Index = () => {
           <Form.Item>
             <Button type="primary" onClick={onFinish} loading={loading}>
               登录
+            </Button>
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" onClick={goDemo} loading={loading}>
+              Demo
             </Button>
           </Form.Item>
         </Form>
