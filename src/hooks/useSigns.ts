@@ -43,7 +43,8 @@ async function getNonce(account: any, rpc: any) {
   const nonceResult = await web3.smpc.getReqAddrNonce(account);
   console.log(nonceResult);
   nonceLocal++;
-  return nonceLocal;
+  // return nonceLocal;
+  return nonceResult.Data.result;
 }
 
 export function useSign(): any {
