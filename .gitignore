@@ -114,4 +114,5 @@ dist
 
 /src/.umi/*
 /l2
+/smpc
 *.zip
