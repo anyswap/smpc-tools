@@ -26,10 +26,10 @@ const ThresHold = "2/2";
 
 const initConfig: any = {
   [USER_ONE]: {
-    rpc: "http://81.69.176.223:5916",
+    rpc: "http://49.235.123.22:5927",
   },
   [USER_TWO]: {
-    rpc: "http://93.104.213.123:5916",
+    rpc: "http://81.69.176.223:5916",
   },
 };
 
@@ -106,6 +106,7 @@ function SignEnoode({
   const validEnode = useCallback(() => {
     if (execute) {
       execute().then((res) => {
+        console.info(3333, res);
         onGetSignEnode(enode + res);
       });
     }
@@ -209,7 +210,6 @@ function CreateAccount({
   );
 
   const createGroup = useCallback(() => {
-    console.log(enodeArr);
     if (execute && enodeArr.length === 2) {
       execute().then((res) => {
         console.log(res);
@@ -219,11 +219,9 @@ function CreateAccount({
   }, [execute, enodeArr]);
 
   const createAccount = useCallback(() => {
-    console.log(Sigs);
     if (reqSmpcAddr) {
       reqSmpcAddr().then((res) => {
         console.log(res);
-        // onGetGID(res.info.Gid)
       });
     }
   }, [reqSmpcAddr, Sigs]);

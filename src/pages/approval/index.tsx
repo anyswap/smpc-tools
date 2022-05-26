@@ -1,8 +1,17 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Tag } from "antd";
+import { useActiveWeb3React } from "@/hooks";
+import { useModel, history } from "umi";
+import web3 from "@/assets/js/web3";
 import "./style.less";
 
 const Index = () => {
+  const { account } = useActiveWeb3React();
+  const {
+    loginAccount: { rpc },
+  } = useModel("global", ({ loginAccount }) => ({
+    loginAccount,
+  }));
   const [list, setList] = useState([
     {
       Key: "keykey1",
@@ -23,8 +32,20 @@ const Index = () => {
     },
   ]);
   console.info("list", list);
+
+  const getApproveList = async () => {
+    if (!rpc || !account) return;
+    web3.setProvider(rpc);
+    const res = await web3.smpc.getCurNodeReqAddrInfo(account);
+    console.info("getCurNodeReqAddrInfo res", res);
+  };
+
+  useEffect(() => {
+    getApproveList();
+  }, [account]);
   return (
     <div className="approval">
+      <Button onClick={getApproveList}>get</Button>
       {list.map((item) => (
         <div className="item" key={item.Key}>
           <div className="left">

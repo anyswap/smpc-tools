@@ -155,7 +155,10 @@ export function useCreateGroup(
     return {
       execute: async () => {
         web3.setProvider(rpc);
-        const result = await web3.smpc.createGroup(mode, nodeArr);
+        const result = await web3.smpc.createGroup(
+          mode,
+          nodeArr.map((item: string) => item.split("0x")[0])
+        );
         let cbData = result;
         if (result && typeof result === "string") {
           cbData = JSON.parse(cbData);

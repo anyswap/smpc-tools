@@ -21,11 +21,15 @@ const Sigs =
 
 const Index = () => {
   const { account, library } = useActiveWeb3React();
-  const { address, loginAccount } = useModel(
+  const { address, loginAccount, globalDispatch } = useModel(
     "global",
-    ({ address, loginAccount }) => ({ address, loginAccount })
+    ({ address, loginAccount, globalDispatch }) => ({
+      address,
+      loginAccount,
+      globalDispatch,
+    })
   );
-  const [enode, setEnode] = useState("");
+  const { signEnode } = loginAccount;
   // console.log(loginAccount);
 
   // const {execute} = useSignEnode(enode)
@@ -36,12 +40,15 @@ const Index = () => {
 
   const onSearch = async (v: string) => {
     console.info("execute", execute);
-    setEnode("");
     try {
       if (execute) {
         execute().then((res) => {
-          setEnode(loginAccount.enode);
-          // setEnode(res.Data.Enode + res + account);
+          globalDispatch({
+            loginAccount: {
+              ...loginAccount,
+              signEnode: loginAccount.enode + res,
+            },
+          });
         });
       }
     } catch (err) {
@@ -68,7 +75,7 @@ const Index = () => {
           //       setEnode(enodeStr + res + account);
           //     });
           // }}
-          disabled={Boolean(enode)}
+          disabled={Boolean(signEnode)}
           onClick={onSearch}
           // onClick={() => {
           //   if (execute)
@@ -90,7 +97,7 @@ const Index = () => {
         >
           Req SMPC Address
         </Button> */}
-        <Input.TextArea disabled value={enode} />
+        <Input.TextArea disabled value={signEnode} />
       </div>
     </div>
   );

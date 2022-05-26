@@ -1,11 +1,14 @@
 import { reducer } from "@/utils";
-import { Input, Form, Select, Button, Modal, Collapse } from "antd";
+import { Input, Form, Select, Button, Modal, Collapse, message } from "antd";
 import { useActiveWeb3React } from "@/hooks";
 import React, { useReducer, useEffect } from "react";
-import { useModel } from "umi";
+import { useModel, history } from "umi";
 import web3 from "@/assets/js/web3.ts";
-import { useSignEnode } from "@/hooks/useSigns";
-import RegSmpcAddr from "./component/RegSmpcAddr";
+import {
+  useSignEnode,
+  useCreateGroup,
+  useReqSmpcAddress,
+} from "@/hooks/useSigns";
 import "./style.less";
 
 const options = [2, 3, 4, 5, 6, 7];
@@ -15,6 +18,7 @@ const initState = {
   tEnode: "",
   Gid: "",
   Sgid: "",
+  onCreateGroup: false,
 };
 
 const Index = () => {
@@ -22,24 +26,38 @@ const Index = () => {
   const { loginAccount } = useModel("global", ({ loginAccount }) => ({
     loginAccount,
   }));
-  const { execute } = useSignEnode(loginAccount.enode);
+  const { account } = useActiveWeb3React();
+
   const [state, dispatch] = useReducer(reducer, initState);
-  const { admin, visible, tEnode, Gid, Sgid } = state;
+  const { admin, visible, tEnode, Gid, Sgid, onCreateGroup } = state;
+  const { execute } = useCreateGroup(
+    loginAccount?.rpc,
+    `${admin.length}/${admin.length}`,
+    Object.values(form.getFieldsValue())
+  );
+  const { execute: reqSmpcAddr } = useReqSmpcAddress(
+    loginAccount?.rpc,
+    Gid,
+    `${admin.length}/${admin.length}`,
+    Object.values(form.getFieldsValue()).join("|")
+  );
+
   const thisEnode = async () => {
-    // web3.setProvider(loginAccount.rpc);
-    // const res = await web3.smpc.getEnode();
-    // dispatch({
-    //   tEnode: res.Data.Enode,
-    // });
-    form.setFieldsValue({ enode1: loginAccount.enode });
+    form.setFieldsValue({ enode1: loginAccount.signEnode });
   };
+
   useEffect(() => {
+    if (!loginAccount.signEnode) {
+      history.push("/getEnode");
+    }
     thisEnode();
   }, []);
+
   const reset = () => {
     form.resetFields();
     form.setFieldsValue({ enode1: loginAccount.enode });
   };
+
   const typeChange = (v: number) => {
     let arr = [];
     for (let i = 1; i < v + 1; i++) {
@@ -50,22 +68,33 @@ const Index = () => {
     });
     reset();
   };
-  console.info("statestatestate", state);
-  const createGroup = async () => {
-    // execute && execute().then((res) => {
-    //   console.info('res', res)
-    // });
-    // web3.setProvider(localStorage.getItem("node"));
-    web3.setProvider(loginAccount.rpc);
-    const length = admin.length;
-    const res = await web3.smpc.createSDKGroup(
-      `${length}/${length}`,
-      // loginAccount.rpc,
-      Object.values(form.getFieldsValue()),
-      false
+
+  const createAccount = async () => {
+    console.info(
+      "reqSmpcAddr",
+      loginAccount?.rpc,
+      Gid,
+      `${admin.length}/${admin.length}`,
+      Object.values(form.getFieldsValue()).join("|")
     );
-    dispatch(res.Data);
-    console.info("res", res);
+    if (!reqSmpcAddr) return;
+    const res = await reqSmpcAddr();
+    console.info("resresres", res);
+    if (res.msg === "Success") {
+      message.success("创建成功");
+      history.push("./approval");
+    }
+  };
+
+  const createGroup = async () => {
+    if (!execute) return;
+    const res = await execute();
+    if (res.msg === "Success") {
+      dispatch({
+        Gid: res.info.Gid,
+      });
+      createAccount();
+    }
   };
   console.info("Gid", Gid);
   console.info("Sgid", Sgid);
@@ -119,13 +148,6 @@ const Index = () => {
           </Collapse.Panel>
         </Collapse>
       </Modal>
-      {Gid && (
-        <RegSmpcAddr
-          Gid={Gid}
-          Sgid={Sgid}
-          ThresHold={`${admin.length}/${admin.length}`}
-        />
-      )}
     </div>
   );
 };
