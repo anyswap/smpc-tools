@@ -1,52 +1,66 @@
 import React, { useEffect, useState } from "react";
-import { Button, Tag } from "antd";
+import { Button, message, Table, Tag } from "antd";
 import { useActiveWeb3React } from "@/hooks";
+import { useApproveReqSmpcAddress } from "@/hooks/useSigns";
 import { useModel, history } from "umi";
 import web3 from "@/assets/js/web3";
 import "./style.less";
 
 const Index = () => {
   const { account } = useActiveWeb3React();
+
   const {
     loginAccount: { rpc },
   } = useModel("global", ({ loginAccount }) => ({
     loginAccount,
   }));
-  const [list, setList] = useState([
-    {
-      Key: "keykey1",
-      TimeStamp: "2022/04/26 17:17:04",
-      status: "sss",
-      Enodes: [
-        "enode://bd363d5959b7bc172cf7c85e75fb50a3f51b9bf6341025fc6aaf35d052bc97fe52233ea756d2a059a17a3ebf6d9f0248d7c3199109ceef5569ce91372c5e0e7c@167.86.86.57:84410xf8ca8080808080b88062643336336435393539623762633137326366376338356537356662353061336635316239626636333431303235666336616166333564303532626339376665353232333365613735366432613035396131376133656266366439663032343864376333313939313039636565663535363963653931333732633565306537631ba0ceca13c62a183a286ea029c8ca71eac43f926aa5b075f8948ca4e582b2be8a4ea07dd5d08bdccbf423bd6109f99155b9b38c3f9e652212baeb63303b27d7fdbb6f0x04A656Fc21a46473Be7f47aC18F6553559E1Ad13",
-        "enode://bd363d5959b7bc172cf7c85e75fb50a3f51b9bf6341025fc6aaf35d052bc97fe52233ea756d2a059a17a3ebf6d9f0248d7c3199109ceef5569ce91372c5e0e7c@167.86.86.57:enode://b606b4d5f08b03fc647848d3a5f1f85d1363fc25c2730ce469365bbe44863f8c821f757cd1277f51e73ad02ff53a1978be1d2f5339fc6496c10ce968d0082816@157.245.252.66:84410xf8ca8080808080b88062363036623464356630386230336663363437383438643361356631663835643133363366633235633237333063653436393336356262653434383633663863383231663735376364313237376635316537336164303266663533613139373862653164326635333339666336343936633130636539363864303038323831361ca0104196d953336ae1b6ea61c8ebd1cdc332d34d60c6d60c5784b358b80c8c5264a03185e0c149990a636d4c02286898db83e487496f0c52c83c85543c6e8bfdd8630x04A656Fc21a46473Be7f47aC18F6553559E1Ad13",
-      ],
-    },
-    {
-      Key: "keykey2",
-      TimeStamp: "2022/04/26 17:17:04",
-      Enodes: [
-        "enode://bd363d5959b7bc172cf7c85e75fb50a3f51b9bf6341025fc6aaf35d052bc97fe52233ea756d2a059a17a3ebf6d9f0248d7c3199109ceef5569ce91372c5e0e7c@167.86.86.57:84410xf8ca8080808080b88062643336336435393539623762633137326366376338356537356662353061336635316239626636333431303235666336616166333564303532626339376665353232333365613735366432613035396131376133656266366439663032343864376333313939313039636565663535363963653931333732633565306537631ba0ceca13c62a183a286ea029c8ca71eac43f926aa5b075f8948ca4e582b2be8a4ea07dd5d08bdccbf423bd6109f99155b9b38c3f9e652212baeb63303b27d7fdbb6f0x04A656Fc21a46473Be7f47aC18F6553559E1Ad13",
-        "enode://bd363d5959b7bc172cf7c85e75fb50a3f51b9bf6341025fc6aaf35d052bc97fe52233ea756d2a059a17a3ebf6d9f0248d7c3199109ceef5569ce91372c5e0e7c@167.86.86.57:enode://b606b4d5f08b03fc647848d3a5f1f85d1363fc25c2730ce469365bbe44863f8c821f757cd1277f51e73ad02ff53a1978be1d2f5339fc6496c10ce968d0082816@157.245.252.66:84410xf8ca8080808080b88062363036623464356630386230336663363437383438643361356631663835643133363366633235633237333063653436393336356262653434383633663863383231663735376364313237376635316537336164303266663533613139373862653164326635333339666336343936633130636539363864303038323831361ca0104196d953336ae1b6ea61c8ebd1cdc332d34d60c6d60c5784b358b80c8c5264a03185e0c149990a636d4c02286898db83e487496f0c52c83c85543c6e8bfdd8630x04A656Fc21a46473Be7f47aC18F6553559E1Ad13",
-      ],
-    },
-  ]);
-  console.info("list", list);
+  const { execute } = useApproveReqSmpcAddress(rpc);
+  const [data, setData] = useState([]);
 
   const getApproveList = async () => {
     if (!rpc || !account) return;
     web3.setProvider(rpc);
     const res = await web3.smpc.getCurNodeReqAddrInfo(account);
     console.info("getCurNodeReqAddrInfo res", res);
+    setData(res.Data);
   };
 
   useEffect(() => {
     getApproveList();
   }, [account]);
+
+  const columns = [
+    {
+      title: "Key",
+      dataIndex: "Key",
+    },
+    {
+      title: "Action",
+      render: (r: any) => (
+        <span>
+          <Button onClick={() => approve(r.Key, "AGREE")}>Agree</Button>
+          <Button onClick={() => approve(r.Key, "DISAGREE")}>Disagree</Button>
+        </span>
+      ),
+    },
+  ];
+
+  const approve = async (key: string, type: string) => {
+    if (!execute) return;
+    const res = await execute(key, type);
+    if (res?.result.Status === "Success") {
+      message.success("Success");
+      getApproveList();
+    } else {
+      message.error(res.result.Tip);
+    }
+  };
+
   return (
     <div className="approval">
-      <Button onClick={getApproveList}>get</Button>
-      {list.map((item) => (
+      <Button onClick={getApproveList}>get</Button>{" "}
+      <Table columns={columns} dataSource={data} pagination={false} />
+      {/* {list.map((item) => (
         <div className="item" key={item.Key}>
           <div className="left">
             <div className="key">{item.Key}</div>
@@ -67,7 +81,7 @@ const Index = () => {
             )}
           </div>
         </div>
-      ))}
+      ))} */}
     </div>
   );
 };

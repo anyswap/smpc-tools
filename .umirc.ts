@@ -3,6 +3,7 @@ import { defineConfig } from "umi";
 export default defineConfig({
   favicon: "./favicon.ico",
   title: "Multichain - SMPC",
+  history: { type: "hash" },
   nodeModulesTransform: {
     type: "none",
   },
@@ -26,6 +27,10 @@ export default defineConfig({
             {
               path: "/demo",
               component: "@/pages/demo/index.tsx",
+            },
+            {
+              path: "/Account",
+              component: "@/pages/account",
             },
             {
               path: "/getEnode",

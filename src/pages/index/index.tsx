@@ -18,10 +18,8 @@ const initState = {
 };
 
 const Index = () => {
-  // const isDay = (moment().format('YYYY-MM-DD HH:mm:ss') < moment().format('YYYY-MM-DD 21:00:00')) &&
-  //   (moment().format('YYYY-MM-DD HH:mm:ss') > moment().format('YYYY-MM-DD 05:00:00'));
   const { account, library, activate } = useActiveWeb3React();
-  // console.log(account)
+  console.log("account", account);
   // console.log(library)
   const { isDay, globalDispatch } = useModel(
     "global",
@@ -39,7 +37,9 @@ const Index = () => {
 
   // const enable = async () => {
   const enable = useCallback(() => {
-    if (!account && injected && activate) {
+    console.info(7777, !account, injected, activate);
+    // if (!account && injected && activate) {
+    if (!account && activate) {
       activate(injected);
     }
   }, [account, activate]);

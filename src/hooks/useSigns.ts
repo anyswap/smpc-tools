@@ -37,14 +37,14 @@ export function eNodeCut(enode: any) {
     enode: enodeObj.input,
   };
 }
-
-let mmWeb3: any;
-if (
-  typeof window.ethereum !== "undefined" ||
-  typeof window.web3 !== "undefined"
-) {
-  // Web3 browser user detected. You can now use the provider.
-  mmWeb3 = window["ethereum"] || window?.web3?.currentProvider;
+let nonceLocal = 0;
+async function getNonce(account: any, rpc: any) {
+  web3.setProvider(rpc);
+  const nonceResult = await web3.smpc.getReqAddrNonce(account);
+  console.log(nonceResult);
+  nonceLocal++;
+  // return nonceLocal;
+  return nonceResult.Data.result;
 }
 
 export function useSign(): any {
@@ -54,21 +54,21 @@ export function useSign(): any {
       return new Promise((resolve) => {
         const params = [account, hash];
         const method = "eth_sign";
-        console.log(params);
+        // console.log(params);
         if (library) {
           library
             .send(method, params)
             .then((res: any) => {
-              console.log(res);
+              // console.log(res);
               // return result;
               const rsv = res.indexOf("0x") === 0 ? res.replace("0x", "") : res;
-              let v = parseInt("0x" + rsv.substr(128));
-              v = Number(CHAINID) * 2 + 35 + Number(v) - 27;
+              const v0 = parseInt("0x" + rsv.substr(128));
+              const v = Number(CHAINID) * 2 + 35 + Number(v0) - 27;
               const result = {
-                rsv: res.result,
+                rsv: res,
                 r: rsv.substr(0, 64),
                 s: rsv.substr(64, 64),
-                // v: Number(v) - 27 === 0 ? "00" : "01",
+                v0: Number(v0) - 27 === 0 ? "00" : "01",
                 v: web3.utils.toHex(v).replace("0x", ""),
               };
               resolve(result);
@@ -80,29 +80,6 @@ export function useSign(): any {
         } else {
           resolve("");
         }
-        // if (mmWeb3) {
-
-        //   mmWeb3.sendAsync({
-        //     method,
-        //     params,
-        //     // from,
-        //   }, (err:any, res:any) => {
-        //     console.log(res)
-        //     if (!err) {
-        //       const rsv = res.result.indexOf("0x") === 0 ? res.result.replace("0x", "") : res.result;
-        //       const v = parseInt("0x" + rsv.substr(128))
-        //       const result = {
-        //         rsv: res.result,
-        //         r: rsv.substr(0, 64),
-        //         s: rsv.substr(64, 64),
-        //         v: (Number(v) - 27 === 0 ? "00" : "01"),
-        //       }
-        //       resolve(result)
-        //     } else {
-        //       resolve('')
-        //     }
-        //   })
-        // }
       });
     },
     [library]
@@ -124,6 +101,7 @@ export function useSignEnode(enode: string | undefined): {
         const eNodeKey = eNodeCut(enode).key;
         // const provider = new ethers.providers.Web3Provider(library.provider);
         // const signer = provider.getSigner();
+        // console.log(eNodeKey)
         const hash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(eNodeKey));
         // const hash = ethers.utils.keccak256('0x' + (eNodeKey))
         // const hash = ethers.utils.hashMessage(eNodeKey)
@@ -132,11 +110,11 @@ export function useSignEnode(enode: string | undefined): {
         // const result = await signer.signMessage(hash);
         const result = await signMessage(hash);
         // console.log(signer)
-        console.log(result);
-        console.log(hash);
+        // console.log(result);
+        // console.log(hash);
         // console.log(ethers.utils.toUtf8Bytes(eNodeKey))
 
-        const rsvFormat = "0x" + result.r + result.s + result.v;
+        const rsvFormat = "0x" + result.r + result.s + result.v0;
         return rsvFormat;
       },
     };
@@ -194,11 +172,12 @@ export function useReqSmpcAddress(
         // const signer = provider.getSigner();
         // web3.setProvider('http://47.114.115.33:5913/')
         web3.setProvider(rpc);
-        const nonceResult = await web3.smpc.getReqAddrNonce(account);
-        let nonce = 0;
-        if (nonceResult.Status !== "Error") {
-          nonce = nonceResult.Data.result;
-        }
+        const nonce = await getNonce(account, rpc);
+        console.log("nonce", nonce);
+        // let nonce = nonceResult
+        // if (nonceResult.Status !== "Error") {
+        //   nonce = nonceResult.Data.result;
+        // }
         const data = {
           TxType: "REQSMPCADDR",
           GroupId: gID,
@@ -215,8 +194,8 @@ export function useReqSmpcAddress(
 
           // gas: '0x0',
           // gasPrice: "0x0",
-          nonce: nonce,
-          // nonce: "0x0",
+          // nonce: nonce,
+          nonce: web3.utils.toHex(nonce),
           data: JSON.stringify(data),
         };
         console.log(rawTx);
@@ -254,7 +233,7 @@ export function useReqSmpcAddress(
 }
 
 export function useApproveReqSmpcAddress(rpc: string | undefined): {
-  execute?: undefined | ((Key: any) => Promise<any>);
+  execute?: undefined | ((Key: any, type: any) => Promise<any>);
 } {
   const { account, library } = useActiveWeb3React();
   const { signMessage } = useSign();
@@ -262,20 +241,17 @@ export function useApproveReqSmpcAddress(rpc: string | undefined): {
     // if (!library || !account || !gID || !ThresHold || !Sigs) return {};
     if (!library || !account) return {};
     return {
-      execute: async (Key: any) => {
+      execute: async (Key: any, type: any) => {
         // const provider = new ethers.providers.Web3Provider(library.provider);
         // const signer = provider.getSigner();
         // web3.setProvider('http://47.114.115.33:5913/')
         web3.setProvider(rpc);
-        const nonceResult = await web3.smpc.getReqAddrNonce(account);
-        let nonce = 0;
-        if (nonceResult.Status !== "Error") {
-          nonce = nonceResult.Data.result;
-        }
+        const nonce = await getNonce(account, rpc);
+        console.log("nonce", nonce);
         const data = {
           TxType: "ACCEPTREQADDR",
           Key: Key,
-          Accept: "AGREE", // DISAGREE
+          Accept: type, // DISAGREE
           TimeStamp: Date.now().toString(),
         };
         const rawTx: any = {
@@ -285,8 +261,8 @@ export function useApproveReqSmpcAddress(rpc: string | undefined): {
 
           // gas: '0x0',
           // gasPrice: "0x0",
-          nonce: nonce,
-          // nonce: "0x0",
+          // nonce: nonce,
+          nonce: web3.utils.toHex(nonce),
           data: JSON.stringify(data),
         };
         console.log(rawTx);
@@ -304,7 +280,7 @@ export function useApproveReqSmpcAddress(rpc: string | undefined): {
         console.log(tx1);
         let signTx = tx1.serialize().toString("hex");
         signTx = signTx.indexOf("0x") === 0 ? signTx : "0x" + signTx;
-        let cbData = await web3.smpc.reqSmpcAddr(signTx);
+        let cbData = await web3.smpc.acceptReqAddr(signTx);
         let resultData: any = {};
         if (cbData && typeof cbData === "string") {
           cbData = JSON.parse(cbData);

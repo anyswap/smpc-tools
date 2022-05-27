@@ -14,16 +14,21 @@ const Index = (props) => {
   // console.info('his', history)location
   // console.info(111, getLocale)
   const { account, library, activate } = useActiveWeb3React();
-  const { isDay, globalDispatch, loginAccount } = useModel(
-    "global",
-    ({ isDay, globalDispatch, loginAccount }) => ({
-      isDay,
-      globalDispatch,
-      loginAccount,
-    })
-  );
+  const {
+    isDay,
+    globalDispatch,
+    loginAccount: { rpc, signEnode },
+  } = useModel("global", ({ isDay, globalDispatch, loginAccount }) => ({
+    isDay,
+    globalDispatch,
+    loginAccount,
+  }));
   const [local, SetLocalAntd] = useState(enUS);
   const nav = [
+    {
+      name: "创建共管账户",
+      url: "/createGrounp",
+    },
     {
       name: "获取enode",
       url: "/getEnode",
@@ -33,8 +38,8 @@ const Index = (props) => {
       url: "/approval",
     },
     {
-      name: "创建共管账户",
-      url: "/createGrounp",
+      name: "账户列表",
+      url: "/account",
     },
   ];
 
@@ -50,11 +55,12 @@ const Index = (props) => {
     console.info("account", account);
     if (!account) {
       history.push("/");
+      return;
     }
-    if (!loginAccount.enode) {
+    if (!rpc || !signEnode) {
       history.push("/login");
     }
-  }, [account, loginAccount]);
+  }, [account, rpc]);
 
   console.info("account", account);
 

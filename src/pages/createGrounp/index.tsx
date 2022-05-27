@@ -70,13 +70,6 @@ const Index = () => {
   };
 
   const createAccount = async () => {
-    console.info(
-      "reqSmpcAddr",
-      loginAccount?.rpc,
-      Gid,
-      `${admin.length}/${admin.length}`,
-      Object.values(form.getFieldsValue()).join("|")
-    );
     if (!reqSmpcAddr) return;
     const res = await reqSmpcAddr();
     console.info("resresres", res);
@@ -86,6 +79,10 @@ const Index = () => {
     }
   };
 
+  useEffect(() => {
+    if (Gid) createAccount();
+  }, [Gid]);
+
   const createGroup = async () => {
     if (!execute) return;
     const res = await execute();
@@ -93,7 +90,8 @@ const Index = () => {
       dispatch({
         Gid: res.info.Gid,
       });
-      createAccount();
+      // setTimeout(())
+      // createAccount()
     }
   };
   console.info("Gid", Gid);

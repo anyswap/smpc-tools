@@ -11,6 +11,7 @@ import {
 } from "umi";
 import web3 from "@/assets/js/web3";
 import { useActiveWeb3React } from "@/hooks";
+import { useSignEnode, useReqSmpcAddress } from "@/hooks/useSigns";
 // import ModalHead from "@/component/modalHead";
 import Logo_png from "@/pages/img/logo.svg";
 import "./style.less";
@@ -37,6 +38,8 @@ const Index = () => {
       loginAccount,
     })
   );
+  const { execute } = useSignEnode(loginAccount.enode);
+
   useEffect(() => {
     localStorage.removeItem("node");
   }, []);
@@ -47,6 +50,23 @@ const Index = () => {
       history.push("/");
     }
   }, [account]);
+
+  const getSignEnode = () => {
+    if (!execute) return;
+    execute().then((res) => {
+      globalDispatch({
+        loginAccount: {
+          ...loginAccount,
+          signEnode: loginAccount.enode + res,
+        },
+      });
+      history.push("/createGrounp");
+    });
+  };
+
+  useEffect(() => {
+    if (loginAccount.enode) getSignEnode();
+  }, [loginAccount.enode]);
 
   const onFinish = async () => {
     if (!value) return;
@@ -62,17 +82,21 @@ const Index = () => {
         },
       });
       // localStorage.setItem("node", value);
-      history.push("/getEnode");
+      // setTimeout(() => {
+      //   getSignEnode();
+      // }, 500)
     } catch (err) {
       console.info("errerr", err);
       message.error("检查节点");
     }
   };
 
+  const goDemo = () => {
+    history.push("/demo");
+  };
+
   return (
     <div className={isDay ? "login" : "login dark"}>
-      {/* {useIntl().formatMessage({ id: 'number' })} */}
-      {/* {loginAccount.enode && <Redirect to="/getEnode" />} */}
       <Select
         className="language"
         defaultValue={getLocale()}
@@ -148,6 +172,11 @@ const Index = () => {
           <Form.Item>
             <Button type="primary" onClick={onFinish} loading={loading}>
               登录
+            </Button>
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" onClick={goDemo} loading={loading}>
+              Demo
             </Button>
           </Form.Item>
         </Form>
