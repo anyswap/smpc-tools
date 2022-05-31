@@ -32,10 +32,10 @@ export default defineConfig({
               path: "/Account",
               component: "@/pages/account",
             },
-            {
-              path: "/getEnode",
-              component: "@/pages/getEnode",
-            },
+            // {
+            //   path: "/getEnode",
+            //   component: "@/pages/getEnode",
+            // },
             {
               path: "/approval",
               component: "@/pages/approval",
@@ -57,5 +57,7 @@ export default defineConfig({
   //   baseNavigator: false,
   //   baseSeparator: '-'
   // },
-  locale: {},
+  locale: {
+    antd: true,
+  },
 });

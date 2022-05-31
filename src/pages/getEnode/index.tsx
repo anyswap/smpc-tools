@@ -21,15 +21,16 @@ const Sigs =
 
 const Index = () => {
   const { account, library } = useActiveWeb3React();
-  const { address, loginAccount, globalDispatch } = useModel(
+  const { address, globalDispatch } = useModel(
     "global",
-    ({ address, loginAccount, globalDispatch }) => ({
+    ({ address, globalDispatch }) => ({
       address,
-      loginAccount,
       globalDispatch,
     })
   );
+  const loginAccount = JSON.parse(localStorage.getItem("loginAccount") || "{}");
   const { signEnode } = loginAccount;
+
   // console.log(loginAccount);
 
   // const {execute} = useSignEnode(enode)

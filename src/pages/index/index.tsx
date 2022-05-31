@@ -67,13 +67,17 @@ const Index = () => {
       <div>
         <img src={isDay ? LogoB : LogoW} width={69} height={100} />
         <div className="name">
-          <span className="left">密钥</span>
-          <span className="right">管家</span>
+          <span className="left">
+            {useIntl().formatHTMLMessage({ id: "connectTheg.SMPCPurse" })}
+          </span>
+          <span className="right">
+            {useIntl().formatHTMLMessage({ id: "g.Wallet" })}
+          </span>
         </div>
         <div className="text">
-          欢迎使用 SMPC Wallet 1.0
+          {useIntl().formatHTMLMessage({ id: "welcome" })}
           <br />
-          请创建一个钱包或者导入一个钱包
+          {useIntl().formatHTMLMessage({ id: "welcomeOpt" })}
         </div>
         {/* <div className="buttons">
           <CreateWallet isDay={isDay} dispatch={dispatch} visible={visible} />
@@ -81,7 +85,7 @@ const Index = () => {
           <span className="right">导入</span>
         </div> */}
         <Button type="primary" size="large" onClick={enable}>
-          连接钱包
+          {useIntl().formatHTMLMessage({ id: "connectThePurse" })}
         </Button>
       </div>
     </div>

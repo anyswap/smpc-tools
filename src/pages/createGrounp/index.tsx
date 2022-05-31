@@ -2,7 +2,7 @@ import { reducer } from "@/utils";
 import { Input, Form, Select, Button, Modal, Collapse, message } from "antd";
 import { useActiveWeb3React } from "@/hooks";
 import React, { useReducer, useEffect } from "react";
-import { useModel, history } from "umi";
+import { useModel, history, useIntl } from "umi";
 import web3 from "@/assets/js/web3.ts";
 import {
   useSignEnode,
@@ -23,9 +23,10 @@ const initState = {
 
 const Index = () => {
   const [form] = Form.useForm();
-  const { loginAccount } = useModel("global", ({ loginAccount }) => ({
-    loginAccount,
-  }));
+  // const { loginAccount } = useModel("global", ({ loginAccount }) => ({
+  //   loginAccount,
+  // }));
+  const loginAccount = JSON.parse(localStorage.getItem("loginAccount") || "{}");
   const { account } = useActiveWeb3React();
 
   const [state, dispatch] = useReducer(reducer, initState);
@@ -68,13 +69,13 @@ const Index = () => {
     });
     reset();
   };
-
+  const createSuccess = useIntl().formatMessage({ id: "createSuccess" });
   const createAccount = async () => {
     if (!reqSmpcAddr) return;
     const res = await reqSmpcAddr();
     console.info("resresres", res);
     if (res.msg === "Success") {
-      message.success("创建成功");
+      message.success(createSuccess);
       history.push("./approval");
     }
   };
@@ -108,7 +109,9 @@ const Index = () => {
             onChange={typeChange}
             defaultValue={2}
             options={options.map((i) => ({
-              label: `${i}/${i}模式`,
+              label: `${i}/${i}${useIntl().formatHTMLMessage({
+                id: "createGrounp.model",
+              })}`,
               value: i,
             }))}
           />
@@ -116,19 +119,33 @@ const Index = () => {
         {admin.map((i: number, index: number) => (
           <Form.Item
             name={`enode${i}`}
-            label={`管理人${i}`}
+            label={`${useIntl().formatHTMLMessage({
+              id: "createGrounp.admin",
+            })}${i}`}
             required
-            rules={[{ required: true, message: "必填" }]}
+            rules={[
+              {
+                required: true,
+                message: useIntl().formatHTMLMessage({ id: "g.required" }),
+              },
+            ]}
             key={i}
           >
-            <Input placeholder="请输入" disabled={i === 1} />
+            <Input
+              placeholder={useIntl().formatHTMLMessage({
+                id: "g.placeholder1",
+              })}
+              disabled={i === 1}
+            />
           </Form.Item>
         ))}
         <Form.Item style={{ textAlign: "right" }}>
-          <Button type="primary" htmlType="submit">
-            创建共管帐户
+          <Button type="primary" htmlType="submit" className="mr10">
+            {useIntl().formatHTMLMessage({ id: "nav.createAccount" })}
           </Button>
-          <Button onClick={reset}>重置</Button>
+          <Button onClick={reset}>
+            {useIntl().formatHTMLMessage({ id: "g.reset" })}
+          </Button>
         </Form.Item>
       </Form>
       <Modal
@@ -141,9 +158,11 @@ const Index = () => {
           模式: {admin.length}/{admin.length}
         </h3>
         <Collapse expandIconPosition="right">
-          <Collapse.Panel header="发起者" key={0}>
-            {loginAccount.enode}
-          </Collapse.Panel>
+          {Object.values(form.getFieldsValue()).map((item: string, i) => (
+            <Collapse.Panel header={`发起者${i + 1}`} key={i}>
+              {item}
+            </Collapse.Panel>
+          ))}
         </Collapse>
       </Modal>
     </div>

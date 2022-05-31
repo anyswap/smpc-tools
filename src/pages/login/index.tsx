@@ -53,23 +53,38 @@ const Index = () => {
 
   const getSignEnode = () => {
     if (!execute) return;
-    execute().then((res) => {
+    execute().then(async (res) => {
+      localStorage.setItem(
+        "loginAccount",
+        JSON.stringify({
+          ...loginAccount,
+          signEnode: loginAccount.enode + res,
+        })
+      );
       globalDispatch({
         loginAccount: {
           ...loginAccount,
           signEnode: loginAccount.enode + res,
         },
       });
-      history.push("/createGrounp");
+      history.push("/account");
     });
   };
 
   useEffect(() => {
-    if (loginAccount.enode) getSignEnode();
+    if (loginAccount.enode && !loginAccount.signEnode) getSignEnode();
   }, [loginAccount.enode]);
 
   const onFinish = async () => {
     if (!value) return;
+    localStorage.setItem("loginAccount", "{}");
+    globalDispatch({
+      loginAccount: {
+        ...loginAccount,
+        enode: "",
+        signEnode: "",
+      },
+    });
     try {
       setLoading(true);
       web3.setProvider(value);
@@ -86,6 +101,7 @@ const Index = () => {
       //   getSignEnode();
       // }, 500)
     } catch (err) {
+      setLoading(false);
       console.info("errerr", err);
       message.error("检查节点");
     }
@@ -115,21 +131,32 @@ const Index = () => {
       <div className="box">
         <div className="logo">
           <img src={Logo_png} width={35} />
-          <span className="name1">SMPC</span>
-          <span className="name2">Wallet</span>
+          <span className="name1">
+            {useIntl().formatHTMLMessage({ id: "g.SMPC" })}
+          </span>
+          <span className="name2">
+            {useIntl().formatHTMLMessage({ id: "g.Wallet" })}
+          </span>
         </div>
         <div className="back">
           <span onClick={() => history.push("/")}>
             <LeftOutlined />
-            Back
+            {useIntl().formatHTMLMessage({ id: "g.Back" })}
           </span>
         </div>
-        <div className="tit">登录账户</div>
+        <div className="tit">
+          {useIntl().formatHTMLMessage({ id: "g.loginAccount" })}
+        </div>
         <Form form={form} layout="vertical" onFinish={onFinish}>
           <Form.Item
-            label="设置节点"
+            label={useIntl().formatHTMLMessage({ id: "g.setTheNode" })}
             required
-            rules={[{ required: true, message: "至少选择一个" }]}
+            rules={[
+              {
+                required: true,
+                message: useIntl().formatHTMLMessage({ id: "g.rules1" }),
+              },
+            ]}
           >
             <Select
               placeholder="请输入"
@@ -160,7 +187,9 @@ const Index = () => {
               filterOption={() => true}
               options={[
                 ...nodeList
-                  .filter((item: nodeListItem) => item.rpc.includes("http://"))
+                  .filter((item: nodeListItem) =>
+                    (item.rpc || "").includes("http://")
+                  )
                   .map((item: nodeListItem) => ({
                     label: item.rpc,
                     value: item.rpc,
@@ -171,7 +200,7 @@ const Index = () => {
           </Form.Item>
           <Form.Item>
             <Button type="primary" onClick={onFinish} loading={loading}>
-              登录
+              {useIntl().formatHTMLMessage({ id: "g.login" })}
             </Button>
           </Form.Item>
           <Form.Item>

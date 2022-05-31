@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Logo from "@/pages/img/logo.png";
-import { history, useModel, getLocale, setLocale } from "umi";
+import { history, useModel, getLocale, setLocale, useIntl } from "umi";
 import { useActiveWeb3React } from "@/hooks";
 // import { setLocale, getLocale, history, getAllLocales, useIntl, useModel } from 'umi';
 import { ConfigProvider, Select } from "antd";
@@ -8,37 +8,40 @@ import enUS from "antd/lib/locale/en_US";
 import zhCN from "antd/lib/locale/zh_CN";
 import Sun from "@/assets/images/sun.png";
 import Moon from "@/assets/images/moon.png";
+import "antd/dist/antd.min.css";
+import "./custom-dark.css";
+import "./custom-default.css";
 import "./style.less";
 
 const Index = (props) => {
   // console.info('his', history)location
   // console.info(111, getLocale)
+  const [prefix, setPrefix] = useState(
+    localStorage.getItem("prefix") || "custom-default"
+  );
   const { account, library, activate } = useActiveWeb3React();
-  const {
-    isDay,
+  const { rpc, signEnode } = JSON.parse(
+    localStorage.getItem("loginAccount") || "{}"
+  );
+  const { globalDispatch } = useModel("global", ({ globalDispatch }) => ({
     globalDispatch,
-    loginAccount: { rpc, signEnode },
-  } = useModel("global", ({ isDay, globalDispatch, loginAccount }) => ({
-    isDay,
-    globalDispatch,
-    loginAccount,
   }));
   const [local, SetLocalAntd] = useState(enUS);
   const nav = [
     {
-      name: "创建共管账户",
+      name: useIntl().formatHTMLMessage({ id: "nav.createAccount" }),
       url: "/createGrounp",
     },
+    // {
+    //   name: "获取enode",
+    //   url: "/getEnode",
+    // },
     {
-      name: "获取enode",
-      url: "/getEnode",
-    },
-    {
-      name: "审批",
+      name: useIntl().formatHTMLMessage({ id: "nav.approval" }),
       url: "/approval",
     },
     {
-      name: "账户列表",
+      name: useIntl().formatHTMLMessage({ id: "nav.accountList" }),
       url: "/account",
     },
   ];
@@ -65,34 +68,38 @@ const Index = (props) => {
   console.info("account", account);
 
   return (
-    <ConfigProvider locale={enUS}>
-      <div className={isDay ? "layouts" : "layouts dark"}>
+    <ConfigProvider locale={local} prefixCls={prefix}>
+      <div className={prefix === "custom-default" ? "layouts" : "layouts dark"}>
         <div className="head">
           <div className="left">
             <div className="logo">
               <img src={Logo} width={31} />
               <div className="name">
-                <span className="name1">密钥</span>
-                <span className="name2">管家</span>
+                <span className="name1">
+                  {useIntl().formatHTMLMessage({ id: "g.SMPC" })}
+                </span>
+                <span className="name2">
+                  {useIntl().formatHTMLMessage({ id: "g.Wallet" })}
+                </span>
               </div>
             </div>
-            <div className="nav">
-              {/* <div onClick={() => history.push('/approvalList')}>审批</div>
+          </div>
+          <div className="nav">
+            {/* <div onClick={() => history.push('/approvalList')}>审批</div>
             <div>创建组</div> */}
-              {nav.map((item) => {
-                return (
-                  <div
-                    key={item.url}
-                    className={
-                      history.location.pathname === item.url ? "active" : ""
-                    }
-                    onClick={() => history.push(item.url)}
-                  >
-                    {item.name}
-                  </div>
-                );
-              })}
-            </div>
+            {nav.map((item) => {
+              return (
+                <div
+                  key={item.url}
+                  className={
+                    history.location.pathname === item.url ? "active" : ""
+                  }
+                  onClick={() => history.push(item.url)}
+                >
+                  {item.name}
+                </div>
+              );
+            })}
           </div>
           <div className="right">
             <Select
@@ -110,10 +117,19 @@ const Index = (props) => {
               ]}
             />
             <img
-              src={isDay ? Sun : Moon}
+              src={prefix === "custom-default" ? Sun : Moon}
               width={50}
               height={28}
-              onClick={() => globalDispatch({ isDay: !isDay })}
+              onClick={() => {
+                setPrefix(
+                  prefix === "custom-default" ? "custom-dark" : "custom-default"
+                );
+                localStorage.setItem(
+                  "prefix",
+                  prefix === "custom-default" ? "custom-dark" : "custom-default"
+                );
+                // globalDispatch({ isDay: !isDay })
+              }}
             />
           </div>
         </div>

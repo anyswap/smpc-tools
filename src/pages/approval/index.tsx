@@ -2,18 +2,19 @@ import React, { useEffect, useState } from "react";
 import { Button, message, Table, Tag } from "antd";
 import { useActiveWeb3React } from "@/hooks";
 import { useApproveReqSmpcAddress } from "@/hooks/useSigns";
-import { useModel, history } from "umi";
+import { useModel, history, useIntl } from "umi";
 import web3 from "@/assets/js/web3";
 import "./style.less";
 
 const Index = () => {
   const { account } = useActiveWeb3React();
 
-  const {
-    loginAccount: { rpc },
-  } = useModel("global", ({ loginAccount }) => ({
-    loginAccount,
-  }));
+  // const {
+  //   loginAccount: { rpc },
+  // } = useModel("global", ({ loginAccount }) => ({
+  //   loginAccount,
+  // }));
+  const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
   const { execute } = useApproveReqSmpcAddress(rpc);
   const [data, setData] = useState([]);
 
@@ -35,21 +36,27 @@ const Index = () => {
       dataIndex: "Key",
     },
     {
-      title: "Action",
+      title: useIntl().formatHTMLMessage({ id: "g.action" }),
       render: (r: any) => (
         <span>
-          <Button onClick={() => approve(r.Key, "AGREE")}>Agree</Button>
-          <Button onClick={() => approve(r.Key, "DISAGREE")}>Disagree</Button>
+          <Button onClick={() => approve(r.Key, "AGREE")} className="mr8">
+            {useIntl().formatHTMLMessage({ id: "approval.agree" })}
+          </Button>
+          <Button onClick={() => approve(r.Key, "DISAGREE")}>
+            {useIntl().formatHTMLMessage({ id: "approval.disagree" })}
+          </Button>
         </span>
       ),
     },
   ];
-
+  const operationIsSuccessful = useIntl().formatMessage({
+    id: "operationIsSuccessful",
+  });
   const approve = async (key: string, type: string) => {
     if (!execute) return;
     const res = await execute(key, type);
     if (res?.result.Status === "Success") {
-      message.success("Success");
+      message.success(operationIsSuccessful);
       getApproveList();
     } else {
       message.error(res.result.Tip);
@@ -58,7 +65,7 @@ const Index = () => {
 
   return (
     <div className="approval">
-      <Button onClick={getApproveList}>get</Button>{" "}
+      {/* <Button onClick={getApproveList}>get</Button>{" "} */}
       <Table columns={columns} dataSource={data} pagination={false} />
       {/* {list.map((item) => (
         <div className="item" key={item.Key}>

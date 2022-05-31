@@ -1,3 +1,12 @@
+.mr5 {
+  margin-right: 5px;
+}
+.mr8 {
+  margin-right: 8px;
+}
+.mr10 {
+  margin-right: 10px;
+}
 .layouts {
   min-height: 100vh;
 
@@ -26,31 +35,43 @@
           color: #1b55d1;
         }
       }
-      .nav {
-        div {
-          display: inline-block;
-          font-size: 14px;
-          font-weight: 500;
-          color: #252525;
-          border-bottom: 1px solid rgba(0, 0, 0, 0);
-          line-height: 69px;
-          padding: 0 26px;
-          cursor: pointer;
-          &.active,
-          &:hover {
-            color: #1b55d1;
-            border-bottom: 1px solid #1b55d1;
-            background-color: rgba(39, 98, 224, 0.1);
-          }
+    }
+    .nav {
+      width: 100%;
+      margin-right: 170px;
+      text-align: center;
+      div {
+        display: inline-block;
+        font-size: 14px;
+        font-weight: 500;
+        color: #252525;
+        border-bottom: 1px solid rgba(0, 0, 0, 0);
+        line-height: 69px;
+        padding: 0 26px;
+        cursor: pointer;
+        &.active,
+        &:hover {
+          color: #1b55d1;
+          border-bottom: 1px solid #1b55d1;
+          background-color: rgba(39, 98, 224, 0.1);
         }
       }
     }
     & > .right {
       margin-right: 15px;
+      min-width: 130px;
+      display: flex;
+      justify-content: space-between;
       img {
         cursor: pointer;
+        margin-top: 2px;
       }
-      .ant-select-selector {
+      .custom-dark-select-selector {
+        border: none;
+      }
+      .ant-select-selector,
+      .custom-dark-select,
+      .custom-default-select {
         background-color: rgba(0, 0, 0, 0);
         border: none;
       }
@@ -65,10 +86,10 @@
         .name2 {
           color: white;
         }
-        .nav {
-          & > div {
-            color: white;
-          }
+      }
+      .nav {
+        & > div {
+          color: white;
         }
       }
       & > .right {
