@@ -68,7 +68,7 @@ const Index = () => {
         <img src={isDay ? LogoB : LogoW} width={69} height={100} />
         <div className="name">
           <span className="left">
-            {useIntl().formatHTMLMessage({ id: "connectTheg.SMPCPurse" })}
+            {useIntl().formatHTMLMessage({ id: "g.SMPC" })}
           </span>
           <span className="right">
             {useIntl().formatHTMLMessage({ id: "g.Wallet" })}

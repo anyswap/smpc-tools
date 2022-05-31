@@ -45,6 +45,9 @@ jspm_packages/
 /src/.umi/
 /src/.umi-production/
 
+# DS_Store
+.DS_Store
+
 
 # TypeScript v1 declaration files
 typings/
