@@ -7,6 +7,10 @@
 .mr10 {
   margin-right: 10px;
 }
+.flex_SB {
+  display: flex;
+  justify-content: space-between;
+}
 .layouts {
   min-height: 100vh;
 
@@ -59,10 +63,20 @@
     }
     & > .right {
       margin-right: 15px;
-      min-width: 130px;
+      min-width: 280px;
       display: flex;
       justify-content: space-between;
-      img {
+      .loginInfo {
+        width: 145px;
+        line-height: 32px;
+        background-color: #f6f4ff;
+        color: #031a6e;
+        border-radius: 10px;
+        margin-right: 8px;
+        text-align: center;
+        cursor: pointer;
+      }
+      & > img {
         cursor: pointer;
         margin-top: 2px;
       }
@@ -109,4 +123,8 @@
 .container {
   width: 1440px;
   margin: 15px auto;
+}
+
+.custom-dark-modal-body h3 {
+  color: white;
 }

@@ -15,6 +15,8 @@ import { useSignEnode, useReqSmpcAddress } from "@/hooks/useSigns";
 // import ModalHead from "@/component/modalHead";
 import Logo_png from "@/pages/img/logo.svg";
 import "./style.less";
+import { mmWeb3 } from "@/libs/wallet/metamask.js";
+const Web3 = require("web3");
 
 interface nodeListItem {
   name: string;
@@ -45,7 +47,6 @@ const Index = () => {
   }, []);
 
   useEffect(() => {
-    console.info("account", account);
     if (!account) {
       history.push("/");
     }

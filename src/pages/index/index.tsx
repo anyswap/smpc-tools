@@ -25,7 +25,6 @@ const Index = () => {
     "global",
     ({ isDay, globalDispatch }) => ({ isDay, globalDispatch })
   );
-  console.info("isDay", isDay);
   const [state, dispatch] = useReducer(reducer, initState);
   const { visible } = state;
 
@@ -35,10 +34,7 @@ const Index = () => {
     }
   }, [account]);
 
-  // const enable = async () => {
   const enable = useCallback(() => {
-    console.info(7777, !account, injected, activate);
-    // if (!account && injected && activate) {
     if (!account && activate) {
       activate(injected);
     }

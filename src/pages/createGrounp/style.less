@@ -1,6 +1,7 @@
 .create-grounp {
   height: calc(100vh - 300px);
-  width: 400px;
+  width: 100%;
+  max-width: 550px;
   margin: 50px auto;
   .ant-btn-primary {
     margin-right: 12px;
@@ -17,9 +18,24 @@
     padding-left: 3%;
     flex: 2;
   }
+  form > div {
+    & > .ant-form-item,
+    & > .custom-default-form-item,
+    & > .custom-dark-form-item {
+      display: inline-block;
+      width: 80%;
+    }
+  }
+  .opts .anticon {
+    font-size: 18px;
+    color: #ccc;
+    margin: 0 6px;
+    margin-top: 35px;
+    cursor: pointer;
+  }
 }
 .dark {
-  .ant-form-item-label > label {
+  .custom-dark-form > label {
     color: white;
   }
 }

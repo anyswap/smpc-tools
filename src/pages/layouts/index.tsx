@@ -3,7 +3,9 @@ import Logo from "@/pages/img/logo.png";
 import { history, useModel, getLocale, setLocale, useIntl } from "umi";
 import { useActiveWeb3React } from "@/hooks";
 // import { setLocale, getLocale, history, getAllLocales, useIntl, useModel } from 'umi';
-import { ConfigProvider, Select } from "antd";
+import { ConfigProvider, Select, Modal, Button } from "antd";
+import { CopyOutlined } from "@ant-design/icons";
+import { cutOut, copyTxt } from "@/utils";
 import enUS from "antd/lib/locale/en_US";
 import zhCN from "antd/lib/locale/zh_CN";
 import Sun from "@/assets/images/sun.png";
@@ -20,13 +22,14 @@ const Index = (props) => {
     localStorage.getItem("prefix") || "custom-default"
   );
   const { account, library, activate } = useActiveWeb3React();
-  const { rpc, signEnode } = JSON.parse(
+  const { rpc = "", signEnode = "" } = JSON.parse(
     localStorage.getItem("loginAccount") || "{}"
   );
   const { globalDispatch } = useModel("global", ({ globalDispatch }) => ({
     globalDispatch,
   }));
   const [local, SetLocalAntd] = useState(enUS);
+  const [visible, setVisible] = useState(false);
   const nav = [
     {
       name: useIntl().formatHTMLMessage({ id: "nav.createAccount" }),
@@ -65,8 +68,13 @@ const Index = (props) => {
     }
   }, [account, rpc]);
 
-  console.info("account", account);
+  const cutOutSign = cutOut("0x" + signEnode.split("0x")[1], 6, 4);
 
+  const logout = () => {
+    localStorage.removeItem("loginAccount");
+    setVisible(false);
+  };
+  const { ethereum } = window;
   return (
     <ConfigProvider locale={local} prefixCls={prefix}>
       <div className={prefix === "custom-default" ? "layouts" : "layouts dark"}>
@@ -102,7 +110,35 @@ const Index = (props) => {
             })}
           </div>
           <div className="right">
+            <Modal
+              title={useIntl().formatHTMLMessage({ id: "account" })}
+              footer={false}
+              visible={visible}
+              onCancel={() => setVisible(false)}
+              getContainer={
+                document.getElementsByClassName("layouts")[0] as HTMLElement
+              }
+            >
+              <div className="flex_SB">
+                <span>{rpc}</span>
+                <Button type="link" onClick={logout}>
+                  退出
+                </Button>
+              </div>
+              <div>
+                {/* {signEnode} */}
+                <span className="mr10">{cutOut(signEnode, 30, 8)}</span>
+                <CopyOutlined
+                  onClick={() => copyTxt(signEnode)}
+                  style={{ fontSize: 17, cursor: "pointer" }}
+                />
+              </div>
+            </Modal>
+            <div className="loginInfo" onClick={() => setVisible(true)}>
+              {cutOut(ethereum.selectedAddress, 6, 4)}
+            </div>
             <Select
+              className="mr8"
               defaultValue={getLocale()}
               onChange={localChange}
               options={[

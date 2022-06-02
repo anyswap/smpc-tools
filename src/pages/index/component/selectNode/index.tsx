@@ -31,13 +31,12 @@ const Index = (props: Iprops) => {
 
   const onFinish = async (v: any) => {
     // const res = await web3.dcrm.createSDKGroup(v.node, nodeList._id)
-    web3.dcrm
-      .createSDKGroup(
-        v.node,
-        nodeList.map((item) => item._id)
-      )
-      .then((res) => console.info(1111, res))
-      .catch((err) => console.info(2222, err));
+    web3.dcrm.createSDKGroup(
+      v.node,
+      nodeList.map((item) => item._id)
+    );
+    // .then((res) => console.info(1111, res))
+    // .catch((err) => console.info(2222, err));
     // console.info('resssss', res)
   };
   // useEffect(() => {

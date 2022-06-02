@@ -100,7 +100,6 @@ function SignEnoode({
   const validEnode = useCallback(() => {
     if (execute) {
       execute().then((res) => {
-        console.info(3333, res);
         onGetSignEnode(enode + res);
       });
     }

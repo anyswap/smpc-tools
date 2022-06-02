@@ -25,4 +25,6 @@ export default {
   welcomeOpt: "请创建一个钱包或者导入一个钱包",
   createSuccess: "创建成功",
   operationIsSuccessful: "操作成功",
+  account: "账户",
+  clickCopy: "点击复制",
 };

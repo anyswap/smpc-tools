@@ -36,11 +36,9 @@ const Index = () => {
   ];
 
   const getAccountList = async () => {
-    console.info(111, rpc, account);
     if (!rpc || !account) return;
     web3.setProvider(rpc);
     const res = await web3.smpc.getAccounts(account, "0");
-    console.info("ressssssss", res);
     const { Group = [] } = res.Data.result;
     let arr: any = [];
     Group.forEach((item: any) => {
@@ -56,7 +54,6 @@ const Index = () => {
         }
       });
     });
-    console.info("arr", arr);
     setData(arr);
   };
 

@@ -17,16 +17,8 @@ const Index = () => {
     // const instance = await SUPPORTED_WALLETS.METAMASK.connector
     mmWeb3.enable().then((res: Array<string>) => {
       dispatch({ visible: true });
-      console.info(111155, res);
     });
   };
-
-  // useEffect(() => {
-  //   const { ethereum } = window;
-  //   ethereum.on('connect', (chainId: any) => {
-  //     console.info(3333333, chainId)
-  //   })
-  // }, [])
 
   return (
     <>

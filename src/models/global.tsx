@@ -21,7 +21,6 @@ const initState = {
 
 export default function Index() {
   const [state, dispatch] = useReducer(reducer, initState);
-  console.info("configappURL", config.appURL);
 
   const getNodeList = async () => {
     const res = await nodeListService();

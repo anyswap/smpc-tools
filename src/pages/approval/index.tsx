@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Button, message, Table, Tag } from "antd";
 import { useActiveWeb3React } from "@/hooks";
-import { useApproveReqSmpcAddress } from "@/hooks/useSigns";
+import { useApproveReqSmpcAddress, useSign, getNonce } from "@/hooks/useSigns";
 import { useModel, history, useIntl } from "umi";
+import moment from "moment";
 import web3 from "@/assets/js/web3";
 import "./style.less";
+import { cutOut } from "@/utils";
 
 const Index = () => {
   const { account } = useActiveWeb3React();
+  const { signMessage } = useSign();
 
   // const {
   //   loginAccount: { rpc },
@@ -22,7 +25,6 @@ const Index = () => {
     if (!rpc || !account) return;
     web3.setProvider(rpc);
     const res = await web3.smpc.getCurNodeReqAddrInfo(account);
-    console.info("getCurNodeReqAddrInfo res", res);
     setData(res.Data);
   };
 
@@ -32,8 +34,28 @@ const Index = () => {
 
   const columns = [
     {
+      title: "Account",
+      dataIndex: "Account",
+      render: (t: string) => cutOut(t, 6, 4),
+    },
+    {
+      title: "GroupID",
+      dataIndex: "GroupID",
+      render: (t: string) => cutOut(t, 6, 4),
+    },
+    {
       title: "Key",
       dataIndex: "Key",
+      render: (t: string) => cutOut(t, 6, 4),
+    },
+    {
+      title: "TimeStamp",
+      dataIndex: "TimeStamp",
+      render: (t: string) => moment(Number(t)).format("YYYY-MM-DD HH:MM:SS"),
+    },
+    {
+      title: "ThresHold",
+      dataIndex: "ThresHold",
     },
     {
       title: useIntl().formatHTMLMessage({ id: "g.action" }),
@@ -55,11 +77,11 @@ const Index = () => {
   const approve = async (key: string, type: string) => {
     if (!execute) return;
     const res = await execute(key, type);
-    if (res?.result.Status === "Success") {
+    if (res?.info === "Success") {
       message.success(operationIsSuccessful);
       getApproveList();
     } else {
-      message.error(res.result.Tip);
+      message.error(res.msg);
     }
   };
 
