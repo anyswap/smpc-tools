@@ -13,6 +13,7 @@ export default {
   "login.rules1": "至少选择一个",
   "nav.createAccount": "创建共管账户",
   "nav.approval": "审批",
+  "nav.approvaled": "已审批列表",
   "nav.accountList": "账户列表",
   "createGrounp.admin": "管理人",
   "createGrounp.model": "模式",
@@ -27,4 +28,5 @@ export default {
   operationIsSuccessful: "操作成功",
   account: "账户",
   clickCopy: "点击复制",
+  thereAreDuplicateValues: "有重复的值",
 };

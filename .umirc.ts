@@ -41,6 +41,10 @@ export default defineConfig({
               component: "@/pages/approval",
             },
             {
+              path: "/approvaled",
+              component: "@/pages/approvaled",
+            },
+            {
               path: "/createGrounp",
               component: "@/pages/createGrounp",
             },

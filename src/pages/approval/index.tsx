@@ -25,7 +25,10 @@ const Index = () => {
     if (!rpc || !account) return;
     web3.setProvider(rpc);
     const res = await web3.smpc.getCurNodeReqAddrInfo(account);
-    setData(res.Data);
+    const { Data } = res;
+    setData(
+      (Data || []).sort((a, b) => Number(b.TimeStamp) - Number(a.TimeStamp))
+    );
   };
 
   useEffect(() => {
@@ -51,20 +54,24 @@ const Index = () => {
     {
       title: "TimeStamp",
       dataIndex: "TimeStamp",
-      render: (t: string) => moment(Number(t)).format("YYYY-MM-DD HH:MM:SS"),
+      render: (t: string) => moment(Number(t)).format("YYYY-MM-DD HH:mm:ss"),
     },
     {
       title: "ThresHold",
       dataIndex: "ThresHold",
     },
     {
+      title: "Nonce",
+      dataIndex: "Nonce",
+    },
+    {
       title: useIntl().formatHTMLMessage({ id: "g.action" }),
-      render: (r: any) => (
+      render: (r: any, i) => (
         <span>
-          <Button onClick={() => approve(r.Key, "AGREE")} className="mr8">
+          <Button onClick={() => approve(r, "AGREE")} className="mr8">
             {useIntl().formatHTMLMessage({ id: "approval.agree" })}
           </Button>
-          <Button onClick={() => approve(r.Key, "DISAGREE")}>
+          <Button onClick={() => approve(r, "DISAGREE")}>
             {useIntl().formatHTMLMessage({ id: "approval.disagree" })}
           </Button>
         </span>
@@ -74,12 +81,17 @@ const Index = () => {
   const operationIsSuccessful = useIntl().formatMessage({
     id: "operationIsSuccessful",
   });
-  const approve = async (key: string, type: string) => {
+  const approve = async (r: any, type: string) => {
     if (!execute) return;
-    const res = await execute(key, type);
+    const res = await execute(r, type);
     if (res?.info === "Success") {
       message.success(operationIsSuccessful);
       getApproveList();
+      const approvaled = JSON.parse(localStorage.getItem("approvaled") || "[]");
+      localStorage.setItem(
+        "approvaled",
+        JSON.stringify([{ ...r, status: type }, ...approvaled])
+      );
     } else {
       message.error(res.msg);
     }
@@ -88,7 +100,12 @@ const Index = () => {
   return (
     <div className="approval">
       {/* <Button onClick={getApproveList}>get</Button>{" "} */}
-      <Table columns={columns} dataSource={data} pagination={false} />
+      <Table
+        columns={columns}
+        dataSource={data}
+        pagination={false}
+        rowKey="Key"
+      />
       {/* {list.map((item) => (
         <div className="item" key={item.Key}>
           <div className="left">

@@ -13,6 +13,7 @@ export default {
   "g.rules1": "Choose at least one",
   "nav.createAccount": "Create new mpc",
   "nav.approval": "Transactions",
+  "nav.approvaled": "Transactionsed list",
   "nav.accountList": "Account list",
   "createGrounp.admin": "Admin",
   "createGrounp.model": "Model",
@@ -27,4 +28,5 @@ export default {
   operationIsSuccessful: "Operation is successful",
   account: "Account",
   clickCopy: "Click on the copy",
+  thereAreDuplicateValues: "There are duplicate values",
 };

@@ -1,0 +1,41 @@
+.approval {
+  & > .item {
+    padding: 20px;
+    margin-bottom: 25px;
+    border-radius: 8px;
+    border: 1px solid rgba(27, 85, 209, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .left {
+      .key {
+        color: #333;
+        font-weight: bold;
+      }
+      .enode {
+        & > div {
+          display: inline-block;
+          max-width: 150px;
+          line-height: 30px;
+          color: #999;
+          padding: 0 12px;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          background-color: rgba(27, 85, 209, 0.1);
+          border-radius: 30px;
+          margin: 10px 5px 0 0;
+        }
+      }
+      .date {
+        color: #999;
+      }
+    }
+    .right {
+      .repeat {
+        background-color: #67c23a;
+        border-color: #67c23a;
+      }
+    }
+  }
+}

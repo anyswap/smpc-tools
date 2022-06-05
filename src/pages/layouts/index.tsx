@@ -16,8 +16,6 @@ import "./custom-default.css";
 import "./style.less";
 
 const Index = (props) => {
-  // console.info('his', history)location
-  // console.info(111, getLocale)
   const [prefix, setPrefix] = useState(
     localStorage.getItem("prefix") || "custom-default"
   );
@@ -44,6 +42,10 @@ const Index = (props) => {
       url: "/approval",
     },
     {
+      name: useIntl().formatHTMLMessage({ id: "nav.approvaled" }),
+      url: "/approvaled",
+    },
+    {
       name: useIntl().formatHTMLMessage({ id: "nav.accountList" }),
       url: "/account",
     },
@@ -58,7 +60,6 @@ const Index = (props) => {
   // }, []);
 
   useEffect(() => {
-    console.info("account", account);
     if (!account) {
       history.push("/");
       return;

@@ -26,7 +26,8 @@ const Index = () => {
     {
       title: useIntl().formatHTMLMessage({ id: "accountList.createDate" }),
       dataIndex: "TimeStamp",
-      render: (t: string) => moment(Number(t)).format("YYYY-MM-DD HH:MM:SS"),
+      render: (t: string, r) => r,
+      render: (t: string) => moment(Number(t)).format("YYYY-MM-DD HH:mm:ss"),
     },
     {
       title: useIntl().formatHTMLMessage({ id: "accountList.thresHold" }),
@@ -49,12 +50,12 @@ const Index = () => {
             GroupID: item.GroupID,
             ThresHold: it.ThresHold,
             // name: it.publicKey.substr(2),
-            TimeStamp: it.TimeStamp,
+            TimeStamp: Number(it.TimeStamp),
           });
         }
       });
     });
-    setData(arr);
+    setData(arr.sort((a, b) => b.TimeStamp - a.TimeStamp));
   };
 
   useEffect(() => {
@@ -74,7 +75,6 @@ const Index = () => {
         columns={columns}
         dataSource={data}
         rowKey="PubKey"
-        title={() => <Button onClick={viewSignEnode}>View sign enode</Button>}
         pagination={false}
       />
     </div>

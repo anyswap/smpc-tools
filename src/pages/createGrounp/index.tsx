@@ -47,7 +47,8 @@ const Index = () => {
     form.getFieldValue("ThresHold"),
     Object.values(form.getFieldsValue())
       .filter((item) => item?.includes("enode"))
-      .join("|")
+      .join("|"),
+    form.getFieldValue("keytype")
   );
 
   const thisEnode = async () => {
@@ -91,14 +92,15 @@ const Index = () => {
   }, [Gid]);
 
   const createGroup = async () => {
+    console.info(3344, form.getFieldsValue());
     if (!execute) return;
     const res = await execute();
     if (res.msg === "Success") {
       dispatch({
         Gid: res.info.Gid,
       });
-      // setTimeout(())
-      // createAccount()
+    } else {
+      message.error(res.error);
     }
   };
 
@@ -120,25 +122,38 @@ const Index = () => {
     });
   };
 
+  const message1 = useIntl().formatMessage({ id: "thereAreDuplicateValues" });
+
+  const onFinish = () => {
+    const values = Object.values(form.getFieldsValue());
+    if (
+      //检查表单重复值
+      !values.every((item) => values.filter((it) => it === item).length === 1)
+    ) {
+      message.error(message1);
+      return;
+    }
+    dispatch({ visible: true });
+  };
+
   return (
     <div className="create-grounp">
-      <Form
-        layout="vertical"
-        form={form}
-        onFinish={() => dispatch({ visible: true })}
-      >
-        <Form.Item>
-          {/* <Select
-            onChange={typeChange}
-            defaultValue={2}
-            options={options.map((i) => ({
-              label: `${i}/${i}${useIntl().formatHTMLMessage({
-                id: "createGrounp.model",
-              })}`,
-              value: i,
-            }))}
-          /> */}
-        </Form.Item>
+      <Form layout="vertical" form={form} onFinish={onFinish}>
+        <div>
+          <Form.Item name="keytype" label="Mpc type" initialValue="EC256K1">
+            <Select
+              onChange={typeChange}
+              options={[
+                {
+                  value: "EC256K1",
+                },
+                {
+                  value: "ED25519",
+                },
+              ]}
+            />
+          </Form.Item>
+        </div>
         {admin.map((i: number, index: number) => (
           <div key={i}>
             <Form.Item

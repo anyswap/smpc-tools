@@ -157,14 +157,16 @@ export function useReqSmpcAddress(
   rpc: string | undefined,
   gID: string | undefined,
   ThresHold: string | undefined,
-  Sigs: string | undefined
+  Sigs: string | undefined,
+  keytype: string
 ): {
   execute?: undefined | (() => Promise<any>);
 } {
   const { account, library } = useActiveWeb3React();
   const { signMessage } = useSign();
   return useMemo(() => {
-    if (!library || !account || !gID || !ThresHold || !Sigs) return {};
+    if (!library || !account || !gID || !ThresHold || !Sigs || !keytype)
+      return {};
     // if (!library || !account || !gID || !ThresHold) return {};
     return {
       execute: async () => {
@@ -185,7 +187,7 @@ export function useReqSmpcAddress(
           Mode: "0",
           TimeStamp: Date.now().toString(),
           Sigs: Sigs,
-          keytype: "ED25519",
+          keytype,
         };
         const rawTx: any = {
           from: account,
@@ -232,8 +234,16 @@ export function useReqSmpcAddress(
   }, [account, library, gID, ThresHold, Sigs]);
 }
 
+type ApproveRecordType = {
+  Key: any;
+  GroupID: string;
+  Mode: string;
+  ThresHold: string;
+  Cointype: string;
+};
+
 export function useApproveReqSmpcAddress(rpc: string | undefined): {
-  execute?: undefined | ((Key: any, type: any) => Promise<any>);
+  execute?: undefined | ((r: ApproveRecordType, type: any) => Promise<any>);
 } {
   const { account, library } = useActiveWeb3React();
   const { signMessage } = useSign();
@@ -241,7 +251,8 @@ export function useApproveReqSmpcAddress(rpc: string | undefined): {
     // if (!library || !account || !gID || !ThresHold || !Sigs) return {};
     if (!library || !account) return {};
     return {
-      execute: async (Key: any, type: any) => {
+      execute: async (r: ApproveRecordType, type: any) => {
+        const { Key, GroupID, Mode, ThresHold, Cointype: Keytype } = r;
         // const provider = new ethers.providers.Web3Provider(library.provider);
         // const signer = provider.getSigner();
         // web3.setProvider('http://47.114.115.33:5913/')
@@ -250,7 +261,11 @@ export function useApproveReqSmpcAddress(rpc: string | undefined): {
         console.log("nonce", nonce);
         const data = {
           TxType: "ACCEPTREQADDR",
-          Key: Key,
+          Key,
+          GroupID,
+          Mode,
+          ThresHold,
+          Keytype,
           Accept: type, // DISAGREE
           TimeStamp: Date.now().toString(),
         };
@@ -280,6 +295,7 @@ export function useApproveReqSmpcAddress(rpc: string | undefined): {
         console.log(tx1);
         let signTx = tx1.serialize().toString("hex");
         signTx = signTx.indexOf("0x") === 0 ? signTx : "0x" + signTx;
+        console.info("signTxsignTxsignTx", signTx);
         let cbData = await web3.smpc.acceptReqAddr(signTx);
         let resultData: any = {};
         if (cbData && typeof cbData === "string") {
