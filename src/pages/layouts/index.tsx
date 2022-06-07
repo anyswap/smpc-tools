@@ -30,6 +30,10 @@ const Index = (props) => {
   const [visible, setVisible] = useState(false);
   const nav = [
     {
+      name: useIntl().formatHTMLMessage({ id: "nav.accountList" }),
+      url: "/account",
+    },
+    {
       name: useIntl().formatHTMLMessage({ id: "nav.createAccount" }),
       url: "/createGrounp",
     },
@@ -44,10 +48,6 @@ const Index = (props) => {
     {
       name: useIntl().formatHTMLMessage({ id: "nav.approvaled" }),
       url: "/approvaled",
-    },
-    {
-      name: useIntl().formatHTMLMessage({ id: "nav.accountList" }),
-      url: "/account",
     },
   ];
 

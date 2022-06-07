@@ -172,6 +172,13 @@ web3.extend({
       inputFormatter: [null],
       outputFormatter: null,
     },
+    {
+      name: "getSmpcAddr",
+      call: "smpc_getSmpcAddr",
+      params: 1,
+      inputFormatter: [null],
+      outputFormatter: null,
+    },
   ],
 });
 // web3.setProvider('http://47.114.113.16:5912')

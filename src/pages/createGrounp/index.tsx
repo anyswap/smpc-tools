@@ -92,7 +92,7 @@ const Index = () => {
   }, [Gid]);
 
   const createGroup = async () => {
-    console.info(3344, form.getFieldsValue());
+    web3.setProvider(loginAccount?.rpc);
     if (!execute) return;
     const res = await execute();
     if (res.msg === "Success") {
@@ -222,9 +222,7 @@ const Index = () => {
           document.getElementsByClassName("layouts")[0] as HTMLElement
         }
       >
-        <h3>
-          模式: {admin.length}/{admin.length}
-        </h3>
+        <h3>模式: {form.getFieldValue("ThresHold")}</h3>
         <Collapse expandIconPosition="right">
           {Object.values(form.getFieldsValue())
             .filter((item) => item?.includes("enode"))
