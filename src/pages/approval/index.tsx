@@ -30,7 +30,7 @@ const Index = () => {
       (Data || []).sort((a, b) => Number(b.TimeStamp) - Number(a.TimeStamp))
     );
   };
-
+  console.info("account", account);
   useEffect(() => {
     getApproveList();
   }, [account]);
@@ -68,20 +68,44 @@ const Index = () => {
       title: useIntl().formatHTMLMessage({ id: "g.action" }),
       render: (r: any, i) => (
         <span>
-          <Button
-            type="primary"
-            onClick={() => approve(r, "AGREE")}
-            className="mr8"
-          >
-            {useIntl().formatHTMLMessage({ id: "approval.agree" })}
-          </Button>
-          <Button onClick={() => approve(r, "DISAGREE")}>
-            {useIntl().formatHTMLMessage({ id: "approval.disagree" })}
-          </Button>
+          {account === r.Account ? (
+            <span>自己创建</span>
+          ) : (
+            <span>
+              <Button
+                type="primary"
+                onClick={() => approve(r, "AGREE")}
+                className="mr8"
+              >
+                {useIntl().formatHTMLMessage({ id: "approval.agree" })}
+              </Button>
+              <Button onClick={() => approve(r, "DISAGREE")}>
+                {useIntl().formatHTMLMessage({ id: "approval.disagree" })}
+              </Button>
+            </span>
+          )}
         </span>
       ),
     },
   ];
+
+  // const intervel = setInterval(async () => {
+  //   const cbRsv = await web3.smpc.getSignStatus(cbData.Data?.result);
+  //   console.info("cbRsv", cbRsv);
+  //   debugger;
+  // }, 1000);
+
+  // const setAccount = async (r: any) => {
+  //   const result = await web3.smpc.getReqAddrStatus(r.Key);
+  //   debugger
+  // }
+
+  // const intervel = setInterval(async () => {
+  //   const result = await web3.smpc.getReqAddrStatus(r.Key);
+  //   console.info("cbRsv", cbRsv);
+  //   debugger;
+  // }, 1000);
+
   const operationIsSuccessful = useIntl().formatMessage({
     id: "operationIsSuccessful",
   });
@@ -89,7 +113,9 @@ const Index = () => {
     if (!execute) return;
     const res = await execute(r, type);
     if (res?.info === "Success") {
+      debugger;
       message.success(operationIsSuccessful);
+      // setAccount(r);
       getApproveList();
       const approvaled = JSON.parse(
         localStorage.getItem("accountApprovaled") || "[]"
@@ -98,6 +124,31 @@ const Index = () => {
         "accountApprovaled",
         JSON.stringify([{ ...r, status: type }, ...approvaled])
       );
+
+      const intervel = setInterval(async () => {
+        const res = await web3.smpc.getReqAddrStatus(r.Key);
+        if (res.Status === "Success") {
+          const cbPkey = await web3.smpc.getReqAddrStatus(r.Key);
+          if (cbPkey.Status === "Success") {
+            JSON.parse(res?.Data?.result || "{}");
+            const Account = JSON.parse(localStorage.getItem("Account") || "[]");
+            localStorage.setItem(
+              "Account",
+              JSON.stringify([
+                {
+                  ...JSON.parse(res?.Data?.result || "{}"),
+                  key: r.Key,
+                  GroupID: r.GroupID,
+                  ThresHold: r.ThresHold,
+                  PubKey: JSON.parse(cbPkey.Data.result).PubKey,
+                },
+                ...Account,
+              ])
+            );
+            clearInterval(intervel);
+          }
+        }
+      }, 1000);
     } else {
       message.error(res.msg);
     }

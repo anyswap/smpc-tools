@@ -134,6 +134,7 @@ export function useSendTxDemo(): {
         signTx = signTx.indexOf("0x") === 0 ? signTx : "0x" + signTx;
         web3.eth.sendSignedTransaction(signTx).then((res: any) => {
           console.log(res);
+          debugger;
         });
       },
     };
@@ -352,8 +353,9 @@ export function useApproveReqSmpcAddress(rpc: string | undefined): {
         rawTx.r = "0x" + result.r;
         rawTx.s = "0x" + result.s;
         rawTx.v = "0x" + result.v;
+        console.log("rawTx", rawTx);
         const tx1 = new Tx(rawTx);
-        console.log(rawTx);
+
         console.log(tx1);
         let signTx = tx1.serialize().toString("hex");
         signTx = signTx.indexOf("0x") === 0 ? signTx : "0x" + signTx;
@@ -384,41 +386,69 @@ type GetSignType = {
   ThresHold: string;
 };
 
-const toTxnHash = (TxnData) => {
-  let tx = new Tx(TxnData);
+function useMsgData(): {
+  execute?: undefined | ((to: string, value: string) => Promise<any>);
+} {
+  // web3.setProvider('https://bsc-dataseed1.defibit.io/')
+  const { account, library } = useActiveWeb3React();
+  const { signMessage } = useSign();
+  return useMemo(() => {
+    if (!account || !library) return {};
+    return {
+      execute: async (to: string, value: string) => {
+        web3.setProvider("https://bsc-dataseed1.defibit.io/");
+        const data: any = {
+          from: account,
+          // to: "0xC03033d8b833fF7ca08BF2A58C9BC9d711257249",
+          to,
+          chainId: web3.utils.toHex(56),
+          // value: "1",
+          value,
+          nonce: "",
+          gas: "",
+          gasPrice: "",
+          data: "",
+        };
+        data.nonce = await web3.eth.getTransactionCount(account);
+        data.gas = await web3.eth.estimateGas({ to: data.to });
+        data.gasPrice = await web3.eth.getGasPrice();
+        data.gasPrice = Number(data.gasPrice);
+        return data;
+      },
+    };
+  }, [account, signMessage]);
+}
+
+const toTxnHash = (data: any) => {
+  let tx = new Tx(data);
   let hash = Buffer.from(tx.hash(false)).toString("hex");
   hash = hash.indexOf("0x") == 0 ? hash : "0x" + hash;
   return hash;
 };
 
 export function useGetSign(rpc: string | undefined): {
-  execute: undefined | ((r: GetSignType, address: string) => Promise<any>);
+  execute?:
+    | undefined
+    | ((r: GetSignType, to: string, value: string) => Promise<any>);
 } {
   const { account, library } = useActiveWeb3React();
   const { signMessage } = useSign();
+  const { execute } = useMsgData();
   return useMemo(() => {
-    if (!account || !library) return {};
+    if (!account || !library || !execute) return {};
     return {
-      execute: async (r: GetSignType, address: string) => {
+      execute: async (r: GetSignType, to: string, value: string) => {
         const { GroupID, PubKey, ThresHold } = r;
+        console.info(45, r, to, value);
+        const MsgContext = await execute(to, value);
         web3.setProvider(rpc);
         const nonce = await getNonce(account, rpc);
         console.info("nonce", nonce);
         const data = {
           TxType: "SIGN",
           PubKey,
-          MsgHash: [toTxnHash({})],
-          MsgContext: [
-            JSON.stringify({
-              chainId: web3.utils.toHex(CHAINID),
-              gas: "",
-              gasPrice: "",
-              nonce: "",
-              to: "",
-              value: "0",
-              data: {},
-            }),
-          ],
+          MsgHash: [toTxnHash(MsgContext)],
+          MsgContext: [JSON.stringify(MsgContext)],
           GroupID,
           ThresHold,
           Keytype: "EC256K1",
@@ -438,7 +468,11 @@ export function useGetSign(rpc: string | undefined): {
         hash = hash.indexOf("0x") === 0 ? hash : "0x" + hash;
 
         const result = await signMessage(hash);
-        console.info("result", result);
+        if (!result) {
+          message.info("no sign");
+          return;
+        }
+        debugger;
         rawTx.r = "0x" + result.r;
         rawTx.s = "0x" + result.s;
         rawTx.v = "0x" + result.v;
@@ -447,14 +481,16 @@ export function useGetSign(rpc: string | undefined): {
         let signTx = tx1.serialize().toString("hex");
         signTx = signTx.indexOf("0x") === 0 ? signTx : "0x" + signTx;
         const cbData = await web3.smpc.sign(signTx);
-        if (cbData.Data?.result) {
-          // rsv
-          const intervel = setInterval(async () => {
-            const cbRsv = await web3.smpc.getSignStatus(cbData.Data?.result);
-            console.info("cbRsv", cbRsv);
-            debugger;
-          }, 1000);
-        }
+        debugger;
+        // if (cbData.Data?.result) {
+        //   debugger
+        //   // rsv
+        //   const intervel = setInterval(async () => {
+        //     const cbRsv = await web3.smpc.getSignStatus(cbData.Data?.result);
+        //     console.info("cbRsv", cbRsv);
+        //     debugger;
+        //   }, 1000);
+        // }
         return cbData;
       },
     };
@@ -508,6 +544,10 @@ export function acceptSign(rpc: string): {
         let hash = Buffer.from(tx.hash(false)).toString("hex");
         hash = hash.indexOf("0x") === 0 ? hash : "0x" + hash;
         const result = await signMessage(hash);
+        if (!result) {
+          message.info("no sign");
+          return;
+        }
         rawTx.r = "0x" + result.r;
         rawTx.s = "0x" + result.s;
         rawTx.v = "0x" + result.v;
@@ -518,6 +558,16 @@ export function acceptSign(rpc: string): {
         signTx = signTx.indexOf("0x") === 0 ? signTx : "0x" + signTx;
         console.info("signTxsignTxsignTx", signTx);
         let cbData = await web3.smpc.acceptSign(signTx);
+        debugger;
+        if (cbData.Data?.result) {
+          debugger;
+          // // rsv
+          // const intervel = setInterval(async () => {
+          //   const cbRsv = await web3.smpc.getSignStatus(cbData.Data?.result);
+          //   console.info("cbRsv", cbRsv);
+          //   debugger;
+          // }, 1000);
+        }
         return cbData;
       },
     };

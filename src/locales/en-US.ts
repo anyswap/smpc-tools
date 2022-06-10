@@ -11,6 +11,7 @@ export default {
   "g.reset": "Reset",
   "g.action": "operation",
   "g.rules1": "Choose at least one",
+  "login.rules2": "value is not a valid number",
   "nav.createAccount": "Create Pubkey",
   "nav.approval": "Transactions",
   "nav.approvaled": "Transactionsed List",

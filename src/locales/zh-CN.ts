@@ -11,6 +11,7 @@ export default {
   "g.reset": "重置",
   "g.action": "操作",
   "login.rules1": "至少选择一个",
+  "login.rules2": "值不是一个有效的数字",
   "nav.createAccount": "创建共管账户",
   "nav.approval": "审批",
   "nav.approvaled": "已审批列表",

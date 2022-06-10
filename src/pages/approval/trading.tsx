@@ -25,8 +25,7 @@ const Index = () => {
   const action = async (Accept: string, r: any) => {
     if (!execute) return;
     const res = await execute(Accept, r);
-    const { Status } = res;
-    if (Status === "Success") {
+    if (res?.Status === "Success") {
       message.success("Success");
       const approvaled = JSON.parse(
         localStorage.getItem("tradingApprovaled") || "[]"
@@ -36,8 +35,8 @@ const Index = () => {
         JSON.stringify([{ ...r, status: Accept }, ...approvaled])
       );
       getCurNodeSignInfo();
-      const res = await web3.smpc.getSignStatus(r.Key);
-      // res->rsv
+      // const res = await web3.smpc.getSignStatus(r.Key);
+      // // res->rsv
       return;
     }
     message.error("Error");

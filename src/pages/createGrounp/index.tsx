@@ -77,10 +77,12 @@ const Index = () => {
     });
     reset();
   };
+
   const createSuccess = useIntl().formatMessage({ id: "createSuccess" });
   const createAccount = async () => {
     if (!reqSmpcAddr) return;
     const res = await reqSmpcAddr();
+    debugger;
     if (res.msg === "Success") {
       message.success(createSuccess);
       history.push("./approval");
@@ -95,6 +97,7 @@ const Index = () => {
     web3.setProvider(loginAccount?.rpc);
     if (!execute) return;
     const res = await execute();
+    debugger;
     if (res.msg === "Success") {
       dispatch({
         Gid: res.info.Gid,
