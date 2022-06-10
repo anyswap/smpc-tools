@@ -57,7 +57,7 @@ const Index = () => {
       <Table
         columns={columns}
         dataSource={JSON.parse(
-          localStorage.getItem("accountApprovaled") || "[]"
+          localStorage.getItem("tradingApprovaled") || "[]"
         )}
         pagination={false}
       />

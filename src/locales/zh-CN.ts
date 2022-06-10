@@ -29,4 +29,8 @@ export default {
   account: "账户",
   clickCopy: "点击复制",
   thereAreDuplicateValues: "有重复的值",
+  balance: "余额",
+  transaction: "发起交易",
+  accountApproval: "账户审批",
+  tradingApproval: "交易审批",
 };

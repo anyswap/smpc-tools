@@ -38,11 +38,11 @@ export default defineConfig({
             // },
             {
               path: "/approval",
-              component: "@/pages/approval",
+              component: "@/pages/approval/tabs",
             },
             {
               path: "/approvaled",
-              component: "@/pages/approvaled",
+              component: "@/pages/approvaled/tabs",
             },
             {
               path: "/createGrounp",

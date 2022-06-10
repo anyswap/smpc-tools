@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, message, Table, Tag } from "antd";
+import { Button, message, Table } from "antd";
 import { useActiveWeb3React } from "@/hooks";
 import { useApproveReqSmpcAddress, useSign, getNonce } from "@/hooks/useSigns";
 import { useModel, history, useIntl } from "umi";
@@ -57,7 +57,7 @@ const Index = () => {
       render: (t: string) => moment(Number(t)).format("YYYY-MM-DD HH:mm:ss"),
     },
     {
-      title: "ThresHold",
+      title: useIntl().formatHTMLMessage({ id: "createGrounp.model" }),
       dataIndex: "ThresHold",
     },
     {
@@ -68,7 +68,11 @@ const Index = () => {
       title: useIntl().formatHTMLMessage({ id: "g.action" }),
       render: (r: any, i) => (
         <span>
-          <Button onClick={() => approve(r, "AGREE")} className="mr8">
+          <Button
+            type="primary"
+            onClick={() => approve(r, "AGREE")}
+            className="mr8"
+          >
             {useIntl().formatHTMLMessage({ id: "approval.agree" })}
           </Button>
           <Button onClick={() => approve(r, "DISAGREE")}>
@@ -87,9 +91,11 @@ const Index = () => {
     if (res?.info === "Success") {
       message.success(operationIsSuccessful);
       getApproveList();
-      const approvaled = JSON.parse(localStorage.getItem("approvaled") || "[]");
+      const approvaled = JSON.parse(
+        localStorage.getItem("accountApprovaled") || "[]"
+      );
       localStorage.setItem(
-        "approvaled",
+        "accountApprovaled",
         JSON.stringify([{ ...r, status: type }, ...approvaled])
       );
     } else {

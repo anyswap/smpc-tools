@@ -159,6 +159,13 @@ web3.extend({
       outputFormatter: null,
     },
     {
+      name: "acceptSign",
+      call: "smpc_acceptSign",
+      params: 1,
+      inputFormatter: [null],
+      outputFormatter: null,
+    },
+    {
       name: "getReqAddrNonce",
       call: "smpc_getReqAddrNonce",
       params: 1,
@@ -175,6 +182,27 @@ web3.extend({
     {
       name: "getSmpcAddr",
       call: "smpc_getSmpcAddr",
+      params: 1,
+      inputFormatter: [null],
+      outputFormatter: null,
+    },
+    {
+      name: "sign",
+      call: "smpc_sign",
+      params: 1,
+      inputFormatter: [null],
+      outputFormatter: null,
+    },
+    {
+      name: "getSignStatus",
+      call: "smpc_getSignStatus",
+      params: 1,
+      inputFormatter: [null],
+      outputFormatter: null,
+    },
+    {
+      name: "getCurNodeSignInfo",
+      call: "smpc_getCurNodeSignInfo",
       params: 1,
       inputFormatter: [null],
       outputFormatter: null,

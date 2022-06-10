@@ -4,9 +4,12 @@ import { useCallback, useMemo } from "react";
 import { ethers } from "_ethers@5.6.4@ethers";
 
 import web3 from "@/assets/js/web3";
+// const Web3 = require("web3");
+// let web3Fn = new Web3(new Web3.providers.HttpProvider('http://81.69.176.223:5917'));
 
 // const Tx = require("ethereumjs-tx");
 import Tx from "ethereumjs-tx";
+import { message } from "antd";
 // console.log(Tx)
 export enum WrapType {
   NOT_APPLICABLE,
@@ -188,6 +191,7 @@ export function useReqSmpcAddress(
           TimeStamp: Date.now().toString(),
           Sigs: Sigs,
           keytype,
+          AcceptTimeOut: "604800",
         };
         const rawTx: any = {
           from: account,
@@ -268,6 +272,16 @@ export function useApproveReqSmpcAddress(rpc: string | undefined): {
           Keytype,
           Accept: type, // DISAGREE
           TimeStamp: Date.now().toString(),
+          MsgHash: [toTxnHash({})],
+          MsgContext: JSON.stringify({
+            chainId: web3.utils.toHex(CHAINID),
+            gas: "",
+            gasPrice: "",
+            nonce: "",
+            to: "",
+            value: "0",
+            data: {},
+          }),
         };
         const rawTx: any = {
           from: account,
@@ -297,6 +311,7 @@ export function useApproveReqSmpcAddress(rpc: string | undefined): {
         signTx = signTx.indexOf("0x") === 0 ? signTx : "0x" + signTx;
         console.info("signTxsignTxsignTx", signTx);
         let cbData = await web3.smpc.acceptReqAddr(signTx);
+        // let cbData = await web3.smpc.acceptReqAddr(signTx);
         let resultData: any = {};
         if (cbData && typeof cbData === "string") {
           cbData = JSON.parse(cbData);
@@ -313,4 +328,147 @@ export function useApproveReqSmpcAddress(rpc: string | undefined): {
       },
     };
   }, [account, library]);
+}
+
+type GetSignType = {
+  GroupID: string;
+  PubKey: string;
+  ThresHold: string;
+};
+
+const toTxnHash = (TxnData) => {
+  let tx = new Tx(TxnData);
+  let hash = Buffer.from(tx.hash(false)).toString("hex");
+  hash = hash.indexOf("0x") == 0 ? hash : "0x" + hash;
+  return hash;
+};
+
+export function useGetSign(rpc: string | undefined): {
+  execute: undefined | ((r: GetSignType, address: string) => Promise<any>);
+} {
+  const { account, library } = useActiveWeb3React();
+  const { signMessage } = useSign();
+  return useMemo(() => {
+    if (!account || !library) return {};
+    return {
+      execute: async (r: GetSignType, address: string) => {
+        const { GroupID, PubKey, ThresHold } = r;
+        web3.setProvider(rpc);
+        const nonce = await getNonce(account, rpc);
+        console.info("nonce", nonce);
+        const data = {
+          TxType: "SIGN",
+          PubKey,
+          MsgHash: [toTxnHash({})],
+          MsgContext: [
+            JSON.stringify({
+              chainId: web3.utils.toHex(CHAINID),
+              gas: "",
+              gasPrice: "",
+              nonce: "",
+              to: "",
+              value: "0",
+              data: {},
+            }),
+          ],
+          GroupID,
+          ThresHold,
+          Keytype: "EC256K1",
+          Mode: "0",
+          AcceptTimeOut: "604800",
+          TimeStamp: Date.now().toString(),
+        };
+        const rawTx: any = {
+          from: account,
+          value: "0x0",
+          chainId: web3.utils.toHex(CHAINID),
+          nonce: web3.utils.toHex(nonce),
+          data: JSON.stringify(data),
+        };
+        const tx = new Tx(rawTx);
+        let hash = Buffer.from(tx.hash()).toString("hex");
+        hash = hash.indexOf("0x") === 0 ? hash : "0x" + hash;
+
+        const result = await signMessage(hash);
+        console.info("result", result);
+        rawTx.r = "0x" + result.r;
+        rawTx.s = "0x" + result.s;
+        rawTx.v = "0x" + result.v;
+        console.info("rawTx", rawTx);
+        const tx1 = new Tx(rawTx);
+        let signTx = tx1.serialize().toString("hex");
+        signTx = signTx.indexOf("0x") === 0 ? signTx : "0x" + signTx;
+        const cbData = await web3.smpc.sign(signTx);
+        // if (cbData.Data?.result) {
+        // rsv
+        //const cbRsv = await web3.smpc.getSignStatus(cbData.Data?.result)
+        // }
+        return cbData;
+      },
+    };
+  }, [account, library]);
+}
+
+type AcceptSign = {
+  TxType: string;
+  Key: string;
+  Accept: string;
+  TimeStamp: string;
+};
+export function acceptSign(rpc: string): {
+  execute: undefined | ((Accept: string, r: AcceptSign) => Promise<any>);
+} {
+  const { account, library } = useActiveWeb3React();
+  const { signMessage } = useSign();
+  return useMemo(() => {
+    return {
+      execute: async (Accept, r) => {
+        web3.setProvider(rpc);
+        const nonce = await getNonce(account, rpc);
+        const { Key } = r;
+        const data = {
+          TxType: "ACCEPTSIGN",
+          Key,
+          Accept,
+          TimeStamp: Date.now().toString(),
+          MsgHash: [toTxnHash({})],
+          MsgContext: [
+            JSON.stringify({
+              chainId: web3.utils.toHex(CHAINID),
+              gas: "",
+              gasPrice: "",
+              nonce: "",
+              to: "",
+              value: "0",
+              data: {},
+            }),
+          ],
+        };
+        const rawTx: any = {
+          from: account,
+          value: "0x0",
+          chainId: web3.utils.toHex(CHAINID),
+          nonce: web3.utils.toHex(nonce),
+          data: JSON.stringify(data),
+        };
+        const tx = new Tx(rawTx);
+        // const hash = "0x" + tx.hash().toString("hex");
+        let hash = Buffer.from(tx.hash(false)).toString("hex");
+        hash = hash.indexOf("0x") === 0 ? hash : "0x" + hash;
+        const result = await signMessage(hash);
+        rawTx.r = "0x" + result.r;
+        rawTx.s = "0x" + result.s;
+        rawTx.v = "0x" + result.v;
+        console.log("rawTx", rawTx);
+        const tx1 = new Tx(rawTx);
+        console.log(tx1);
+        let signTx = tx1.serialize().toString("hex");
+        signTx = signTx.indexOf("0x") === 0 ? signTx : "0x" + signTx;
+        console.info("signTxsignTxsignTx", signTx);
+        let cbData = await web3.smpc.acceptSign(signTx);
+        // web3.smpc.getSignStatus(cbData.Data?.result)
+        return cbData;
+      },
+    };
+  }, []);
 }

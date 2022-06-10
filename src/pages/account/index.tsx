@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Button, Modal, Table } from "antd";
+import { Button, message, Modal, Table } from "antd";
 import { useIntl, useModel } from "umi";
 import web3 from "@/assets/js/web3";
 // import web3Fn from "@/libs/web3/index.js";
 import { useActiveWeb3React } from "@/hooks";
+import { useGetSign } from "@/hooks/useSigns";
 import moment from "moment";
 import { cutOut } from "@/utils";
 const keccak256 = require("js-sha3").keccak256;
@@ -12,7 +13,9 @@ const Index = () => {
   const { rpc, signEnode } = JSON.parse(
     localStorage.getItem("loginAccount") || "{}"
   );
+  const { execute } = useGetSign(rpc);
   const { account } = useActiveWeb3React();
+
   const [data, setData] = useState([]);
   const [details, setDetails] = useState<any>({});
 
@@ -32,7 +35,7 @@ const Index = () => {
       },
     },
     {
-      title: "余额",
+      title: useIntl().formatHTMLMessage({ id: "balance" }),
       dataIndex: "PubKey",
       width: "10%",
       render: (t: string) => details[t]?.balance,
@@ -48,10 +51,20 @@ const Index = () => {
       width: "10%",
     },
     {
-      title: "发起交易",
-      dataIndex: "ThresHold",
+      title: useIntl().formatHTMLMessage({ id: "g.action" }),
       width: "10%",
-      render: () => <a>发起交易</a>,
+      render: (r: any) => (
+        <a
+          onClick={async () => {
+            if (!execute) return;
+            const res = await execute(r, details["PubKey"]?.SmpcAddress?.ETH);
+            console.info("ressss", res);
+            if (res.Status === "Success") message.success("Success");
+          }}
+        >
+          {useIntl().formatHTMLMessage({ id: "transaction" })}
+        </a>
+      ),
     },
   ];
 
@@ -60,6 +73,10 @@ const Index = () => {
     web3.setProvider("https://api.mycryptoapi.com/eth");
     const balanceRes = await web3.eth.getBalance(
       JSON.parse(res.Data.result).SmpcAddress.ETH
+    );
+    console.info(
+      "JSON.parse(res.Data.result).SmpcAddress",
+      JSON.parse(res.Data.result).SmpcAddress
     );
     setDetails({
       ...details,
