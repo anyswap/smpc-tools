@@ -11,7 +11,11 @@ import {
 } from "umi";
 import web3 from "@/assets/js/web3";
 import { useActiveWeb3React } from "@/hooks";
-import { useSignEnode, useReqSmpcAddress } from "@/hooks/useSigns";
+import {
+  useSignEnode,
+  useReqSmpcAddress,
+  useSendTxDemo,
+} from "@/hooks/useSigns";
 // import ModalHead from "@/component/modalHead";
 import Logo_png from "@/pages/img/logo.svg";
 import "./style.less";
@@ -41,6 +45,7 @@ const Index = () => {
     })
   );
   const { execute } = useSignEnode(loginAccount.enode);
+  const { execute: sendTx } = useSendTxDemo();
 
   useEffect(() => {
     localStorage.removeItem("node");
@@ -207,6 +212,11 @@ const Index = () => {
           <Form.Item>
             <Button type="primary" onClick={goDemo} loading={loading}>
               Demo
+            </Button>
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" onClick={sendTx} loading={loading}>
+              SendT x
             </Button>
           </Form.Item>
         </Form>

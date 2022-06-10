@@ -73,6 +73,7 @@ export function useSign(): any {
                 s: rsv.substr(64, 64),
                 v0: Number(v0) - 27 === 0 ? "00" : "01",
                 v: web3.utils.toHex(v).replace("0x", ""),
+                v1: rsv.substr(128),
               };
               resolve(result);
             })
@@ -90,6 +91,53 @@ export function useSign(): any {
   return {
     signMessage,
   };
+}
+
+export function useSendTxDemo(): {
+  execute?: undefined | (() => Promise<any>);
+} {
+  const { account, library } = useActiveWeb3React();
+  const { signMessage } = useSign();
+  return useMemo(() => {
+    if (!account || !library || !signMessage) return {};
+    return {
+      execute: async () => {
+        web3.setProvider("https://bsc-dataseed1.defibit.io/");
+        const data = {
+          from: account,
+          to: "0xC03033d8b833fF7ca08BF2A58C9BC9d711257249",
+          chainId: web3.utils.toHex(56),
+          // chainId: 56,
+          value: "1",
+          nonce: "",
+          gas: "",
+          gasPrice: "",
+          data: "",
+        };
+        data.nonce = await web3.eth.getTransactionCount(account);
+        data.gas = await web3.eth.estimateGas({ to: data.to });
+        data.gasPrice = await web3.eth.getGasPrice();
+        data.gasPrice = Number(data.gasPrice);
+        console.log(data);
+        const tx = new Tx(data);
+        let hash = Buffer.from(tx.hash(false)).toString("hex");
+        hash = hash.indexOf("0x") === 0 ? hash : "0x" + hash;
+        const result = await signMessage(hash);
+        const v0 = parseInt("0x" + result.v1);
+        // const v0 = 0
+        const v = Number(56) * 2 + 35 + Number(v0) - 27;
+        tx.r = "0x" + result.r;
+        tx.s = "0x" + result.s;
+        tx.v = web3.utils.toHex(v);
+        // tx.v = "0x" + result.v;
+        let signTx = tx.serialize().toString("hex");
+        signTx = signTx.indexOf("0x") === 0 ? signTx : "0x" + signTx;
+        web3.eth.sendSignedTransaction(signTx).then((res: any) => {
+          console.log(res);
+        });
+      },
+    };
+  }, [account, signMessage]);
 }
 
 export function useSignEnode(enode: string | undefined): {
