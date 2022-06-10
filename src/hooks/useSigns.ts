@@ -447,10 +447,14 @@ export function useGetSign(rpc: string | undefined): {
         let signTx = tx1.serialize().toString("hex");
         signTx = signTx.indexOf("0x") === 0 ? signTx : "0x" + signTx;
         const cbData = await web3.smpc.sign(signTx);
-        // if (cbData.Data?.result) {
-        // rsv
-        //const cbRsv = await web3.smpc.getSignStatus(cbData.Data?.result)
-        // }
+        if (cbData.Data?.result) {
+          // rsv
+          const intervel = setInterval(async () => {
+            const cbRsv = await web3.smpc.getSignStatus(cbData.Data?.result);
+            console.info("cbRsv", cbRsv);
+            debugger;
+          }, 1000);
+        }
         return cbData;
       },
     };
@@ -514,7 +518,6 @@ export function acceptSign(rpc: string): {
         signTx = signTx.indexOf("0x") === 0 ? signTx : "0x" + signTx;
         console.info("signTxsignTxsignTx", signTx);
         let cbData = await web3.smpc.acceptSign(signTx);
-        // web3.smpc.getSignStatus(cbData.Data?.result)
         return cbData;
       },
     };

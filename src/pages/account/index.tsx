@@ -17,7 +17,7 @@ const Index = () => {
   const { account } = useActiveWeb3React();
 
   const [data, setData] = useState([]);
-  const [details, setDetails] = useState<any>({});
+  const [details, setDetails] = useState<any>("{}");
 
   const columns = [
     {
@@ -31,14 +31,14 @@ const Index = () => {
       dataIndex: "PubKey",
       width: "25%",
       render: (t: string) => {
-        return details[t]?.SmpcAddress?.ETH;
+        return <span>{JSON.parse(details)[t]?.SmpcAddress?.ETH}</span>;
       },
     },
     {
       title: useIntl().formatHTMLMessage({ id: "balance" }),
       dataIndex: "PubKey",
       width: "10%",
-      render: (t: string) => details[t]?.balance,
+      render: (t: string) => JSON.parse(details)[t]?.balance,
     },
     {
       title: useIntl().formatHTMLMessage({ id: "accountList.createDate" }),
@@ -58,7 +58,6 @@ const Index = () => {
           onClick={async () => {
             if (!execute) return;
             const res = await execute(r, details["PubKey"]?.SmpcAddress?.ETH);
-            console.info("ressss", res);
             if (res.Status === "Success") message.success("Success");
           }}
         >
@@ -68,23 +67,22 @@ const Index = () => {
     },
   ];
 
-  const getSmpcAddr = async (PubKey: string) => {
+  const detailsObj: any = {};
+  const getSmpcAddr = async (PubKey: string, newArr: Array<any>) => {
     const res = await web3.smpc.getSmpcAddr(PubKey);
     web3.setProvider("https://api.mycryptoapi.com/eth");
     const balanceRes = await web3.eth.getBalance(
       JSON.parse(res.Data.result).SmpcAddress.ETH
     );
-    console.info(
-      "JSON.parse(res.Data.result).SmpcAddress",
-      JSON.parse(res.Data.result).SmpcAddress
-    );
-    setDetails({
-      ...details,
-      [PubKey]: {
-        balance: balanceRes + "eth",
-        SmpcAddress: JSON.parse(res.Data.result).SmpcAddress,
-      },
-    });
+    detailsObj[PubKey] = {
+      balance: balanceRes + "eth",
+      SmpcAddress: JSON.parse(res.Data.result).SmpcAddress,
+    };
+    if (
+      Object.entries(detailsObj).length === Object.entries(detailsObj).length
+    ) {
+      setDetails(JSON.stringify(detailsObj));
+    }
   };
 
   const getAccountList = async () => {
@@ -97,20 +95,21 @@ const Index = () => {
     let arr: any = [];
     Group.forEach((item: any) => {
       item.Accounts.forEach((it: any) => {
-        // if (arr.every((el: any) => el.PubKey !== it.PubKey)) {
-        arr.push({
-          PubKey: it.PubKey,
-          GroupID: item.GroupID,
-          ThresHold: it.ThresHold,
-          // name: it.publicKey.substr(2),
-          TimeStamp: Number(it.TimeStamp),
-        });
-        // }
+        if (arr.every((el: any) => el.PubKey !== it.PubKey)) {
+          arr.push({
+            PubKey: it.PubKey,
+            GroupID: item.GroupID,
+            ThresHold: it.ThresHold,
+            // name: it.publicKey.substr(2),
+            TimeStamp: Number(it.TimeStamp),
+          });
+        }
       });
     });
     setData(arr.sort((a: any, b: any) => b.TimeStamp - a.TimeStamp));
-    Array.from(new Set(arr.map((item: any) => item.PubKey))).forEach((item) => {
-      getSmpcAddr(item as string);
+    const newArr = Array.from(new Set(arr.map((item: any) => item.PubKey)));
+    newArr.forEach((item) => {
+      getSmpcAddr(item as string, newArr);
     });
   };
 
@@ -126,13 +125,19 @@ const Index = () => {
     });
   };
 
-  return useMemo(() => {
-    return (
-      <div>
-        <Table columns={columns} dataSource={data} pagination={false} />
-      </div>
-    );
-  }, [account, data, JSON.stringify(details)]);
+  // return useMemo(() => {
+  return (
+    <div>
+      <Table
+        columns={columns}
+        dataSource={data}
+        pagination={false}
+        rowKey="PubKey"
+        key={Object.values(details).length}
+      />
+    </div>
+  );
+  // }, [account, data, JSON.stringify(details), details]);
 };
 
 export default Index;
