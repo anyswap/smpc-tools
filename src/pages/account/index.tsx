@@ -26,7 +26,7 @@ const Index = () => {
 
   const columns = [
     {
-      title: "pubicKey",
+      title: "publickey",
       dataIndex: "PubKey",
       width: "25%",
       render: (t: string) => {
@@ -155,7 +155,12 @@ const Index = () => {
   const onSend = async (to: string, value: string) => {
     if (!execute) return;
     const res = await execute(active, to, value);
-    if (res.Status === "Success") message.success("Success");
+    if (res.Status === "Success") {
+      message.success("Success");
+      setVisible(false);
+      return true;
+    }
+    return false;
   };
 
   // return useMemo(() => {

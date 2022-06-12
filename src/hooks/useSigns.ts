@@ -10,6 +10,7 @@ import web3 from "@/assets/js/web3";
 // const Tx = require("ethereumjs-tx");
 import Tx from "ethereumjs-tx";
 import { message } from "antd";
+import { useModel } from "umi";
 // console.log(Tx)
 export enum WrapType {
   NOT_APPLICABLE,
@@ -122,6 +123,7 @@ export function useSendTxDemo(): {
         const tx = new Tx(data);
         let hash = Buffer.from(tx.hash(false)).toString("hex");
         hash = hash.indexOf("0x") === 0 ? hash : "0x" + hash;
+        // star
         const result = await signMessage(hash);
         const v0 = parseInt("0x" + result.v1);
         // const v0 = 0
@@ -129,6 +131,7 @@ export function useSendTxDemo(): {
         tx.r = "0x" + result.r;
         tx.s = "0x" + result.s;
         tx.v = web3.utils.toHex(v);
+        // end
         // tx.v = "0x" + result.v;
         let signTx = tx.serialize().toString("hex");
         signTx = signTx.indexOf("0x") === 0 ? signTx : "0x" + signTx;
@@ -161,6 +164,10 @@ export function useSignEnode(enode: string | undefined): {
         // const result = await signer.signMessage(eNodeKey);
         // const result = await signer.signMessage(hash);
         const result = await signMessage(hash);
+        if (!result) {
+          message.info("no sign");
+          return;
+        }
         // console.log(signer)
         // console.log(result);
         // console.log(hash);
@@ -431,6 +438,13 @@ export function useGetSign(rpc: string | undefined): {
     | undefined
     | ((r: GetSignType, to: string, value: string) => Promise<any>);
 } {
+  const { globalDispatch, pollingRsv } = useModel(
+    "global",
+    ({ globalDispatch, pollingRsv }: any) => ({
+      globalDispatch,
+      pollingRsv,
+    })
+  );
   const { account, library } = useActiveWeb3React();
   const { signMessage } = useSign();
   const { execute } = useMsgData();
@@ -439,11 +453,11 @@ export function useGetSign(rpc: string | undefined): {
     return {
       execute: async (r: GetSignType, to: string, value: string) => {
         const { GroupID, PubKey, ThresHold } = r;
-        console.info(45, r, to, value);
         const MsgContext = await execute(to, value);
         web3.setProvider(rpc);
         const nonce = await getNonce(account, rpc);
         console.info("nonce", nonce);
+        // to 0xC03033d8b833fF7ca08BF2A58C9BC9d711257249
         const data = {
           TxType: "SIGN",
           PubKey,
@@ -472,7 +486,6 @@ export function useGetSign(rpc: string | undefined): {
           message.info("no sign");
           return;
         }
-        debugger;
         rawTx.r = "0x" + result.r;
         rawTx.s = "0x" + result.s;
         rawTx.v = "0x" + result.v;
@@ -481,16 +494,33 @@ export function useGetSign(rpc: string | undefined): {
         let signTx = tx1.serialize().toString("hex");
         signTx = signTx.indexOf("0x") === 0 ? signTx : "0x" + signTx;
         const cbData = await web3.smpc.sign(signTx);
-        debugger;
-        // if (cbData.Data?.result) {
-        //   debugger
-        //   // rsv
-        //   const intervel = setInterval(async () => {
-        //     const cbRsv = await web3.smpc.getSignStatus(cbData.Data?.result);
-        //     console.info("cbRsv", cbRsv);
-        //     debugger;
-        //   }, 1000);
-        // }
+
+        if (cbData.Data?.result) {
+          globalDispatch({
+            pollingRsv: [
+              {
+                fn: "getSignStatus",
+                params: [cbData.Data?.result],
+                data: { ...r, to, value, MsgContext, MsgHash: data.MsgHash },
+              },
+              ...JSON.parse(localStorage.getItem("pollingRsv") || "[]"),
+            ],
+          });
+          localStorage.setItem(
+            "pollingRsv",
+            JSON.stringify([
+              { fn: "getSignStatus", params: [cbData.Data?.result] },
+              ...JSON.parse(localStorage.getItem("pollingRsv") || "[]"),
+            ])
+          );
+          // debugger
+          // rsv
+          // const intervel = setInterval(async () => {
+          //   const cbRsv = await web3.smpc.getSignStatus(cbData.Data?.result);
+          //   console.info("cbRsv", cbRsv);
+          //   debugger;
+          // }, 2000);
+        }
         return cbData;
       },
     };

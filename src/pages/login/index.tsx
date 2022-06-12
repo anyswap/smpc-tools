@@ -60,6 +60,7 @@ const Index = () => {
   const getSignEnode = () => {
     if (!execute) return;
     execute().then(async (res) => {
+      if (!res) return;
       localStorage.setItem(
         "loginAccount",
         JSON.stringify({

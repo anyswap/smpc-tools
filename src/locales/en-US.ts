@@ -17,7 +17,7 @@ export default {
   "nav.approvaled": "Transactionsed List",
   "nav.accountList": "Account List",
   "createGrounp.admin": "Admin",
-  "createGrounp.model": "Model",
+  "createGrounp.model": "thresHold",
   "accountList.thresHold": "thresHold",
   "accountList.createDate": "create date",
   "approval.agree": "Confirm",

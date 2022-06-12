@@ -26,9 +26,13 @@ const initState = {
 
 const Index = () => {
   const [form] = Form.useForm();
-  // const { loginAccount } = useModel("global", ({ loginAccount }) => ({
-  //   loginAccount,
-  // }));
+  const { globalDispatch, pollingRsv } = useModel(
+    "global",
+    ({ globalDispatch, pollingRsv }: any) => ({
+      globalDispatch,
+      pollingRsv,
+    })
+  );
   const loginAccount = JSON.parse(localStorage.getItem("loginAccount") || "{}");
   const { account } = useActiveWeb3React();
 
@@ -77,16 +81,63 @@ const Index = () => {
     });
     reset();
   };
+  useEffect(() => {
+    onstorage;
+  });
 
   const createSuccess = useIntl().formatMessage({ id: "createSuccess" });
   const createAccount = async () => {
     if (!reqSmpcAddr) return;
     const res = await reqSmpcAddr();
-    debugger;
     if (res.msg === "Success") {
       message.success(createSuccess);
-      history.push("./approval");
+      dispatch({ visible: false });
+      const newPollingPubKeyItem = {
+        fn: "getReqAddrStatus",
+        params: [res.info],
+        data: {
+          GroupID: Gid,
+          ThresHold: form.getFieldValue("ThresHold"),
+        },
+      };
+      globalDispatch({
+        pollingPubKey: [
+          newPollingPubKeyItem,
+          ...JSON.parse(localStorage.getItem("pollingPubKey") || "[]"),
+        ],
+      });
+      localStorage.setItem(
+        "pollingPubKey",
+        JSON.stringify([
+          newPollingPubKeyItem,
+          ...JSON.parse(localStorage.getItem("pollingPubKey") || "[]"),
+        ])
+      );
     }
+
+    // localStorage
+    // const intervel = setInterval(async () => {
+    //   const cbPkey = await web3.smpc.getReqAddrStatus(res.info);
+    //   if (cbPkey.Status === "Success") {
+    //     const parseResykt = JSON.parse(cbPkey?.Data?.result || "{}");
+    //     const Account = JSON.parse(localStorage.getItem("Account") || "[]");
+    //     localStorage.setItem(
+    //       "Account",
+    //       JSON.stringify([
+    //         {
+    //           ...parseResykt,
+    //           key: parseResykt.Key,
+    //           GroupID: Gid,
+    //           ThresHold: form.getFieldValue("ThresHold"),
+    //           PubKey: JSON.parse(cbPkey.Data.result).PubKey,
+    //         },
+    //         ...Account,
+    //       ])
+    //     );
+    //     clearInterval(intervel);
+    //     history.push("./approval");
+    //   }
+    // }, 1000);
   };
 
   useEffect(() => {
@@ -97,7 +148,6 @@ const Index = () => {
     web3.setProvider(loginAccount?.rpc);
     if (!execute) return;
     const res = await execute();
-    debugger;
     if (res.msg === "Success") {
       dispatch({
         Gid: res.info.Gid,

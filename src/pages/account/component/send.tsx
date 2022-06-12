@@ -11,8 +11,9 @@ const Index = (props: {
 
   const [form] = Form.useForm();
 
-  const onFinish = (v: { to: string; value: string }) => {
-    onSend(v.to, v.value);
+  const onFinish = async (v: { to: string; value: string }) => {
+    const res = await onSend(v.to, v.value);
+    if (res) setVisible(false);
   };
   const rules2 = useIntl().formatHTMLMessage({ id: "login.rules2" });
 

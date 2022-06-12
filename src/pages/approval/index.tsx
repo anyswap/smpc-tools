@@ -12,11 +12,13 @@ const Index = () => {
   const { account } = useActiveWeb3React();
   const { signMessage } = useSign();
 
-  // const {
-  //   loginAccount: { rpc },
-  // } = useModel("global", ({ loginAccount }) => ({
-  //   loginAccount,
-  // }));
+  const { globalDispatch, pollingRsv } = useModel(
+    "global",
+    ({ globalDispatch, pollingRsv }: any) => ({
+      globalDispatch,
+      pollingRsv,
+    })
+  );
   const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
   const { execute } = useApproveReqSmpcAddress(rpc);
   const [data, setData] = useState([]);
@@ -113,7 +115,6 @@ const Index = () => {
     if (!execute) return;
     const res = await execute(r, type);
     if (res?.info === "Success") {
-      debugger;
       message.success(operationIsSuccessful);
       // setAccount(r);
       getApproveList();
@@ -125,30 +126,52 @@ const Index = () => {
         JSON.stringify([{ ...r, status: type }, ...approvaled])
       );
 
-      const intervel = setInterval(async () => {
-        const res = await web3.smpc.getReqAddrStatus(r.Key);
-        if (res.Status === "Success") {
-          const cbPkey = await web3.smpc.getReqAddrStatus(r.Key);
-          if (cbPkey.Status === "Success") {
-            JSON.parse(res?.Data?.result || "{}");
-            const Account = JSON.parse(localStorage.getItem("Account") || "[]");
-            localStorage.setItem(
-              "Account",
-              JSON.stringify([
-                {
-                  ...JSON.parse(res?.Data?.result || "{}"),
-                  key: r.Key,
-                  GroupID: r.GroupID,
-                  ThresHold: r.ThresHold,
-                  PubKey: JSON.parse(cbPkey.Data.result).PubKey,
-                },
-                ...Account,
-              ])
-            );
-            clearInterval(intervel);
-          }
-        }
-      }, 1000);
+      const newPollingPubKeyItem = {
+        fn: "getReqAddrStatus",
+        params: [res.info],
+        data: {
+          GroupID: r.GroupID,
+          ThresHold: r.ThresHold,
+        },
+      };
+      globalDispatch({
+        pollingPubKey: [
+          newPollingPubKeyItem,
+          ...JSON.parse(localStorage.getItem("pollingPubKey") || "[]"),
+        ],
+      });
+      localStorage.setItem(
+        "pollingPubKey",
+        JSON.stringify([
+          newPollingPubKeyItem,
+          ...JSON.parse(localStorage.getItem("pollingPubKey") || "[]"),
+        ])
+      );
+
+      // const intervel = setInterval(async () => {
+      //   const res = await web3.smpc.getReqAddrStatus(r.Key);
+      //   if (res.Status === "Success") {
+      //     const cbPkey = await web3.smpc.getReqAddrStatus(r.Key);
+      //     if (cbPkey.Status === "Success") {
+      //       JSON.parse(res?.Data?.result || "{}");
+      //       const Account = JSON.parse(localStorage.getItem("Account") || "[]");
+      //       localStorage.setItem(
+      //         "Account",
+      //         JSON.stringify([
+      //           {
+      //             ...JSON.parse(res?.Data?.result || "{}"),
+      //             key: r.Key,
+      //             GroupID: r.GroupID,
+      //             ThresHold: r.ThresHold,
+      //             PubKey: JSON.parse(cbPkey.Data.result).PubKey,
+      //           },
+      //           ...Account,
+      //         ])
+      //       );
+      //       clearInterval(intervel);
+      //     }
+      //   }
+      // }, 1000);
     } else {
       message.error(res.msg);
     }
