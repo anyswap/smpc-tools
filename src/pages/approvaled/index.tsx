@@ -9,6 +9,16 @@ import "./style.less";
 import { cutOut } from "@/utils";
 
 const Index = () => {
+  const { globalDispatch } = useModel("global", ({ globalDispatch }) => ({
+    globalDispatch,
+  }));
+  useEffect(() => {
+    localStorage.setItem("pollingRsvInfo", "0");
+    globalDispatch({
+      pollingPubKeyInfo: 0,
+    });
+  }, []);
+
   const { account } = useActiveWeb3React();
   const action: any = {
     AGREE: useIntl().formatHTMLMessage({ id: "approval.agree" }),

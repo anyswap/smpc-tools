@@ -3,7 +3,7 @@ import Logo from "@/pages/img/logo.png";
 import { history, useModel, getLocale, setLocale, useIntl } from "umi";
 import { useActiveWeb3React } from "@/hooks";
 // import { setLocale, getLocale, history, getAllLocales, useIntl, useModel } from 'umi';
-import { ConfigProvider, Select, Modal, Button } from "antd";
+import { ConfigProvider, Select, Modal, Button, Badge } from "antd";
 import { CopyOutlined } from "@ant-design/icons";
 import { cutOut, copyTxt } from "@/utils";
 import enUS from "antd/lib/locale/en_US";
@@ -23,9 +23,14 @@ const Index = (props) => {
   const { rpc = "", signEnode = "" } = JSON.parse(
     localStorage.getItem("loginAccount") || "{}"
   );
-  const { globalDispatch } = useModel("global", ({ globalDispatch }) => ({
-    globalDispatch,
-  }));
+  const { globalDispatch, pollingRsvInfo, pollingPubKeyInfo } = useModel(
+    "global",
+    ({ globalDispatch, pollingRsvInfo, pollingPubKeyInfo }) => ({
+      globalDispatch,
+      pollingRsvInfo,
+      pollingPubKeyInfo,
+    })
+  );
   const [local, SetLocalAntd] = useState(enUS);
   const [visible, setVisible] = useState(false);
   const nav = [
@@ -44,10 +49,6 @@ const Index = (props) => {
     {
       name: useIntl().formatHTMLMessage({ id: "nav.approval" }),
       url: "/approval",
-    },
-    {
-      name: useIntl().formatHTMLMessage({ id: "nav.approvaled" }),
-      url: "/approvaled",
     },
   ];
 
@@ -76,6 +77,8 @@ const Index = (props) => {
     setVisible(false);
   };
   const { ethereum } = window;
+  console.info("pollingRsvInfo", pollingPubKeyInfo);
+  console.info("pollingRsvInfo ", pollingPubKeyInfo);
   return (
     <ConfigProvider locale={local} prefixCls={prefix}>
       <div className={prefix === "custom-default" ? "layouts" : "layouts dark"}>
@@ -109,6 +112,27 @@ const Index = (props) => {
                 </div>
               );
             })}
+            {/* {
+      name: useIntl().formatHTMLMessage({ id: "nav.approvaled" }),
+      url: "/approvaled",
+    }, */}
+            <Badge
+              count={pollingRsvInfo + pollingPubKeyInfo}
+              key={pollingRsvInfo + pollingPubKeyInfo}
+              overflowCount={100}
+              offset={[0, 10]}
+              showZero={false}
+            >
+              <div
+                key="/approvaled"
+                className={
+                  history.location.pathname === "/approvaled" ? "active" : ""
+                }
+                onClick={() => history.push("/approvaled")}
+              >
+                {useIntl().formatHTMLMessage({ id: "nav.approvaled" })}
+              </div>
+            </Badge>
           </div>
           <div className="right">
             <Modal

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useDebugValue, useEffect, useState } from "react";
 import { Button, message, Table, Tag } from "antd";
 import { useActiveWeb3React } from "@/hooks";
 import { useApproveReqSmpcAddress, useSign, getNonce } from "@/hooks/useSigns";
@@ -15,6 +15,18 @@ const Index = () => {
     AGREE: useIntl().formatHTMLMessage({ id: "approval.agree" }),
     DISAGREE: useIntl().formatHTMLMessage({ id: "approval.disagree" }),
   };
+
+  const { globalDispatch } = useModel("global", ({ globalDispatch }) => ({
+    globalDispatch,
+  }));
+
+  useEffect(() => {
+    debugger;
+    localStorage.setItem("pollingRsvInfo", "0");
+    globalDispatch({
+      pollingPubKeyInfo: 0,
+    });
+  }, []);
 
   const send = async (r: any) => {
     console.info(r);

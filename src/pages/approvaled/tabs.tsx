@@ -1,22 +1,41 @@
-import { Table } from "antd";
-import React from "react";
+import { Table, Badge, Button } from "antd";
+import React, { useEffect } from "react";
 import { Tabs } from "antd";
 import AccountList from "./index";
 import TradingList from "./trading";
-import { useIntl } from "umi";
+import { useIntl, useModel } from "umi";
 
 const Index = () => {
+  const { pollingRsvInfo, pollingPubKeyInfo } = useModel(
+    "global",
+    ({ pollingRsvInfo, pollingPubKeyInfo }) => ({
+      pollingRsvInfo,
+      pollingPubKeyInfo,
+    })
+  );
   return (
     <Tabs defaultActiveKey={"0"}>
       <Tabs.TabPane
         key={"0"}
-        tab={useIntl().formatHTMLMessage({ id: "accountApproval" })}
+        tab={
+          <Badge count={pollingPubKeyInfo} overflowCount={100}>
+            <Button type="text">
+              {useIntl().formatHTMLMessage({ id: "accountApproval" })}
+            </Button>
+          </Badge>
+        }
       >
         <AccountList />
       </Tabs.TabPane>
       <Tabs.TabPane
         key={"1"}
-        tab={useIntl().formatHTMLMessage({ id: "tradingApproval" })}
+        tab={
+          <Badge count={pollingRsvInfo} overflowCount={100}>
+            <Button type="text">
+              {useIntl().formatHTMLMessage({ id: "tradingApproval" })}
+            </Button>
+          </Badge>
+        }
       >
         <TradingList />
       </Tabs.TabPane>

@@ -22,9 +22,11 @@ const initState = {
   // 发起交易后轮询rsv
   pollingRsv: JSON.parse(localStorage.getItem("pollingRsv") || "[]"),
   pollingRsvActiveInterval: [],
+  pollingRsvInfo: Number(localStorage.getItem("pollingRsvInfo") || 0),
   //创建账号后轮询Pubkey
   pollingPubKey: JSON.parse(localStorage.getItem("pollingPubKey") || "[]"),
   pollingPubKeyActiveInterval: [],
+  pollingPubKeyInfo: Number(localStorage.getItem("pollingPubKeyInfo") || 0),
 };
 
 export default function Index() {
@@ -34,6 +36,8 @@ export default function Index() {
     pollingRsvActiveInterval,
     pollingPubKey,
     pollingPubKeyActiveInterval,
+    pollingRsvInfo,
+    pollingPubKeyInfo,
   } = state;
 
   const getNodeList = async () => {
@@ -69,6 +73,10 @@ export default function Index() {
           "sendApprovaled",
           JSON.stringify([{ ...data, Rsv: res.Data.result }, ...sendApprovaled])
         );
+        dispatch({
+          pollingRsvInfo: pollingRsvInfo + 1,
+        });
+        localStorage.setItem("pollingRsvInfo", pollingRsvInfo + 1);
       }
     }, 30000);
     const newPollingRsvActiveInterval = pollingRsvActiveInterval;
@@ -122,6 +130,10 @@ export default function Index() {
             ...Account,
           ])
         );
+        dispatch({
+          pollingRsvInfo: pollingPubKeyInfo + 1,
+        });
+        localStorage.setItem("pollingRsvInfo", pollingPubKeyInfo + 1);
       }
     }, 30000);
     const newPollingPubKeyActiveInterval = pollingPubKeyActiveInterval;
