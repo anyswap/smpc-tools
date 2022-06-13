@@ -63,8 +63,23 @@ export default function Index() {
         const newPollingRsv = pollingRsv.filter(
           (item: any, index: number) => index !== i
         );
-        debugger;
         localStorage.setItem("pollingRsv", JSON.stringify(newPollingRsv));
+        const result = JSON.parse(res?.Data?.result || "{}");
+
+        if (result.Status === "Failure") {
+          console.info("被拒绝了一笔Rsv申请, 参数是", params);
+          console.info("data:", data);
+          console.info("index:", i);
+          return;
+        }
+
+        if (result.Status === "Timeout") {
+          // 超时了
+          console.info("超时了一笔Rsv申请, 参数是", params);
+          console.info("data:", data);
+          console.info("index:", i);
+          return;
+        }
         // 设置交易审批记录页面数据
         const sendApprovaled = JSON.parse(
           localStorage.getItem("sendApprovaled") || "[]"
@@ -102,11 +117,9 @@ export default function Index() {
   const pollingPubKeyInterval = (fn: any, params: any, data: any, i: any) => {
     const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
     const interval = setInterval(async () => {
-      console.info("rpc", rpc);
-      console.info("web3.setProvider", web3.setProvider);
       web3.setProvider(rpc);
       const res = await fn(...params);
-      console.info("pollingPubKeyInterval", res);
+      debugger;
       if (res.Status === "Success") {
         clearInterval(interval);
         const newPollingPubKey = pollingPubKey.filter(
@@ -115,6 +128,18 @@ export default function Index() {
         localStorage.setItem("pollingPubKey", JSON.stringify(newPollingPubKey));
 
         const result = JSON.parse(res?.Data?.result || "{}");
+        if (result.Status === "Failure") {
+          console.info("被拒绝了一笔PubKey申请, 参数是", params);
+          console.info("data:", data);
+          console.info("index:", i);
+          return;
+        }
+        if (result.Status === "Timeout") {
+          console.info("超时了一笔PubKey申请, 参数是", params);
+          console.info("data:", data);
+          console.info("index:", i);
+          return;
+        }
         // 设置账户列表页面数据
         const Account = JSON.parse(localStorage.getItem("Account") || "[]");
         localStorage.setItem(
@@ -131,9 +156,9 @@ export default function Index() {
           ])
         );
         dispatch({
-          pollingRsvInfo: pollingPubKeyInfo + 1,
+          pollingPubKeyInfo: pollingPubKeyInfo + 1,
         });
-        localStorage.setItem("pollingRsvInfo", pollingPubKeyInfo + 1);
+        localStorage.setItem("pollingPubKeyInfo", pollingPubKeyInfo + 1);
       }
     }, 30000);
     const newPollingPubKeyActiveInterval = pollingPubKeyActiveInterval;

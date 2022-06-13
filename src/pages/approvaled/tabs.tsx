@@ -1,5 +1,5 @@
 import { Table, Badge, Button } from "antd";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Tabs } from "antd";
 import AccountList from "./index";
 import TradingList from "./trading";
@@ -13,6 +13,13 @@ const Index = () => {
       pollingPubKeyInfo,
     })
   );
+  // const [RsvInfo, setRsvInfoInfo] = useState(pollingRsvInfo);
+
+  // useEffect(() => {
+  //   setRsvInfoInfo(pollingRsvInfo);
+  //   debugger;
+  // }, [pollingRsvInfo]);
+  // console.info("RsvInfo", RsvInfo);
   return (
     <Tabs defaultActiveKey={"0"}>
       <Tabs.TabPane

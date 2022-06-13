@@ -65,7 +65,10 @@ const Index = () => {
         <a
           onClick={
             () => {
-              setActive(r);
+              setActive({
+                ...r,
+                address: ethers.utils.computeAddress("0x" + r.PubKey),
+              });
               setVisible(true);
             }
             //   async () => {

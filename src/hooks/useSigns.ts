@@ -1,7 +1,7 @@
 import { useActiveWeb3React } from "@/hooks";
 import { useCallback, useMemo } from "react";
 
-import { ethers } from "_ethers@5.6.4@ethers";
+import { ethers } from "ethers";
 
 import web3 from "@/assets/js/web3";
 // const Web3 = require("web3");
@@ -125,11 +125,15 @@ export function useSendTxDemo(): {
         hash = hash.indexOf("0x") === 0 ? hash : "0x" + hash;
         // star
         const result = await signMessage(hash);
+        debugger;
         const v0 = parseInt("0x" + result.v1);
         // const v0 = 0
         const v = Number(56) * 2 + 35 + Number(v0) - 27;
         tx.r = "0x" + result.r;
         tx.s = "0x" + result.s;
+        debugger;
+        console.info("v", v);
+        console.info("web3.utils.toHex(v)", web3.utils.toHex(v));
         tx.v = web3.utils.toHex(v);
         // end
         // tx.v = "0x" + result.v;
@@ -247,7 +251,8 @@ export function useReqSmpcAddress(
           TimeStamp: Date.now().toString(),
           Sigs: Sigs,
           keytype,
-          AcceptTimeOut: "604800",
+          // AcceptTimeOut: "604800",
+          AcceptTimeOut: "60", // 测试超时用
         };
         const rawTx: any = {
           from: account,
@@ -394,7 +399,9 @@ type GetSignType = {
 };
 
 function useMsgData(): {
-  execute?: undefined | ((to: string, value: string) => Promise<any>);
+  execute?:
+    | undefined
+    | ((to: string, value: string, address: string) => Promise<any>);
 } {
   // web3.setProvider('https://bsc-dataseed1.defibit.io/')
   const { account, library } = useActiveWeb3React();
@@ -402,13 +409,16 @@ function useMsgData(): {
   return useMemo(() => {
     if (!account || !library) return {};
     return {
-      execute: async (to: string, value: string) => {
-        web3.setProvider("https://bsc-dataseed1.defibit.io/");
+      execute: async (to: string, value: string, address: string) => {
+        web3.setProvider(
+          "https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"
+        );
         const data: any = {
-          from: account,
+          from: address,
           // to: "0xC03033d8b833fF7ca08BF2A58C9BC9d711257249",
           to,
-          chainId: web3.utils.toHex(56),
+          chainId: web3.utils.toHex(4),
+          // chainId: web3.utils.toHex(56),
           // value: "1",
           value,
           nonce: "",
@@ -452,9 +462,10 @@ export function useGetSign(rpc: string | undefined): {
     if (!account || !library || !execute) return {};
     return {
       execute: async (r: GetSignType, to: string, value: string) => {
-        const { GroupID, PubKey, ThresHold } = r;
-        const MsgContext = await execute(to, value);
+        const { GroupID, PubKey, ThresHold, address } = r;
+        debugger;
         web3.setProvider(rpc);
+        const MsgContext = await execute(to, value, address);
         const nonce = await getNonce(account, rpc);
         console.info("nonce", nonce);
         // to 0xC03033d8b833fF7ca08BF2A58C9BC9d711257249
@@ -467,6 +478,7 @@ export function useGetSign(rpc: string | undefined): {
           ThresHold,
           Keytype: "EC256K1",
           Mode: "0",
+          // AcceptTimeOut: "60", // 测试超时用
           AcceptTimeOut: "604800",
           TimeStamp: Date.now().toString(),
         };

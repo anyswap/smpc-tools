@@ -77,8 +77,6 @@ const Index = (props) => {
     setVisible(false);
   };
   const { ethereum } = window;
-  console.info("pollingRsvInfo", pollingPubKeyInfo);
-  console.info("pollingRsvInfo ", pollingPubKeyInfo);
   return (
     <ConfigProvider locale={local} prefixCls={prefix}>
       <div className={prefix === "custom-default" ? "layouts" : "layouts dark"}>
