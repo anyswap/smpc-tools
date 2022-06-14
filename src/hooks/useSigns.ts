@@ -51,6 +51,12 @@ async function getNonce(account: any, rpc: any) {
   return nonceResult.Data.result;
 }
 
+const getSignNonce = async (account: any, rpc: any) => {
+  web3.setProvider(rpc);
+  const nonceResult = await web3.smpc.getReqAddrNonce(account);
+  return nonceResult.Data.result;
+};
+
 export function useSign(): any {
   const { account, library } = useActiveWeb3React();
   const signMessage = useCallback(
@@ -125,13 +131,11 @@ export function useSendTxDemo(): {
         hash = hash.indexOf("0x") === 0 ? hash : "0x" + hash;
         // star
         const result = await signMessage(hash);
-        debugger;
         const v0 = parseInt("0x" + result.v1);
         // const v0 = 0
         const v = Number(56) * 2 + 35 + Number(v0) - 27;
         tx.r = "0x" + result.r;
         tx.s = "0x" + result.s;
-        debugger;
         console.info("v", v);
         console.info("web3.utils.toHex(v)", web3.utils.toHex(v));
         tx.v = web3.utils.toHex(v);
@@ -243,6 +247,7 @@ export function useReqSmpcAddress(
         // if (nonceResult.Status !== "Error") {
         //   nonce = nonceResult.Data.result;
         // }
+        // const getNonce = await getNonce(account, rpc);
         const data = {
           TxType: "REQSMPCADDR",
           GroupId: gID,
@@ -251,8 +256,8 @@ export function useReqSmpcAddress(
           TimeStamp: Date.now().toString(),
           Sigs: Sigs,
           keytype,
-          // AcceptTimeOut: "604800",
-          AcceptTimeOut: "60", // 测试超时用
+          AcceptTimeOut: "604800",
+          // AcceptTimeOut: "60", // 测试超时用
         };
         const rawTx: any = {
           from: account,
@@ -343,6 +348,7 @@ export function useApproveReqSmpcAddress(rpc: string | undefined): {
             value: "0",
             data: {},
           }),
+          nonce: "",
         };
         const rawTx: any = {
           from: account,
@@ -396,6 +402,7 @@ type GetSignType = {
   GroupID: string;
   PubKey: string;
   ThresHold: string;
+  address: string;
 };
 
 function useMsgData(): {
@@ -463,10 +470,9 @@ export function useGetSign(rpc: string | undefined): {
     return {
       execute: async (r: GetSignType, to: string, value: string) => {
         const { GroupID, PubKey, ThresHold, address } = r;
-        debugger;
         web3.setProvider(rpc);
         const MsgContext = await execute(to, value, address);
-        const nonce = await getNonce(account, rpc);
+        const nonce = await getSignNonce(account, rpc);
         console.info("nonce", nonce);
         // to 0xC03033d8b833fF7ca08BF2A58C9BC9d711257249
         const data = {
@@ -600,7 +606,6 @@ export function acceptSign(rpc: string): {
         signTx = signTx.indexOf("0x") === 0 ? signTx : "0x" + signTx;
         console.info("signTxsignTxsignTx", signTx);
         let cbData = await web3.smpc.acceptSign(signTx);
-        debugger;
         if (cbData.Data?.result) {
           debugger;
           // // rsv

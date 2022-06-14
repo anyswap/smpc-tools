@@ -166,6 +166,13 @@ web3.extend({
       outputFormatter: null,
     },
     {
+      name: "getSignNonce",
+      call: "smpc_getSignNonce",
+      params: 1,
+      inputFormatter: [null],
+      outputFormatter: null,
+    },
+    {
       name: "getReqAddrNonce",
       call: "smpc_getReqAddrNonce",
       params: 1,

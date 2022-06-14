@@ -125,10 +125,9 @@ const Index = () => {
         "accountApprovaled",
         JSON.stringify([{ ...r, status: type }, ...approvaled])
       );
-
       const newPollingPubKeyItem = {
         fn: "getReqAddrStatus",
-        params: [res.info],
+        params: [r.Key],
         data: {
           GroupID: r.GroupID,
           ThresHold: r.ThresHold,
