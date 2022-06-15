@@ -60,7 +60,15 @@ const Index = () => {
   const getSignEnode = () => {
     if (!execute) return;
     execute().then(async (res) => {
-      if (!res) return;
+      if (!res) {
+        globalDispatch({
+          loginAccount: {
+            ...loginAccount,
+            signEnode: "",
+          },
+        });
+        return;
+      }
       localStorage.setItem(
         "loginAccount",
         JSON.stringify({

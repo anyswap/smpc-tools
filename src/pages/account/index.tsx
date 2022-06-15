@@ -15,6 +15,17 @@ const Index = () => {
   const { rpc, signEnode } = JSON.parse(
     localStorage.getItem("loginAccount") || "{}"
   );
+
+  const {
+    globalDispatch,
+    Account: GAccount,
+    pollingPubKeyInfo,
+  } = useModel("global", ({ globalDispatch, Account, pollingPubKeyInfo }) => ({
+    globalDispatch,
+    Account,
+    pollingPubKeyInfo,
+  }));
+
   const { execute } = useGetSign(rpc);
   const { account } = useActiveWeb3React();
 
@@ -23,6 +34,13 @@ const Index = () => {
   const [visible, setVisible] = useState<boolean>(false);
   const [spinning, setSpinning] = useState(false);
   const [details, setDetails] = useState<any>("{}");
+
+  useEffect(() => {
+    localStorage.setItem("pollingRsvInfo", "0");
+    globalDispatch({
+      pollingPubKeyInfo: 0,
+    });
+  }, []);
 
   const columns = [
     {
@@ -146,14 +164,14 @@ const Index = () => {
     // getAccountList();
     // getAccountsBalance()
 
-    const Account = JSON.parse(localStorage.getItem("Account") || "[]");
+    const Account = GAccount;
     web3.setProvider("https://api.mycryptoapi.com/eth");
     Account.forEach((item: any) => {
       const address = ethers.utils.computeAddress("0x" + item.PubKey);
       getBalance(address, item.PubKey);
     });
     setData(Account);
-  }, [localStorage.getItem("Account")]);
+  }, [GAccount]);
 
   const onSend = async (to: string, value: string) => {
     if (!execute) return;
@@ -168,18 +186,28 @@ const Index = () => {
 
   // return useMemo(() => {
   return (
-    <Spin tip="Loading..." spinning={spinning}>
-      <div>
-        <Table
-          columns={columns}
-          dataSource={data}
-          pagination={false}
-          rowKey="PubKey"
-          key={Object.values(details).length}
-        />
-      </div>
+    // <Spin tip="Loading..." spinning={spinning}>
+    <div
+      onMouseMove={() => {
+        if (pollingPubKeyInfo) {
+          globalDispatch({
+            pollingPubKeyInfo: 0,
+          });
+          localStorage.setItem("pollingPubKeyInfo", "0");
+        }
+      }}
+    >
+      <Table
+        columns={columns}
+        dataSource={data}
+        pagination={false}
+        rowKey="PubKey"
+        key={Object.values(details).length}
+      />
       <Send visible={visible} onSend={onSend} setVisible={setVisible} />
-    </Spin>
+    </div>
+
+    // </Spin>
   );
   // }, [account, data, JSON.stringify(details), details]);
 };

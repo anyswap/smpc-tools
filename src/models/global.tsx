@@ -28,6 +28,10 @@ const initState = {
   pollingPubKey: JSON.parse(localStorage.getItem("pollingPubKey") || "[]"),
   pollingPubKeyActiveInterval: [],
   pollingPubKeyInfo: Number(localStorage.getItem("pollingPubKeyInfo") || 0),
+  // 已审批交易列表数据
+  sendApprovaled: JSON.parse(localStorage.getItem("sendApprovaled") || "[]"),
+  // 账户列表数据（审批通过的才展示）
+  Account: JSON.parse(localStorage.getItem("Account") || "[]"),
 };
 
 export default function Index() {
@@ -39,6 +43,8 @@ export default function Index() {
     pollingPubKeyActiveInterval,
     pollingRsvInfo,
     pollingPubKeyInfo,
+    sendApprovaled: GsendApprovaled,
+    Account: GAccount,
   } = state;
 
   const getNodeList = async () => {
@@ -95,23 +101,30 @@ export default function Index() {
         console.info("index:", i);
         return;
       }
-      if (res.Status === "Success") {
+      if (res.Status === "Success" && result.Status === "Success") {
         clearInterval(interval);
         const newPollingRsv = pollingRsv.filter(
           (item: any, index: number) => index !== i
         );
         localStorage.setItem("pollingRsv", JSON.stringify(newPollingRsv));
 
-        // 设置交易审批记录页面数据
+        // 设置已审批交易记录页面数据
         const sendApprovaled = JSON.parse(
           localStorage.getItem("sendApprovaled") || "[]"
         );
         localStorage.setItem(
           "sendApprovaled",
-          JSON.stringify([{ ...data, Rsv: res.Data.result }, ...sendApprovaled])
+          JSON.stringify([
+            { ...data, Rsv: res.Data.result },
+            ...GsendApprovaled,
+          ])
         );
         dispatch({
           pollingRsvInfo: pollingRsvInfo + 1,
+          sendApprovaled: [
+            { ...data, Rsv: res.Data.result },
+            ...GsendApprovaled,
+          ],
         });
         localStorage.setItem("pollingRsvInfo", pollingRsvInfo + 1);
       }
@@ -141,7 +154,7 @@ export default function Index() {
     let count = 0;
     const interval = setInterval(async () => {
       web3.setProvider(rpc);
-      const res = await fn(...params);
+      const { result: res } = await fn(...params);
       const result = JSON.parse(res?.Data?.result || "{}");
 
       if (result.Status === "Failure") {
@@ -203,6 +216,16 @@ export default function Index() {
         );
         dispatch({
           pollingPubKeyInfo: pollingPubKeyInfo + 1,
+          Account: [
+            {
+              ...result,
+              key: result.Key,
+              GroupID: data.GroupID,
+              ThresHold: data.ThresHold,
+              PubKey: result.PubKey,
+            },
+            ...GAccount,
+          ],
         });
         localStorage.setItem("pollingPubKeyInfo", pollingPubKeyInfo + 1);
       }

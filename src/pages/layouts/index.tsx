@@ -34,10 +34,10 @@ const Index = (props) => {
   const [local, SetLocalAntd] = useState(enUS);
   const [visible, setVisible] = useState(false);
   const nav = [
-    {
-      name: useIntl().formatHTMLMessage({ id: "nav.accountList" }),
-      url: "/account",
-    },
+    // {
+    //   name: useIntl().formatHTMLMessage({ id: "nav.accountList" }),
+    //   url: "/account",
+    // },
     {
       name: useIntl().formatHTMLMessage({ id: "nav.createAccount" }),
       url: "/createGrounp",
@@ -97,12 +97,33 @@ const Index = (props) => {
           <div className="nav">
             {/* <div onClick={() => history.push('/approvalList')}>审批</div>
             <div>创建组</div> */}
+            <Badge
+              count={pollingPubKeyInfo}
+              key={pollingPubKeyInfo}
+              overflowCount={100}
+              offset={[0, 10]}
+              showZero={false}
+            >
+              <div
+                key="/account"
+                className={
+                  history.location.pathname === "/account"
+                    ? "item active"
+                    : "item"
+                }
+                onClick={() => history.push("/account")}
+              >
+                {useIntl().formatHTMLMessage({ id: "nav.accountList" })}
+              </div>
+            </Badge>
             {nav.map((item) => {
               return (
                 <div
                   key={item.url}
                   className={
-                    history.location.pathname === item.url ? "active" : ""
+                    history.location.pathname === item.url
+                      ? "item active"
+                      : "item"
                   }
                   onClick={() => history.push(item.url)}
                 >
@@ -115,8 +136,9 @@ const Index = (props) => {
       url: "/approvaled",
     }, */}
             <Badge
-              count={pollingRsvInfo + pollingPubKeyInfo}
-              key={pollingRsvInfo + pollingPubKeyInfo}
+              // count={pollingRsvInfo + pollingPubKeyInfo}
+              // key={pollingRsvInfo + pollingPubKeyInfo}
+              count={pollingRsvInfo}
               overflowCount={100}
               offset={[0, 10]}
               showZero={false}
@@ -124,11 +146,13 @@ const Index = (props) => {
               <div
                 key="/approvaled"
                 className={
-                  history.location.pathname === "/approvaled" ? "active" : ""
+                  history.location.pathname === "/approvaled"
+                    ? "item active"
+                    : "item"
                 }
                 onClick={() => history.push("/approvaled")}
               >
-                {useIntl().formatHTMLMessage({ id: "nav.approvaled" })}
+                {useIntl().formatHTMLMessage({ id: "nav.approvedTransaction" })}
               </div>
             </Badge>
           </div>

@@ -293,7 +293,7 @@ export function useReqSmpcAddress(
         if (cbData.Status !== "Error") {
           resultData = { msg: "Success", info: cbData.Data.result };
         } else {
-          resultData = { msg: "Error", error: cbData.Tip };
+          resultData = { msg: cbData.Error || "Error", error: cbData.Tip };
         }
         console.log(signTx);
         console.log(resultData);

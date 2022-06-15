@@ -16,9 +16,18 @@ const Index = () => {
     DISAGREE: useIntl().formatHTMLMessage({ id: "approval.disagree" }),
   };
 
-  const { globalDispatch } = useModel("global", ({ globalDispatch }) => ({
+  const {
     globalDispatch,
-  }));
+    sendApprovaled: GsendApprovaled,
+    pollingRsvInfo,
+  } = useModel(
+    "global",
+    ({ globalDispatch, sendApprovaled, pollingRsvInfo }) => ({
+      globalDispatch,
+      sendApprovaled,
+      pollingRsvInfo,
+    })
+  );
 
   const [data, setData] = useState(
     JSON.parse(localStorage.getItem("sendApprovaled") || "[]")
@@ -32,7 +41,6 @@ const Index = () => {
   }, []);
 
   const send = async (r: any, i: any) => {
-    debugger;
     console.info("i", i);
     console.info("r", r);
     web3.setProvider(
@@ -77,9 +85,14 @@ const Index = () => {
       .sendSignedTransaction(signTx)
       .then((res: any) => {
         message.success("Send success");
-        const newData = data.filter((it: any, index: number) => index !== i);
+        const newData = GsendApprovaled.filter(
+          (it: any, index: number) => index !== i
+        );
         setData(newData);
-        localStorage.setItem("sendApprovaled", JSON.parse(newData));
+        globalDispatch({
+          sendApprovaled: newData,
+        });
+        localStorage.setItem("sendApprovaled", JSON.stringify(newData));
       })
       .catch((e: any) => {
         message.error(e.message);
@@ -127,9 +140,23 @@ const Index = () => {
   ];
 
   return (
-    <div className="approval">
+    <div
+      className="approval"
+      onMouseMove={() => {
+        if (pollingRsvInfo) {
+          globalDispatch({
+            pollingRsvInfo: 0,
+          });
+          localStorage.setItem("pollingPubKeyInfo", "0");
+        }
+      }}
+    >
       {/* <Button onClick={getApproveList}>get</Button>{" "} */}
-      <Table columns={columns} dataSource={data} pagination={false} />
+      <Table
+        columns={columns}
+        dataSource={GsendApprovaled}
+        pagination={false}
+      />
     </div>
   );
 };

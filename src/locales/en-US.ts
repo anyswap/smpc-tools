@@ -15,6 +15,7 @@ export default {
   "nav.createAccount": "Create Pubkey",
   "nav.approval": "Transactions",
   "nav.approvaled": "Transactionsed List",
+  "nav.approvedTransaction": "Approved transaction",
   "nav.accountList": "Account List",
   "createGrounp.admin": "Admin",
   "createGrounp.model": "thresHold",

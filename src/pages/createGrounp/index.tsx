@@ -113,6 +113,8 @@ const Index = () => {
           ...JSON.parse(localStorage.getItem("pollingPubKey") || "[]"),
         ])
       );
+    } else {
+      message.error(res.msg);
     }
 
     // localStorage
@@ -145,6 +147,9 @@ const Index = () => {
   }, [Gid]);
 
   const createGroup = async () => {
+    dispatch({
+      Gid: "",
+    });
     web3.setProvider(loginAccount?.rpc);
     if (!execute) return;
     const res = await execute();

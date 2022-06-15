@@ -15,6 +15,7 @@ export default {
   "nav.createAccount": "创建共管账户",
   "nav.approval": "审批",
   "nav.approvaled": "已审批列表",
+  "nav.approvedTransaction": "已审批交易",
   "nav.accountList": "账户列表",
   "createGrounp.admin": "管理人",
   "createGrounp.model": "门限",
