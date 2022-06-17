@@ -176,7 +176,10 @@ const Index = () => {
   const onSend = async (to: string, value: string) => {
     if (!execute) return;
     const res = await execute(active, to, value);
-    if (res.Status === "Success") {
+    if (!res) {
+      message.info("no sign");
+    }
+    if (res?.Status === "Success") {
       message.success("Success");
       setVisible(false);
       return true;

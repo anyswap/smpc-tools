@@ -154,7 +154,7 @@ export default function Index() {
     let count = 0;
     const interval = setInterval(async () => {
       web3.setProvider(rpc);
-      const { result: res } = await fn(...params);
+      const res = await fn(...params);
       const result = JSON.parse(res?.Data?.result || "{}");
 
       if (result.Status === "Failure") {

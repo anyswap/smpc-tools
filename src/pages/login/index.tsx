@@ -30,7 +30,7 @@ interface nodeListItem {
 
 const Index = () => {
   const [inputNode, setInputNode] = useState("");
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState(undefined);
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const { account, library, activate } = useActiveWeb3React();
@@ -174,7 +174,7 @@ const Index = () => {
             ]}
           >
             <Select
-              placeholder="请输入"
+              placeholder="Select a person"
               onChange={setValue}
               value={value}
               onSearch={setInputNode}
