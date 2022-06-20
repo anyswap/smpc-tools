@@ -12,11 +12,12 @@ const Index = () => {
   const { account } = useActiveWeb3React();
   const { signMessage } = useSign();
 
-  const { globalDispatch, pollingRsv } = useModel(
+  const { globalDispatch, pollingPubKey, Account } = useModel(
     "global",
-    ({ globalDispatch, pollingRsv }: any) => ({
+    ({ globalDispatch, pollingPubKey, Account }: any) => ({
       globalDispatch,
-      pollingRsv,
+      pollingPubKey,
+      Account,
     })
   );
   const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
@@ -32,10 +33,10 @@ const Index = () => {
       (Data || []).sort((a, b) => Number(b.TimeStamp) - Number(a.TimeStamp))
     );
   };
-  console.info("account", account);
+
   useEffect(() => {
     getApproveList();
-  }, [account]);
+  }, [account, Account]);
 
   const columns = [
     {
@@ -118,32 +119,36 @@ const Index = () => {
       message.success(operationIsSuccessful);
       // setAccount(r);
       getApproveList();
-      const approvaled = JSON.parse(
-        localStorage.getItem("accountApprovaled") || "[]"
-      );
-      localStorage.setItem(
-        "accountApprovaled",
-        JSON.stringify([{ ...r, status: type }, ...approvaled])
-      );
+      // const approvaled = JSON.parse(
+      //   localStorage.getItem("accountApprovaled") || "[]"
+      // );
+      // localStorage.setItem(
+      //   "accountApprovaled",
+      //   JSON.stringify([{ ...r, status: type }, ...approvaled])
+      // );
       const newPollingPubKeyItem = {
         fn: "getReqAddrStatus",
         params: [r.Key],
         data: {
           GroupID: r.GroupID,
           ThresHold: r.ThresHold,
+          Key: r.Key,
         },
       };
+      // const historyPolling = JSON.parse(
+      //   localStorage.getItem("pollingPubKey") || "[]"
+      // ).filter((item: any) => item.Key !== item.data.Key);
       globalDispatch({
         pollingPubKey: [
           newPollingPubKeyItem,
-          ...JSON.parse(localStorage.getItem("pollingPubKey") || "[]"),
+          ...pollingPubKey.filter((item: any) => item.data.Key !== r.Key),
         ],
       });
       localStorage.setItem(
         "pollingPubKey",
         JSON.stringify([
           newPollingPubKeyItem,
-          ...JSON.parse(localStorage.getItem("pollingPubKey") || "[]"),
+          ...pollingPubKey.filter((item: any) => item.data.Key !== r.Key),
         ])
       );
 
@@ -171,7 +176,7 @@ const Index = () => {
       //     }
       //   }
       // }, 1000);
-    } else {
+    } else if (res?.msg) {
       message.error(res.msg);
     }
   };

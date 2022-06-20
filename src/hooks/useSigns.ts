@@ -368,6 +368,10 @@ export function useApproveReqSmpcAddress(rpc: string | undefined): {
         hash = hash.indexOf("0x") === 0 ? hash : "0x" + hash;
         console.log(hash);
         const result = await signMessage(hash);
+        if (!result) {
+          message.info("no sign");
+          return;
+        }
         rawTx.r = "0x" + result.r;
         rawTx.s = "0x" + result.s;
         rawTx.v = "0x" + result.v;

@@ -36,7 +36,7 @@ const Index = () => {
   const [details, setDetails] = useState<any>("{}");
 
   useEffect(() => {
-    localStorage.setItem("pollingRsvInfo", "0");
+    localStorage.setItem("pollingPubKeyInfo", "0");
     globalDispatch({
       pollingPubKeyInfo: 0,
     });

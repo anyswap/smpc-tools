@@ -129,10 +129,9 @@ export default function Index() {
         localStorage.setItem("pollingRsvInfo", pollingRsvInfo + 1);
       }
     }, 30000);
-    const newPollingRsvActiveInterval = pollingRsvActiveInterval;
-    newPollingRsvActiveInterval[i] = interval;
+
     dispatch({
-      pollingRsvActiveInterval: newPollingRsvActiveInterval,
+      pollingRsvActiveInterval: [...pollingRsvActiveInterval, interval],
     });
   };
   //监听要轮询的队列
@@ -152,7 +151,10 @@ export default function Index() {
   const pollingPubKeyInterval = (fn: any, params: any, data: any, i: any) => {
     const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
     let count = 0;
+
     const interval = setInterval(async () => {
+      console.info("pollingPubKeyActiveInterval", pollingPubKeyActiveInterval);
+      console.info("pollingPubKey", pollingPubKey);
       web3.setProvider(rpc);
       const res = await fn(...params);
       const result = JSON.parse(res?.Data?.result || "{}");
@@ -230,14 +232,13 @@ export default function Index() {
         localStorage.setItem("pollingPubKeyInfo", pollingPubKeyInfo + 1);
       }
     }, 30000);
-    const newPollingPubKeyActiveInterval = pollingPubKeyActiveInterval;
-    newPollingPubKeyActiveInterval[i] = interval;
     dispatch({
-      pollingRsvActiveInterval: newPollingPubKeyActiveInterval,
+      pollingPubKeyActiveInterval: [...pollingPubKeyActiveInterval, interval],
     });
   };
   //监听要轮询的队列
   useEffect(() => {
+    console.info("pollingPubKeyActiveInterval", pollingPubKeyActiveInterval);
     pollingPubKeyActiveInterval.forEach((item: any) => {
       clearInterval(item);
     });

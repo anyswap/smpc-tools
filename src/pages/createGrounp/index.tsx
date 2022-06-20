@@ -71,16 +71,6 @@ const Index = () => {
     form.setFieldsValue({ enode1: loginAccount.enode });
   };
 
-  const typeChange = (v: number) => {
-    let arr = [];
-    for (let i = 1; i < v + 1; i++) {
-      arr.push(i);
-    }
-    dispatch({
-      admin: arr,
-    });
-    reset();
-  };
   useEffect(() => {
     onstorage;
   });
@@ -116,30 +106,6 @@ const Index = () => {
     } else {
       message.error(res.msg);
     }
-
-    // localStorage
-    // const intervel = setInterval(async () => {
-    //   const cbPkey = await web3.smpc.getReqAddrStatus(res.info);
-    //   if (cbPkey.Status === "Success") {
-    //     const parseResykt = JSON.parse(cbPkey?.Data?.result || "{}");
-    //     const Account = JSON.parse(localStorage.getItem("Account") || "[]");
-    //     localStorage.setItem(
-    //       "Account",
-    //       JSON.stringify([
-    //         {
-    //           ...parseResykt,
-    //           key: parseResykt.Key,
-    //           GroupID: Gid,
-    //           ThresHold: form.getFieldValue("ThresHold"),
-    //           PubKey: JSON.parse(cbPkey.Data.result).PubKey,
-    //         },
-    //         ...Account,
-    //       ])
-    //     );
-    //     clearInterval(intervel);
-    //     history.push("./approval");
-    //   }
-    // }, 1000);
   };
 
   useEffect(() => {
@@ -200,7 +166,6 @@ const Index = () => {
         <div>
           <Form.Item name="keytype" label="Mpc Type" initialValue="EC256K1">
             <Select
-              onChange={typeChange}
               options={[
                 {
                   value: "EC256K1",
