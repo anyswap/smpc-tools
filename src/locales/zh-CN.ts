@@ -10,7 +10,7 @@ export default {
   "g.placeholder1": "请输入",
   "g.reset": "重置",
   "g.action": "操作",
-  "login.rules1": "至少选择一个",
+  "g.rules1": "至少选择一个",
   "login.rules2": "值不是一个有效的数字",
   "nav.createAccount": "创建共管账户",
   "nav.approval": "审批",
@@ -35,4 +35,6 @@ export default {
   transaction: "发起交易",
   accountApproval: "账户审批",
   tradingApproval: "交易审批",
+  Create_confirmation: "创建确认",
+  initiator: "发起者",
 };

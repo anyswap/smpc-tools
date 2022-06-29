@@ -1,40 +1,21 @@
-import { Input, Form, Select, Button, message } from "antd";
+import { Form, Select, Button, message } from "antd";
 import React, { useEffect, useState } from "react";
 import { LeftOutlined } from "@ant-design/icons";
-import {
-  history,
-  useModel,
-  getLocale,
-  setLocale,
-  useIntl,
-  Redirect,
-} from "umi";
+import { history, useModel, getLocale, setLocale, useIntl } from "umi";
 import web3 from "@/assets/js/web3";
 import { useActiveWeb3React } from "@/hooks";
-import {
-  useSignEnode,
-  useReqSmpcAddress,
-  useSendTxDemo,
-} from "@/hooks/useSigns";
-// import ModalHead from "@/component/modalHead";
+import { useSignEnode, useSendTxDemo } from "@/hooks/useSigns";
 import Logo_png from "@/pages/img/logo.svg";
 import "./style.less";
-import { mmWeb3 } from "@/libs/wallet/metamask.js";
-const Web3 = require("web3");
-
-interface nodeListItem {
-  name: string;
-  enode: string;
-  rpc: string;
-}
+import { nodeListItem } from "./d";
 
 const Index = () => {
   const [inputNode, setInputNode] = useState("");
   const [value, setValue] = useState(undefined);
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
-  const { account, library, activate } = useActiveWeb3React();
-  const { nodeList, isDay, globalDispatch, address, loginAccount } = useModel(
+  const { account, activate } = useActiveWeb3React();
+  const { nodeList, isDay, globalDispatch, loginAccount } = useModel(
     "global",
     ({ isDay, nodeList, globalDispatch, address, loginAccount }) => ({
       isDay,
@@ -111,10 +92,6 @@ const Index = () => {
           enode: res.Data.Enode,
         },
       });
-      // localStorage.setItem("node", value);
-      // setTimeout(() => {
-      //   getSignEnode();
-      // }, 500)
     } catch (err) {
       setLoading(false);
       console.info("errerr", err);
@@ -162,7 +139,7 @@ const Index = () => {
         <div className="tit">
           {useIntl().formatHTMLMessage({ id: "g.loginAccount" })}
         </div>
-        <Form form={form} layout="vertical" onFinish={onFinish}>
+        <Form form={form} name="login" layout="vertical" onFinish={onFinish}>
           <Form.Item
             label={useIntl().formatHTMLMessage({ id: "g.setTheNode" })}
             required
@@ -214,7 +191,12 @@ const Index = () => {
             />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" onClick={onFinish} loading={loading}>
+            <Button
+              htmlType="submit"
+              type="primary"
+              onClick={onFinish}
+              loading={loading}
+            >
               {useIntl().formatHTMLMessage({ id: "g.login" })}
             </Button>
           </Form.Item>

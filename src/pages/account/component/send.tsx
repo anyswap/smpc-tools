@@ -26,8 +26,14 @@ const Index = (props: {
       visible={visible}
       onOk={form.submit}
       onCancel={() => setVisible(false)}
+      forceRender
     >
-      <Form form={form} labelCol={{ flex: "60px" }} onFinish={onFinish}>
+      <Form
+        form={form}
+        labelCol={{ flex: "60px" }}
+        onFinish={onFinish}
+        name="send"
+      >
         <Form.Item
           name="to"
           label="to"

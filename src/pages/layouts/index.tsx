@@ -192,10 +192,12 @@ const Index = (props) => {
                 {
                   label: "中文简体",
                   value: "zh-CN",
+                  key: "zh-CN",
                 },
                 {
                   label: "English",
                   value: "en-US",
+                  key: "en-US",
                 },
               ]}
             />

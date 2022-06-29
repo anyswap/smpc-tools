@@ -103,53 +103,8 @@ const Index = () => {
     },
   ];
 
-  // const detailsObj: any = {};
-  // const getSmpcAddr = async (PubKey: string, newArr: Array<any>) => {
-  //   const res = await web3.smpc.getSmpcAddr(PubKey);
-  //   web3.setProvider("https://api.mycryptoapi.com/eth");
-  //   const balanceRes = await web3.eth.getBalance(
-  //     JSON.parse(res.Data.result).SmpcAddress.ETH
-  //   );
-  //   detailsObj[PubKey] = {
-  //     balance: balanceRes + "eth",
-  //     SmpcAddress: JSON.parse(res.Data.result).SmpcAddress,
-  //   };
-  //   if (
-  //     Object.entries(detailsObj).length === Object.entries(detailsObj).length
-  //   ) {
-  //     setDetails(JSON.stringify(detailsObj));
-  //   }
-  // };
-
-  // const getAccountList = async () => {
-  //   if (!rpc || !account) return;
-  //   web3.setProvider(rpc);
-  //   // const nonce = await getNonce(account, rpc);
-  //   // const result = await signMessage(hash);
-  //   const res = await web3.smpc.getAccounts(account, "0");
-  //   const { Group = [] } = res.Data.result;
-  //   let arr: any = [];
-  //   Group.forEach((item: any) => {
-  //     item.Accounts.forEach((it: any) => {
-  //       if (arr.every((el: any) => el.PubKey !== it.PubKey)) {
-  //         arr.push({
-  //           PubKey: it.PubKey,
-  //           GroupID: item.GroupID,
-  //           ThresHold: it.ThresHold,
-  //           // name: it.publicKey.substr(2),
-  //           TimeStamp: Number(it.TimeStamp),
-  //         });
-  //       }
-  //     });
-  //   });
-  //   setData(arr.sort((a: any, b: any) => b.TimeStamp - a.TimeStamp));
-  //   const newArr = Array.from(new Set(arr.map((item: any) => item.PubKey)));
-  //   newArr.forEach((item) => {
-  //     getSmpcAddr(item as string, newArr);
-  //   });
-  // };
   const detailsObj: any = {};
-  const getBalance = async (address: string, PubKey) => {
+  const getBalance = async (address: string, PubKey: string) => {
     const res = await web3.eth.getBalance(address);
     detailsObj[PubKey] = {
       balance: res + "eth",
@@ -161,9 +116,6 @@ const Index = () => {
     }
   };
   useEffect(() => {
-    // getAccountList();
-    // getAccountsBalance()
-
     const Account = GAccount;
     web3.setProvider("https://api.mycryptoapi.com/eth");
     Account.forEach((item: any) => {
@@ -187,9 +139,7 @@ const Index = () => {
     return false;
   };
 
-  // return useMemo(() => {
   return (
-    // <Spin tip="Loading..." spinning={spinning}>
     <div
       onMouseMove={() => {
         if (pollingPubKeyInfo) {
@@ -209,10 +159,7 @@ const Index = () => {
       />
       <Send visible={visible} onSend={onSend} setVisible={setVisible} />
     </div>
-
-    // </Spin>
   );
-  // }, [account, data, JSON.stringify(details), details]);
 };
 
 export default Index;

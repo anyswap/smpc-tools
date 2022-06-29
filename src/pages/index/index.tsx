@@ -1,32 +1,15 @@
-import React, { useCallback, useEffect, useReducer } from "react";
-import moment from "moment";
+import React, { useCallback, useEffect } from "react";
 import { Button, Select } from "antd";
 import LogoW from "@/pages/img/logo-white.svg";
 import LogoB from "@/pages/img/logo-black.svg";
-import CreateWallet from "./component/selectNode";
-import ConnectWallet from "./component/connectWallet";
-import { mmWeb3 } from "@/libs/wallet/metamask.js";
-import { reducer } from "@/utils";
-import "./index.less";
 import { history, useModel, getLocale, setLocale, useIntl } from "umi";
 import { useActiveWeb3React } from "@/hooks";
 import { injected } from "@/connectors";
-// import { useActiveWeb3React } from '@/constants/hooks'
-
-const initState = {
-  visible: false,
-};
+import "./index.less";
 
 const Index = () => {
-  const { account, library, activate } = useActiveWeb3React();
-  console.log("account", account);
-  // console.log(library)
-  const { isDay, globalDispatch } = useModel(
-    "global",
-    ({ isDay, globalDispatch }) => ({ isDay, globalDispatch })
-  );
-  const [state, dispatch] = useReducer(reducer, initState);
-  const { visible } = state;
+  const { account, activate } = useActiveWeb3React();
+  const { isDay } = useModel("global", ({ isDay }) => ({ isDay }));
 
   useEffect(() => {
     if (account) {
@@ -53,10 +36,12 @@ const Index = () => {
           {
             label: "中文简体",
             value: "zh-CN",
+            key: "zh-CN",
           },
           {
             label: "English",
             value: "en-US",
+            key: "en-US",
           },
         ]}
       />
@@ -75,11 +60,6 @@ const Index = () => {
           <br />
           {useIntl().formatHTMLMessage({ id: "welcomeOpt" })}
         </div>
-        {/* <div className="buttons">
-          <CreateWallet isDay={isDay} dispatch={dispatch} visible={visible} />
-          <span className="left" onClick={() => dispatch({ visible: true })}>创建</span>
-          <span className="right">导入</span>
-        </div> */}
         <Button type="primary" size="large" onClick={enable}>
           {useIntl().formatHTMLMessage({ id: "connectThePurse" })}
         </Button>

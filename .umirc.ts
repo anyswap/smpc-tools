@@ -32,10 +32,6 @@ export default defineConfig({
               path: "/Account",
               component: "@/pages/account",
             },
-            // {
-            //   path: "/getEnode",
-            //   component: "@/pages/getEnode",
-            // },
             {
               path: "/approval",
               component: "@/pages/approval/tabs",

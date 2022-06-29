@@ -1,7 +1,6 @@
-import React, { useDebugValue, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, message, Table, Tag } from "antd";
 import { useActiveWeb3React } from "@/hooks";
-import { useApproveReqSmpcAddress, useSign, getNonce } from "@/hooks/useSigns";
 import { useModel, history, useIntl } from "umi";
 import Tx from "ethereumjs-tx";
 import moment from "moment";
@@ -154,6 +153,7 @@ const Index = () => {
       {/* <Button onClick={getApproveList}>get</Button>{" "} */}
       <Table
         columns={columns}
+        rowKey="PubKey"
         dataSource={GsendApprovaled}
         pagination={false}
       />

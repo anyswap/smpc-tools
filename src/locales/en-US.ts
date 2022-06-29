@@ -35,4 +35,6 @@ export default {
   transaction: "Send",
   accountApproval: "Account approval",
   tradingApproval: "Trading Approval",
+  Create_confirmation: "Create a confirmation",
+  initiator: "Initiator",
 };

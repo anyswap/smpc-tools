@@ -153,8 +153,6 @@ export default function Index() {
     let count = 0;
 
     const interval = setInterval(async () => {
-      console.info("pollingPubKeyActiveInterval", pollingPubKeyActiveInterval);
-      console.info("pollingPubKey", pollingPubKey);
       web3.setProvider(rpc);
       const res = await fn(...params);
       const result = JSON.parse(res?.Data?.result || "{}");
@@ -238,7 +236,6 @@ export default function Index() {
   };
   //监听要轮询的队列
   useEffect(() => {
-    console.info("pollingPubKeyActiveInterval", pollingPubKeyActiveInterval);
     pollingPubKeyActiveInterval.forEach((item: any) => {
       clearInterval(item);
     });

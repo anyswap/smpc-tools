@@ -66,6 +66,7 @@ const Index = () => {
       {/* <Button onClick={getApproveList}>get</Button>{" "} */}
       <Table
         columns={columns}
+        rowKey="PubKey"
         dataSource={JSON.parse(
           localStorage.getItem("accountApprovaled") || "[]"
         )}
