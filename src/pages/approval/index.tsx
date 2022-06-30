@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { Button, message, Table } from "antd";
 import { useActiveWeb3React } from "@/hooks";
-import { useApproveReqSmpcAddress, useSign, getNonce } from "@/hooks/useSigns";
-import { useModel, history, useIntl } from "umi";
+import { useApproveReqSmpcAddress } from "@/hooks/useSigns";
+import { useModel, useIntl } from "umi";
 import moment from "moment";
 import web3 from "@/assets/js/web3";
 import "./style.less";
 import { cutOut } from "@/utils";
 
-const Index = () => {
+const Index = (props: { num: number }) => {
   const { account } = useActiveWeb3React();
-  const { signMessage } = useSign();
 
   const { globalDispatch, pollingPubKey, Account } = useModel(
     "global",
@@ -23,6 +22,7 @@ const Index = () => {
   const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
   const { execute } = useApproveReqSmpcAddress(rpc);
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const getApproveList = async () => {
     if (!rpc || !account) return;
@@ -30,15 +30,17 @@ const Index = () => {
     const res = await web3.smpc.getCurNodeReqAddrInfo(account);
     const { Data } = res;
     setData(
-      (Data || []).sort((a, b) => Number(b.TimeStamp) - Number(a.TimeStamp))
+      (Data || []).sort(
+        (a: any, b: any) => Number(b.TimeStamp) - Number(a.TimeStamp)
+      )
     );
   };
 
   useEffect(() => {
     getApproveList();
-  }, [account, Account]);
+  }, [account, Account, props.num]);
 
-  const columns = [
+  const columns: any = [
     {
       title: "Account",
       dataIndex: "Account",
@@ -69,7 +71,7 @@ const Index = () => {
     },
     {
       title: useIntl().formatHTMLMessage({ id: "g.action" }),
-      render: (r: any, i) => (
+      render: (r: any, i: number) => (
         <span>
           {account === r.Account ? (
             <span>自己创建</span>
@@ -92,23 +94,6 @@ const Index = () => {
     },
   ];
 
-  // const intervel = setInterval(async () => {
-  //   const cbRsv = await web3.smpc.getSignStatus(cbData.Data?.result);
-  //   console.info("cbRsv", cbRsv);
-  //   debugger;
-  // }, 1000);
-
-  // const setAccount = async (r: any) => {
-  //   const result = await web3.smpc.getReqAddrStatus(r.Key);
-  //   debugger
-  // }
-
-  // const intervel = setInterval(async () => {
-  //   const result = await web3.smpc.getReqAddrStatus(r.Key);
-  //   console.info("cbRsv", cbRsv);
-  //   debugger;
-  // }, 1000);
-
   const operationIsSuccessful = useIntl().formatMessage({
     id: "operationIsSuccessful",
   });
@@ -117,15 +102,7 @@ const Index = () => {
     const res = await execute(r, type);
     if (res?.info === "Success") {
       message.success(operationIsSuccessful);
-      // setAccount(r);
       getApproveList();
-      // const approvaled = JSON.parse(
-      //   localStorage.getItem("accountApprovaled") || "[]"
-      // );
-      // localStorage.setItem(
-      //   "accountApprovaled",
-      //   JSON.stringify([{ ...r, status: type }, ...approvaled])
-      // );
       const newPollingPubKeyItem = {
         fn: "getReqAddrStatus",
         params: [r.Key],
@@ -135,9 +112,6 @@ const Index = () => {
           Key: r.Key,
         },
       };
-      // const historyPolling = JSON.parse(
-      //   localStorage.getItem("pollingPubKey") || "[]"
-      // ).filter((item: any) => item.Key !== item.data.Key);
       globalDispatch({
         pollingPubKey: [
           newPollingPubKeyItem,
@@ -151,31 +125,6 @@ const Index = () => {
           ...pollingPubKey.filter((item: any) => item.data.Key !== r.Key),
         ])
       );
-
-      // const intervel = setInterval(async () => {
-      //   const res = await web3.smpc.getReqAddrStatus(r.Key);
-      //   if (res.Status === "Success") {
-      //     const cbPkey = await web3.smpc.getReqAddrStatus(r.Key);
-      //     if (cbPkey.Status === "Success") {
-      //       JSON.parse(res?.Data?.result || "{}");
-      //       const Account = JSON.parse(localStorage.getItem("Account") || "[]");
-      //       localStorage.setItem(
-      //         "Account",
-      //         JSON.stringify([
-      //           {
-      //             ...JSON.parse(res?.Data?.result || "{}"),
-      //             key: r.Key,
-      //             GroupID: r.GroupID,
-      //             ThresHold: r.ThresHold,
-      //             PubKey: JSON.parse(cbPkey.Data.result).PubKey,
-      //           },
-      //           ...Account,
-      //         ])
-      //       );
-      //       clearInterval(intervel);
-      //     }
-      //   }
-      // }, 1000);
     } else if (res?.msg) {
       message.error(res.msg);
     }
@@ -183,35 +132,13 @@ const Index = () => {
 
   return (
     <div className="approval">
-      {/* <Button onClick={getApproveList}>get</Button>{" "} */}
       <Table
+        loading={loading}
         columns={columns}
         dataSource={data}
         pagination={false}
         rowKey="Key"
       />
-      {/* {list.map((item) => (
-        <div className="item" key={item.Key}>
-          <div className="left">
-            <div className="key">{item.Key}</div>
-            <div className="enode">
-              {item.Enodes.map((i) => (
-                <div>{i}</div>
-              ))}
-            </div>
-            <div className="date">{item.TimeStamp}</div>
-          </div>
-          <div className="right">
-            {item.status ? (
-              <Button type="primary">审批</Button>
-            ) : (
-              <Button type="primary" className="repeat">
-                重审
-              </Button>
-            )}
-          </div>
-        </div>
-      ))} */}
     </div>
   );
 };

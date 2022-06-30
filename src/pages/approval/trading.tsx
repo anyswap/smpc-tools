@@ -7,20 +7,23 @@ import { useIntl } from "umi";
 import { cutOut } from "@/utils";
 import moment from "moment";
 
-const Index = () => {
+const Index = (props: { num: number }) => {
   const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
   const { account } = useActiveWeb3React();
   const { execute } = acceptSign(rpc);
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const getCurNodeSignInfo = async () => {
+    setLoading(true);
     const res = await web3.smpc.getCurNodeSignInfo(account);
+    setLoading(false);
     setData(res?.Data || []);
   };
 
   useEffect(() => {
     getCurNodeSignInfo();
-  }, [account]);
+  }, [account, props.num]);
 
   const action = async (Accept: string, r: any) => {
     if (!execute) return;
@@ -42,7 +45,7 @@ const Index = () => {
     message.error("Error");
   };
 
-  const columns = [
+  const columns: any = [
     {
       title: "Key",
       dataIndex: "Key",
@@ -78,7 +81,7 @@ const Index = () => {
     },
     {
       title: useIntl().formatHTMLMessage({ id: "g.action" }),
-      render: (r: any, i) => (
+      render: (r: any, i: number) => (
         <span>
           <Button
             onClick={() => action("AGREE", r)}
@@ -94,7 +97,14 @@ const Index = () => {
       ),
     },
   ];
-  return <Table columns={columns} dataSource={data} pagination={false} />;
+  return (
+    <Table
+      loading={loading}
+      columns={columns}
+      dataSource={data}
+      pagination={false}
+    />
+  );
 };
 
 export default Index;
