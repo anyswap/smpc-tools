@@ -31,10 +31,10 @@ export default function Index() {
     });
   };
   const getCurNodeSignInfo = async () => {
+    web3.setProvider(rpc);
     dispatch({
       tradingListLoading: true,
     });
-    web3.setProvider(rpc);
     const res = await web3.smpc.getCurNodeSignInfo(account);
     dispatch({
       tradingList: res?.Data || [],
@@ -42,11 +42,13 @@ export default function Index() {
     });
   };
   useEffect(() => {
+    if (!rpc) return;
     getApproveList();
     getCurNodeSignInfo();
   }, [account]);
 
   useEffect(() => {
+    if (!rpc) return;
     const interval = setInterval(() => {
       getApproveList();
       getCurNodeSignInfo();

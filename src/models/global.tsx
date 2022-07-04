@@ -99,15 +99,14 @@ export default function Index() {
         console.info("超时了一笔Rsv申请, 参数是", params);
         console.info("data:", data);
         console.info("index:", i);
+        clearInterval(interval);
         return;
       }
       if (res.Status === "Success" && result.Status === "Success") {
-        clearInterval(interval);
         const newPollingRsv = pollingRsv.filter(
           (item: any, index: number) => index !== i
         );
         localStorage.setItem("pollingRsv", JSON.stringify(newPollingRsv));
-
         // 设置已审批交易记录页面数据
         const sendApprovaled = JSON.parse(
           localStorage.getItem("sendApprovaled") || "[]"
@@ -127,6 +126,7 @@ export default function Index() {
           ],
         });
         localStorage.setItem("pollingRsvInfo", pollingRsvInfo + 1);
+        clearInterval(interval);
       }
     }, 30000);
 
@@ -156,11 +156,11 @@ export default function Index() {
       web3.setProvider(rpc);
       const res = await fn(...params);
       const result = JSON.parse(res?.Data?.result || "{}");
-
       if (result.Status === "Failure") {
         console.info("被拒绝了一笔PubKey申请, 参数是", params);
         console.info("data:", data);
         console.info("index:", i);
+        clearInterval(interval);
         return;
       }
 
@@ -168,6 +168,7 @@ export default function Index() {
         console.info("超时了一笔PubKey申请, 参数是", params);
         console.info("data:", data);
         console.info("index:", i);
+        clearInterval(interval);
         return;
       }
 
@@ -179,7 +180,6 @@ export default function Index() {
       ) {
         count = count + 1;
         if (count > 40) {
-          clearInterval(interval);
           const newPollingPubKey = pollingPubKey.filter(
             (item: any, index: number) => index !== i
           );
@@ -189,6 +189,7 @@ export default function Index() {
           );
           message.error("创建帐户失败");
           console.info("创建帐户失败", res);
+          clearInterval(interval);
         }
       }
 

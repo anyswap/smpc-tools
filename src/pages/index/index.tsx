@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from "react";
-import { Button, Select } from "antd";
+import { Button, Select, message } from "antd";
 import LogoW from "@/pages/img/logo-white.svg";
 import LogoB from "@/pages/img/logo-black.svg";
 import { history, useModel, getLocale, setLocale, useIntl } from "umi";
@@ -10,6 +10,12 @@ import "./index.less";
 const Index = () => {
   const { account, activate } = useActiveWeb3React();
   const { isDay } = useModel("global", ({ isDay }) => ({ isDay }));
+
+  useEffect(() => {
+    message.config({
+      maxCount: 1,
+    });
+  }, []);
 
   useEffect(() => {
     if (account) {
