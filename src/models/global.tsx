@@ -48,6 +48,8 @@ export default function Index() {
   } = state;
 
   const getNodeList = async () => {
+    const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
+    if (!rpc) return;
     const res = await nodeListService();
     dispatch({
       nodeList: res.info,
@@ -55,6 +57,8 @@ export default function Index() {
   };
 
   useEffect(() => {
+    const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
+    if (!rpc) return;
     // '/nodes/list'
     getNodeList();
   }, []);
@@ -238,6 +242,8 @@ export default function Index() {
   };
   //监听要轮询的队列
   useEffect(() => {
+    const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
+    if (!rpc) return;
     pollingPubKeyActiveInterval.forEach((item: any) => {
       clearInterval(item);
     });

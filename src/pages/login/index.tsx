@@ -30,6 +30,9 @@ const Index = () => {
 
   useEffect(() => {
     localStorage.removeItem("node");
+    message.config({
+      maxCount: 1,
+    });
   }, []);
 
   useEffect(() => {
@@ -143,10 +146,11 @@ const Index = () => {
           <Form.Item
             label={useIntl().formatHTMLMessage({ id: "g.setTheNode" })}
             required
+            name="node"
             rules={[
               {
                 required: true,
-                message: useIntl().formatHTMLMessage({ id: "g.rules1" }),
+                message: useIntl().formatHTMLMessage({ id: "g.rules3" }),
               },
             ]}
           >

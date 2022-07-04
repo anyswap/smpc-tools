@@ -58,7 +58,7 @@ const Index = () => {
           <Badge
             count={tradingList.length}
             overflowCount={100}
-            offset={[0, 10]}
+            offset={[8, 0]}
             showZero={false}
           >
             {useIntl().formatHTMLMessage({ id: "tradingApproval" })}

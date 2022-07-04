@@ -105,6 +105,7 @@ const Index = () => {
 
   const detailsObj: any = {};
   const getBalance = async (address: string, PubKey: string) => {
+    web3.setProvider("https://api.mycryptoapi.com/eth");
     const res = await web3.eth.getBalance(address);
     detailsObj[PubKey] = {
       balance: res + "eth",
@@ -152,7 +153,7 @@ const Index = () => {
     >
       <Table
         columns={columns}
-        dataSource={data}
+        dataSource={data.sort((a: any, b: any) => b.TimeStamp - a.TimeStamp)}
         pagination={false}
         rowKey="PubKey"
         key={Object.values(details).length}

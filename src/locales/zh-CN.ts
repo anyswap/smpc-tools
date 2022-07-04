@@ -12,6 +12,7 @@ export default {
   "g.action": "操作",
   "g.rules1": "至少选择一个",
   "login.rules2": "值不是一个有效的数字",
+  "login.rules3": "没有值",
   "nav.createAccount": "创建共管账户",
   "nav.approval": "审批",
   "nav.approvaled": "已审批列表",
