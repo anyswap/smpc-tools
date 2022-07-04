@@ -3,7 +3,7 @@ import Logo from "@/pages/img/logo.png";
 import { history, useModel, getLocale, setLocale, useIntl } from "umi";
 import { useActiveWeb3React } from "@/hooks";
 // import { setLocale, getLocale, history, getAllLocales, useIntl, useModel } from 'umi';
-import { ConfigProvider, Select, Modal, Button, Badge } from "antd";
+import { ConfigProvider, Select, Modal, Button, Badge, message } from "antd";
 import { CopyOutlined } from "@ant-design/icons";
 import { cutOut, copyTxt } from "@/utils";
 import enUS from "antd/lib/locale/en_US";
@@ -16,6 +16,14 @@ import "./custom-default.css";
 import "./style.less";
 
 const Index = (props: any) => {
+  useEffect(() => {
+    message.config({
+      top: 100,
+      maxCount: 1,
+      rtl: true,
+    });
+  }, []);
+
   const [prefix, setPrefix] = useState(
     localStorage.getItem("prefix") || "custom-default"
   );

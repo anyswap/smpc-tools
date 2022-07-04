@@ -31,7 +31,9 @@ const Index = () => {
   useEffect(() => {
     localStorage.removeItem("node");
     message.config({
+      top: 100,
       maxCount: 1,
+      rtl: true,
     });
   }, []);
 

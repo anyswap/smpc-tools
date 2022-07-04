@@ -41,7 +41,9 @@ const Index = () => {
     {
       title: "Key",
       dataIndex: "Key",
-      render: (t: string) => cutOut(t, 6, 8),
+      render: (t: string) => (
+        <a onClick={() => copyTxt(t)}>{cutOut(t, 6, 8)}</a>
+      ),
     },
     {
       title: "Account",

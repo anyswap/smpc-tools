@@ -6,7 +6,7 @@ import { useModel, useIntl } from "umi";
 import moment from "moment";
 import web3 from "@/assets/js/web3";
 import "./style.less";
-import { cutOut } from "@/utils";
+import { cutOut, copyTxt } from "@/utils";
 
 const Index = () => {
   const { account } = useActiveWeb3React();
@@ -62,7 +62,9 @@ const Index = () => {
     {
       title: "Key",
       dataIndex: "Key",
-      render: (t: string) => cutOut(t, 6, 4),
+      render: (t: string) => (
+        <a onClick={() => copyTxt(t)}>{cutOut(t, 6, 4)}</a>
+      ),
     },
     {
       title: "TimeStamp",

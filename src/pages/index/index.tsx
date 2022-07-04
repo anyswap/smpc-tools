@@ -13,7 +13,9 @@ const Index = () => {
 
   useEffect(() => {
     message.config({
+      top: 100,
       maxCount: 1,
+      rtl: true,
     });
   }, []);
 

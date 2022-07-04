@@ -153,9 +153,11 @@ const Index = () => {
     >
       <Table
         columns={columns}
-        dataSource={data.sort((a: any, b: any) => b.TimeStamp - a.TimeStamp)}
+        dataSource={data
+          .sort((a: any, b: any) => b.TimeStamp - a.TimeStamp)
+          .map((item: any, i) => ({ ...item, k: i }))}
         pagination={false}
-        rowKey="PubKey"
+        rowKey="k"
         key={Object.values(details).length}
       />
       <Send visible={visible} onSend={onSend} setVisible={setVisible} />
