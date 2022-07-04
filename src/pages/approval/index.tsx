@@ -8,7 +8,7 @@ import web3 from "@/assets/js/web3";
 import "./style.less";
 import { cutOut } from "@/utils";
 
-const Index = (props: { num: number }) => {
+const Index = () => {
   const { account } = useActiveWeb3React();
 
   const { globalDispatch, pollingPubKey, Account } = useModel(
@@ -19,26 +19,34 @@ const Index = (props: { num: number }) => {
       Account,
     })
   );
+  const { approveList, approveListLoading, getApproveList } = useModel(
+    "approval",
+    ({ approveList, approveListLoading, getApproveList }) => ({
+      approveList,
+      approveListLoading,
+      getApproveList,
+    })
+  );
+
   const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
   const { execute } = useApproveReqSmpcAddress(rpc);
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
+  // const [data, setData] = useState([]);
 
-  const getApproveList = async () => {
-    if (!rpc || !account) return;
-    web3.setProvider(rpc);
-    const res = await web3.smpc.getCurNodeReqAddrInfo(account);
-    const { Data } = res;
-    setData(
-      (Data || []).sort(
-        (a: any, b: any) => Number(b.TimeStamp) - Number(a.TimeStamp)
-      )
-    );
-  };
+  // const getApproveList = async () => {
+  //   if (!rpc || !account) return;
+  //   web3.setProvider(rpc);
+  //   const res = await web3.smpc.getCurNodeReqAddrInfo(account);
+  //   const { Data } = res;
+  //   setData(
+  //     (Data || []).sort(
+  //       (a: any, b: any) => Number(b.TimeStamp) - Number(a.TimeStamp)
+  //     )
+  //   );
+  // };
 
-  useEffect(() => {
-    getApproveList();
-  }, [account, Account, props.num]);
+  // useEffect(() => {
+  //   getApproveList();
+  // }, [account, Account]);
 
   const columns: any = [
     {
@@ -133,9 +141,9 @@ const Index = (props: { num: number }) => {
   return (
     <div className="approval">
       <Table
-        loading={loading}
         columns={columns}
-        dataSource={data}
+        dataSource={approveList}
+        loading={approveListLoading}
         pagination={false}
         rowKey="Key"
       />

@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Button, message, Table, Tag } from "antd";
 import { useActiveWeb3React } from "@/hooks";
-import { useApproveReqSmpcAddress, useSign, getNonce } from "@/hooks/useSigns";
-import { useModel, history, useIntl } from "umi";
+import { useModel, useIntl } from "umi";
 import moment from "moment";
-import web3 from "@/assets/js/web3";
 import "./style.less";
 import { cutOut } from "@/utils";
 
@@ -12,6 +10,7 @@ const Index = () => {
   const { globalDispatch } = useModel("global", ({ globalDispatch }) => ({
     globalDispatch,
   }));
+
   useEffect(() => {
     localStorage.setItem("pollingRsvInfo", "0");
     globalDispatch({

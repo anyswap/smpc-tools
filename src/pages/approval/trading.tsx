@@ -1,29 +1,21 @@
 import { Table, Button, message } from "antd";
-import React, { useEffect, useState } from "react";
-import { useActiveWeb3React } from "@/hooks";
-import web3 from "@/assets/js/web3";
+import React from "react";
 import { acceptSign } from "@/hooks/useSigns";
-import { useIntl } from "umi";
+import { useIntl, useModel } from "umi";
 import { cutOut } from "@/utils";
 import moment from "moment";
 
-const Index = (props: { num: number }) => {
+const Index = () => {
   const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
-  const { account } = useActiveWeb3React();
   const { execute } = acceptSign(rpc);
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  const getCurNodeSignInfo = async () => {
-    setLoading(true);
-    const res = await web3.smpc.getCurNodeSignInfo(account);
-    setLoading(false);
-    setData(res?.Data || []);
-  };
-
-  useEffect(() => {
-    getCurNodeSignInfo();
-  }, [account, props.num]);
+  const { tradingList, tradingListLoading, getCurNodeSignInfo } = useModel(
+    "approval",
+    ({ tradingList, tradingListLoading, getCurNodeSignInfo }) => ({
+      tradingList,
+      tradingListLoading,
+      getCurNodeSignInfo,
+    })
+  );
 
   const action = async (Accept: string, r: any) => {
     if (!execute) return;
@@ -99,9 +91,9 @@ const Index = (props: { num: number }) => {
   ];
   return (
     <Table
-      loading={loading}
       columns={columns}
-      dataSource={data}
+      dataSource={tradingList}
+      loading={tradingListLoading}
       pagination={false}
     />
   );

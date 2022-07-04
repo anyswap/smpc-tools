@@ -46,10 +46,10 @@ const Index = (props) => {
     //   name: "获取enode",
     //   url: "/getEnode",
     // },
-    {
-      name: useIntl().formatHTMLMessage({ id: "nav.approval" }),
-      url: "/approval",
-    },
+    // {
+    //   name: useIntl().formatHTMLMessage({ id: "nav.approval" }),
+    //   url: "/approval",
+    // },
   ];
 
   const localChange = (type: "en-Us" | "zh-CN") => {
@@ -77,6 +77,13 @@ const Index = (props) => {
     setVisible(false);
   };
   const { ethereum } = window;
+  const { approveList, tradingList } = useModel(
+    "approval",
+    ({ approveList, tradingList }) => ({
+      approveList,
+      tradingList,
+    })
+  );
   return (
     <ConfigProvider locale={local} prefixCls={prefix}>
       <div className={prefix === "custom-default" ? "layouts" : "layouts dark"}>
@@ -136,8 +143,24 @@ const Index = (props) => {
       url: "/approvaled",
     }, */}
             <Badge
-              // count={pollingRsvInfo + pollingPubKeyInfo}
-              // key={pollingRsvInfo + pollingPubKeyInfo}
+              count={approveList.length + tradingList.length}
+              overflowCount={100}
+              offset={[0, 10]}
+              showZero={false}
+            >
+              <div
+                key="/approval"
+                className={
+                  history.location.pathname === "/approval"
+                    ? "item active"
+                    : "item"
+                }
+                onClick={() => history.push("/approval")}
+              >
+                {useIntl().formatHTMLMessage({ id: "nav.approval" })}
+              </div>
+            </Badge>
+            <Badge
               count={pollingRsvInfo}
               overflowCount={100}
               offset={[0, 10]}
@@ -182,7 +205,7 @@ const Index = (props) => {
               </div>
             </Modal>
             <div className="loginInfo" onClick={() => setVisible(true)}>
-              {cutOut(ethereum.selectedAddress, 6, 4)}
+              {cutOut(ethereum?.selectedAddress, 6, 4)}
             </div>
             <Select
               className="mr8"
