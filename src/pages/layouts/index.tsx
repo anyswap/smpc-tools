@@ -15,7 +15,7 @@ import "./custom-dark.css";
 import "./custom-default.css";
 import "./style.less";
 
-const Index = (props) => {
+const Index = (props: any) => {
   const [prefix, setPrefix] = useState(
     localStorage.getItem("prefix") || "custom-default"
   );
@@ -31,7 +31,13 @@ const Index = (props) => {
       pollingPubKeyInfo,
     })
   );
-  const [local, SetLocalAntd] = useState(enUS);
+  const _local: any = {
+    "zh-CN": zhCN,
+    "en-US": enUS,
+  };
+  const [local, SetLocalAntd] = useState(
+    _local[localStorage.getItem("umi_locale") || "en-US"]
+  );
   const [visible, setVisible] = useState(false);
   const nav = [
     // {
@@ -76,7 +82,7 @@ const Index = (props) => {
     localStorage.removeItem("loginAccount");
     setVisible(false);
   };
-  const { ethereum } = window;
+  const { ethereum }: any = window;
   const { approveList, tradingList } = useModel(
     "approval",
     ({ approveList, tradingList }) => ({
