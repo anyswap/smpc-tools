@@ -22,13 +22,13 @@ const Index = () => {
     const res = await execute(Accept, r);
     if (res?.Status === "Success") {
       message.success("Success");
-      const approvaled = JSON.parse(
-        localStorage.getItem("tradingApprovaled") || "[]"
-      );
-      localStorage.setItem(
-        "tradingApprovaled",
-        JSON.stringify([{ ...r, status: Accept }, ...approvaled])
-      );
+      // const approvaled = JSON.parse(
+      //   localStorage.getItem("tradingApprovaled") || "[]"
+      // );
+      // localStorage.setItem(
+      //   "tradingApprovaled",
+      //   JSON.stringify([{ ...r, status: Accept }, ...approvaled])
+      // );
       getCurNodeSignInfo();
       // const res = await web3.smpc.getSignStatus(r.Key);
       // // res->rsv

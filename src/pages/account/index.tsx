@@ -156,7 +156,6 @@ const Index = () => {
         dataSource={data
           .sort((a: any, b: any) => b.TimeStamp - a.TimeStamp)
           .map((item: any, i) => ({ ...item, k: i }))}
-        pagination={false}
         rowKey="k"
         key={Object.values(details).length}
       />
