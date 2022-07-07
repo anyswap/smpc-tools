@@ -125,14 +125,17 @@ const Index = () => {
       globalDispatch({
         pollingPubKey: [
           newPollingPubKeyItem,
-          ...pollingPubKey.filter((item: any) => item.data.Key !== r.Key),
+          // ...pollingPubKey.filter((item: any) => item.data.Key !== r.Key),
         ],
       });
       localStorage.setItem(
         "pollingPubKey",
         JSON.stringify([
           newPollingPubKeyItem,
-          ...pollingPubKey.filter((item: any) => item.data.Key !== r.Key),
+          // ...pollingPubKey.filter((item: any) => item.data.Key !== r.Key),
+          ...JSON.parse(localStorage.getItem("pollingPubKey") || "[]").filter(
+            (item: any) => item.data.Key !== r.Key
+          ),
         ])
       );
     } else if (res?.msg) {

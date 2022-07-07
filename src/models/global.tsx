@@ -22,11 +22,9 @@ const initState = {
 
   // 发起交易后轮询rsv
   pollingRsv: JSON.parse(localStorage.getItem("pollingRsv") || "[]"),
-  pollingRsvActiveInterval: [],
   pollingRsvInfo: Number(localStorage.getItem("pollingRsvInfo") || 0),
   //创建账号后轮询Pubkey
   pollingPubKey: JSON.parse(localStorage.getItem("pollingPubKey") || "[]"),
-  pollingPubKeyActiveInterval: [],
   pollingPubKeyInfo: Number(localStorage.getItem("pollingPubKeyInfo") || 0),
   // 已审批交易列表数据
   sendApprovaled: JSON.parse(localStorage.getItem("sendApprovaled") || "[]"),
@@ -38,9 +36,7 @@ export default function Index() {
   const [state, dispatch] = useReducer(reducer, initState);
   const {
     pollingRsv,
-    pollingRsvActiveInterval,
     pollingPubKey,
-    pollingPubKeyActiveInterval,
     pollingRsvInfo,
     pollingPubKeyInfo,
     sendApprovaled: GsendApprovaled,
@@ -66,6 +62,9 @@ export default function Index() {
   //获取 发起交易的审批结果 轮询
   const pollingRsvInterval = (fn: any, params: any, data: any, i: any) => {
     const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
+    const localStoragePollingRsv = JSON.parse(
+      localStorage.getItem("pollingRsv") || "[]"
+    );
     let count = 0;
     const interval = setInterval(async () => {
       web3.setProvider(rpc);
@@ -80,13 +79,10 @@ export default function Index() {
         count = count + 1;
         if (count > 40) {
           clearInterval(interval);
-          const newPollingPubKey = pollingPubKey.filter(
-            (item: any, index: number) => index !== i
+          const newPollingRsv = localStoragePollingRsv.filter(
+            (item: any, index: number) => item.params[0] !== params[0]
           );
-          localStorage.setItem(
-            "pollingPubKey",
-            JSON.stringify(newPollingPubKey)
-          );
+          localStorage.setItem("newPollingRsv", JSON.stringify(newPollingRsv));
           message.error("创建的交易失败");
           console.info("创建的交易失败", res);
         }
@@ -109,8 +105,8 @@ export default function Index() {
       }
       if (res.Status === "Success" && result.Status === "Success") {
         clearInterval(interval);
-        const newPollingRsv = pollingRsv.filter(
-          (item: any, index: number) => index !== i
+        const newPollingRsv = localStoragePollingRsv.filter(
+          (item: any, index: number) => item.params[0] !== params[0]
         );
         localStorage.setItem("pollingRsv", JSON.stringify(newPollingRsv));
         // 设置已审批交易记录页面数据
@@ -134,27 +130,25 @@ export default function Index() {
         localStorage.setItem("pollingRsvInfo", pollingRsvInfo + 1);
       }
     }, 30000);
-
-    dispatch({
-      pollingRsvActiveInterval: [...pollingRsvActiveInterval, interval],
-    });
   };
   //监听要轮询的队列
   useEffect(() => {
-    pollingRsvActiveInterval.forEach((item: any) => {
-      clearInterval(item);
-    });
-    dispatch({
-      pollingRsvActiveInterval: [],
-    });
+    const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
+    if (!rpc || !pollingRsv.length) return;
     pollingRsv.forEach(({ fn, params, data }: any, i: number) => {
       pollingRsvInterval(web3.smpc[fn], params, data, i);
+    });
+    dispatch({
+      pollingRsv: [],
     });
   }, [pollingRsv]);
 
   //获取 发起创建账户后的审批结果 轮询
   const pollingPubKeyInterval = (fn: any, params: any, data: any, i: any) => {
     const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
+    const localStoragePollingPubKey = JSON.parse(
+      localStorage.getItem("pollingPubKey") || "[]"
+    );
     let count = 0;
 
     const interval = setInterval(async () => {
@@ -187,8 +181,11 @@ export default function Index() {
         count = count + 1;
         if (count > 40) {
           clearInterval(interval);
-          const newPollingPubKey = pollingPubKey.filter(
-            (item: any, index: number) => index !== i
+          // const newPollingPubKey = pollingPubKey.filter(
+          //   (item: any, index: number) => index !== i
+          // );
+          const newPollingPubKey = localStoragePollingPubKey.filter(
+            (item: any, index: number) => item.params[0] !== params[0]
           );
           localStorage.setItem(
             "pollingPubKey",
@@ -200,9 +197,8 @@ export default function Index() {
       }
       // res.Data.result === '' 没有全部操作审批按钮
       if (res.Status === "Success" && result.Status === "Success") {
-        debugger;
         clearInterval(interval);
-        const newPollingPubKey = pollingPubKey.filter(
+        const newPollingPubKey = localStoragePollingPubKey.filter(
           (item: any, index: number) => index !== i
         );
         localStorage.setItem("pollingPubKey", JSON.stringify(newPollingPubKey));
@@ -218,7 +214,7 @@ export default function Index() {
               ThresHold: data.ThresHold,
               PubKey: result.PubKey,
             },
-            ...Account,
+            ...Account.filter((item) => item.key !== result.Key),
           ])
         );
         dispatch({
@@ -231,28 +227,22 @@ export default function Index() {
               ThresHold: data.ThresHold,
               PubKey: result.PubKey,
             },
-            ...GAccount,
+            ...GAccount.filter((item) => item.key !== result.Key),
           ],
         });
         localStorage.setItem("pollingPubKeyInfo", pollingPubKeyInfo + 1);
       }
     }, 30000);
-    dispatch({
-      pollingPubKeyActiveInterval: [...pollingPubKeyActiveInterval, interval],
-    });
   };
   //监听要轮询的队列
   useEffect(() => {
     const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
-    if (!rpc) return;
-    pollingPubKeyActiveInterval.forEach((item: any) => {
-      clearInterval(item);
-    });
-    dispatch({
-      pollingPubKeyActiveInterval: [],
-    });
+    if (!rpc || pollingPubKey.length) return;
     pollingPubKey.forEach(({ fn, params, data }: any, i: number) => {
       pollingPubKeyInterval(web3.smpc[fn], params, data, i);
+    });
+    dispatch({
+      pollingPubKey: [],
     });
   }, [pollingPubKey]);
 

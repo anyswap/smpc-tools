@@ -87,7 +87,7 @@ const Index = () => {
       globalDispatch({
         pollingPubKey: [
           newPollingPubKeyItem,
-          ...JSON.parse(localStorage.getItem("pollingPubKey") || "[]"),
+          // ...JSON.parse(localStorage.getItem("pollingPubKey") || "[]"),
         ],
       });
       localStorage.setItem(

@@ -525,7 +525,7 @@ export function useGetSign(rpc: string | undefined): {
                 params: [cbData.Data?.result],
                 data: { ...r, to, value, MsgContext, MsgHash: data.MsgHash },
               },
-              ...JSON.parse(localStorage.getItem("pollingRsv") || "[]"),
+              // ...JSON.parse(localStorage.getItem("pollingRsv") || "[]"),
             ],
           });
           localStorage.setItem(
