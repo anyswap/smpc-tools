@@ -36,7 +36,7 @@ const Index = (props: {
       >
         <Form.Item
           name="to"
-          label="to"
+          label="To"
           rules={[
             {
               required: true,
@@ -54,7 +54,7 @@ const Index = (props: {
         </Form.Item>
         <Form.Item
           name="value"
-          label="value"
+          label="Value"
           rules={[
             {
               required: true,

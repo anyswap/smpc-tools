@@ -11,7 +11,7 @@ import { nodeListItem } from "./d";
 
 const Index = () => {
   const [inputNode, setInputNode] = useState("");
-  const [value, setValue] = useState(undefined);
+  const [value, setValue] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const { account, activate } = useActiveWeb3React();
@@ -152,7 +152,9 @@ const Index = () => {
             rules={[
               {
                 required: true,
-                message: useIntl().formatHTMLMessage({ id: "g.rules3" }),
+                message: useIntl().formatHTMLMessage({
+                  id: "login.rules3",
+                }) as string,
               },
             ]}
           >
@@ -176,7 +178,7 @@ const Index = () => {
                   form.setFieldsValue({
                     node: inputNode,
                   });
-                  setValue(inputNode);
+                  setValue(inputNode as string);
                 }, 100);
 
                 return;

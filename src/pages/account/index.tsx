@@ -158,6 +158,13 @@ const Index = () => {
           .map((item: any, i) => ({ ...item, k: i }))}
         rowKey="k"
         key={Object.values(details).length}
+        pagination={{
+          total: data.length,
+          hideOnSinglePage: true,
+          pageSizeOptions: [10, 20, 50, 100],
+          showSizeChanger: true,
+          showQuickJumper: true,
+        }}
       />
       <Send visible={visible} onSend={onSend} setVisible={setVisible} />
     </div>
