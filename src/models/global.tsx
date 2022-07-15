@@ -5,6 +5,7 @@ import { useEffect, useReducer } from "react";
 import moment from "moment";
 import web3 from "@/assets/js/web3";
 import { message } from "antd";
+const Web3 = require("web3");
 
 const initState = {
   address: "",
@@ -33,6 +34,7 @@ const initState = {
 };
 
 export default function Index() {
+  const account = window.ethereum?.selectedAddress;
   const [state, dispatch] = useReducer(reducer, initState);
   const {
     pollingRsv,
@@ -144,107 +146,185 @@ export default function Index() {
   }, [pollingRsv]);
 
   //获取 发起创建账户后的审批结果 轮询
-  const pollingPubKeyInterval = (fn: any, params: any, data: any, i: any) => {
+  const pollingPubKeyResponse = (res, params: any, data: any) => {
     const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
-    const localStoragePollingPubKey = JSON.parse(
-      localStorage.getItem("pollingPubKey") || "[]"
-    );
-    let count = 0;
 
-    const interval = setInterval(async () => {
-      web3.setProvider(rpc);
-      console.info("...params", params);
-      const res = await fn(...params);
-      const result = JSON.parse(res?.Data?.result || "{}");
-      if (result.Status === "Failure") {
-        clearInterval(interval);
-        console.info("被拒绝了一笔PubKey申请, 参数是", params);
-        console.info("data:", data);
-        console.info("index:", i);
-        return;
-      }
+    const updateStatus = () => {
+      dispatch({
+        pollingPubKey: pollingPubKey.filter(
+          (item) => item.params[0] !== params[0]
+        ),
+      });
+      localStorage.setItem(
+        "pollingPubKey",
+        JSON.stringify(
+          pollingPubKey.filter((item) => item.params[0] !== params[0])
+        )
+      );
+    };
+    web3.setProvider(rpc);
+    console.info("...params", params);
+    const result = JSON.parse(res?.Data?.result || "{}");
+    if (result.Status === "Failure") {
+      console.info("被拒绝了一笔PubKey申请, 参数是", params);
+      console.info("data:", data);
+      console.info("index:", i);
+      updateStatus();
+      return;
+    }
 
-      if (result.Status === "Timeout") {
-        clearInterval(interval);
-        console.info("超时了一笔PubKey申请, 参数是", params);
-        console.info("data:", data);
-        console.info("index:", i);
-        return;
-      }
+    if (result.Status === "Timeout") {
+      console.info("超时了一笔PubKey申请, 参数是", params);
+      console.info("data:", data);
+      console.info("index:", i);
+      updateStatus();
+      return;
+    }
 
-      // 全部审批成功后端写入数据库失败
-      if (
-        res.Status === "Success" &&
-        result.Status === "Pending" &&
-        result.AllReply.every((item: any) => item.Status === "AGREE")
-      ) {
-        count = count + 1;
-        if (count > 40) {
-          clearInterval(interval);
-          // const newPollingPubKey = pollingPubKey.filter(
-          //   (item: any, index: number) => index !== i
-          // );
-          const newPollingPubKey = localStoragePollingPubKey.filter(
-            (item: any, index: number) => item.params[0] !== params[0]
-          );
-          localStorage.setItem(
-            "pollingPubKey",
-            JSON.stringify(newPollingPubKey)
-          );
-          message.error("创建帐户失败");
-          console.info("创建帐户失败", res);
-        }
+    // 全部审批成功后端写入数据库失败
+    if (
+      res.Status === "Success" &&
+      result.Status === "Pending" &&
+      result.AllReply.every((item: any) => item.Status === "AGREE")
+    ) {
+      dispatch({
+        pollingPubKey: pollingPubKey.map((item: any) => {
+          const { count = 0 } = item;
+          if (item.params[0] !== params[0]) {
+            return item;
+          } else {
+            return { ...item, count: count + 1 };
+          }
+        }),
+      });
+      localStorage.setItem("");
+      if (count > 40) {
+        // const newPollingPubKey = pollingPubKey.filter(
+        //   (item: any, index: number) => index !== i
+        // );
+        updateStatus();
+        message.error("创建帐户失败");
+        console.info("创建帐户失败", res);
       }
-      // res.Data.result === '' 没有全部操作审批按钮
-      if (res.Status === "Success" && result.Status === "Success") {
-        clearInterval(interval);
-        const newPollingPubKey = localStoragePollingPubKey.filter(
-          (item: any, index: number) => index !== i
-        );
-        localStorage.setItem("pollingPubKey", JSON.stringify(newPollingPubKey));
-        // 设置账户列表页面数据
-        const Account = JSON.parse(localStorage.getItem("Account") || "[]");
-        localStorage.setItem(
-          "Account",
-          JSON.stringify([
-            {
-              ...result,
-              key: result.Key,
-              GroupID: data.GroupID,
-              ThresHold: data.ThresHold,
-              PubKey: result.PubKey,
-            },
-            ...Account.filter((item) => item.key !== result.Key),
-          ])
-        );
-        dispatch({
-          pollingPubKeyInfo: pollingPubKeyInfo + 1,
-          Account: [
-            {
-              ...result,
-              key: result.Key,
-              GroupID: data.GroupID,
-              ThresHold: data.ThresHold,
-              PubKey: result.PubKey,
-            },
-            ...GAccount.filter((item) => item.key !== result.Key),
-          ],
-        });
-        localStorage.setItem("pollingPubKeyInfo", pollingPubKeyInfo + 1);
-      }
-    }, 30000);
+    }
+    // res.Data.result === '' 是没有全部操作审批按钮
+    if (res.Status === "Success" && result.Status === "Success") {
+      updateStatus();
+      // 设置账户列表页面数据
+      const Account = JSON.parse(localStorage.getItem("Account") || "[]");
+      localStorage.setItem("pollingPubKeyInfo", pollingPubKeyInfo + 1);
+      localStorage.setItem(
+        "Account",
+        JSON.stringify([
+          {
+            ...result,
+            key: params[0],
+            GroupID: data.GroupID,
+            ThresHold: data.ThresHold,
+            PubKey: result.PubKey,
+          },
+          ...Account.filter((item) => item.key !== params[0]),
+        ])
+      );
+
+      dispatch({
+        pollingPubKeyInfo: pollingPubKeyInfo + 1,
+        Account: [
+          {
+            ...result,
+            key: params[0],
+            GroupID: data.GroupID,
+            ThresHold: data.ThresHold,
+            PubKey: result.PubKey,
+          },
+          ...GAccount.filter((item) => item.key !== params[0]),
+        ],
+      });
+    }
   };
   //监听要轮询的队列
   useEffect(() => {
-    const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
-    if (!rpc || pollingPubKey.length) return;
-    pollingPubKey.forEach(({ fn, params, data }: any, i: number) => {
-      pollingPubKeyInterval(web3.smpc[fn], params, data, i);
-    });
-    dispatch({
-      pollingPubKey: [],
-    });
+    // const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
+    // if (!rpc || pollingPubKey.length) return;
+    // pollingPubKey.forEach(({ fn, params, data }: any, i: number) => {
+    //   pollingPubKeyInterval(web3.smpc[fn], params, data, i);
+    // });
+    // dispatch({
+    //   pollingPubKey: [],
+    // });
   }, [pollingPubKey]);
+
+  useEffect(() => {
+    const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
+    if (!rpc || !account || !pollingPubKey.length) return;
+    let interval: any;
+    clearInterval(interval);
+    interval = setInterval(() => {
+      console.info("pollingPubKey", pollingPubKey);
+      web3.setProvider(rpc);
+      const batch = new web3.BatchRequest();
+      pollingPubKey.forEach(({ fn, params, data }: any) => {
+        batch.add(
+          web3.smpc[fn].request(...params, (e, res) => {
+            if (e) return;
+            pollingPubKeyResponse(res, params, data);
+          })
+        );
+      });
+      batch.requestManager.sendBatch(batch.requests, (err, resArr) => {
+        console.info(3333, err, resArr);
+
+        if (err) return;
+
+        let newPollingPubKey = pollingPubKey.map((item: any, i: Number) => {
+          const { count = 0 } = item;
+          const res = resArr[i].result;
+          const result = JSON.parse(resArr[i].Data?.result || "{}");
+          if (
+            res.Status === "Success" &&
+            result.Status === "Pending" &&
+            result.AllReply.every((it: any) => it.Status === "AGREE")
+          ) {
+            return { ...item, count: count + 1 };
+          } else {
+            return item;
+          }
+        });
+        const needRemovePollingPubKeyItem = [];
+        resArr.forEach((item, i) => {
+          const res = resArr[i].result;
+          const result = JSON.parse(res?.Data?.result || "{}");
+          const isFailure = result.Status === "Failure";
+          const isTimeout = result.Status === "Timeout";
+          const isSuccess =
+            res.Status === "Success" && result.Status === "Success";
+          if (isFailure || isTimeout || isSuccess) {
+            needRemovePollingPubKeyItem.push(i);
+          }
+        });
+        debugger;
+        newPollingPubKey = newPollingPubKey.filter((item, i) => {
+          const { count = 0 } = item;
+          return !needRemovePollingPubKeyItem.includes(i) && count < 40;
+        });
+        dispatch({
+          pollingPubKey: newPollingPubKey,
+          pollingPubKeyInfo: needRemovePollingPubKeyItem.length,
+        });
+        localStorage.setItem("pollingPubKey", newPollingPubKey);
+        localStorage.setItem(
+          "pollingPubKeyInfo",
+          needRemovePollingPubKeyItem.length
+        );
+      });
+    }, 30000);
+  }, [account, pollingPubKey]);
+
+  useEffect(() => {
+    setInterval(() => {
+      console.info("OOpollingPubKey", pollingPubKey);
+    }, 30000);
+  }, []);
 
   return { ...state, globalDispatch: dispatch };
 }

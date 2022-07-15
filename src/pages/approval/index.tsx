@@ -19,12 +19,12 @@ const Index = () => {
       Account,
     })
   );
-  const { approveList, approveListLoading, getApproveList } = useModel(
+  const { approveList, approveListLoading, getData } = useModel(
     "approval",
-    ({ approveList, approveListLoading, getApproveList }) => ({
+    ({ approveList, approveListLoading, getData }) => ({
       approveList,
       approveListLoading,
-      getApproveList,
+      getData,
     })
   );
 
@@ -112,7 +112,7 @@ const Index = () => {
     const res = await execute(r, type);
     if (res?.info === "Success") {
       message.success(operationIsSuccessful);
-      getApproveList();
+      getData();
       const newPollingPubKeyItem = {
         fn: "getReqAddrStatus",
         params: [r.Key],
@@ -125,7 +125,7 @@ const Index = () => {
       globalDispatch({
         pollingPubKey: [
           newPollingPubKeyItem,
-          // ...pollingPubKey.filter((item: any) => item.data.Key !== r.Key),
+          ...pollingPubKey.filter((item: any) => item.data.Key !== r.Key),
         ],
       });
       localStorage.setItem(

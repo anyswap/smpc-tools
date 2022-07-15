@@ -8,12 +8,12 @@ import moment from "moment";
 const Index = () => {
   const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
   const { execute } = acceptSign(rpc);
-  const { tradingList, tradingListLoading, getCurNodeSignInfo } = useModel(
+  const { tradingList, tradingListLoading, getData } = useModel(
     "approval",
-    ({ tradingList, tradingListLoading, getCurNodeSignInfo }) => ({
+    ({ tradingList, tradingListLoading, getData }) => ({
       tradingList,
       tradingListLoading,
-      getCurNodeSignInfo,
+      getData,
     })
   );
 
@@ -29,7 +29,7 @@ const Index = () => {
       //   "tradingApprovaled",
       //   JSON.stringify([{ ...r, status: Accept }, ...approvaled])
       // );
-      getCurNodeSignInfo();
+      getData();
       // const res = await web3.smpc.getSignStatus(r.Key);
       // // res->rsv
       return;

@@ -41,7 +41,15 @@ const Index = () => {
       pollingPubKeyInfo: 0,
     });
   }, []);
-
+  const intl_balance = useIntl().formatHTMLMessage({ id: "balance" });
+  const intl_createDate = useIntl().formatHTMLMessage({
+    id: "accountList.createDate",
+  });
+  const intl_thresHold = useIntl().formatHTMLMessage({
+    id: "accountList.thresHold",
+  });
+  const intl_action = useIntl().formatHTMLMessage({ id: "g.action" });
+  const intl_transaction = useIntl().formatHTMLMessage({ id: "transaction" });
   const columns = [
     {
       title: "publickey",
@@ -61,23 +69,23 @@ const Index = () => {
       },
     },
     {
-      title: useIntl().formatHTMLMessage({ id: "balance" }),
+      title: intl_balance,
       dataIndex: "PubKey",
       width: "10%",
       render: (t: string) => JSON.parse(details)[t]?.balance,
     },
     {
-      title: useIntl().formatHTMLMessage({ id: "accountList.createDate" }),
+      title: intl_createDate,
       dataIndex: "TimeStamp",
       render: (t: string) => moment(Number(t)).format("YYYY-MM-DD HH:mm:ss"),
     },
     {
-      title: useIntl().formatHTMLMessage({ id: "accountList.thresHold" }),
+      title: intl_thresHold,
       dataIndex: "ThresHold",
       width: "10%",
     },
     {
-      title: useIntl().formatHTMLMessage({ id: "g.action" }),
+      title: intl_action,
       width: "10%",
       render: (r: any) => (
         <a
@@ -97,7 +105,7 @@ const Index = () => {
             // }
           }
         >
-          {useIntl().formatHTMLMessage({ id: "transaction" })}
+          {intl_transaction}
         </a>
       ),
     },

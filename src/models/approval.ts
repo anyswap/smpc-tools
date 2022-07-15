@@ -15,13 +15,8 @@ export default function Index() {
   const account = window.ethereum?.selectedAddress;
   const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
 
-  const getApproveList = async () => {
-    if (!rpc || !account) return;
-    web3.setProvider(rpc);
-    dispatch({
-      approveListLoading: true,
-    });
-    const res = await web3.smpc.getCurNodeReqAddrInfo(account);
+  const getCurNodeReqAddrInfoResponse = (e: any, res: any) => {
+    if (e) return;
     const { Data } = res;
     dispatch({
       approveList: (Data || []).sort(
@@ -30,33 +25,44 @@ export default function Index() {
       approveListLoading: false,
     });
   };
-  const getCurNodeSignInfo = async () => {
-    web3.setProvider(rpc);
+  const getCurNodeSignInfoResponse = (e: any, res: any) => {
+    if (e) return;
     dispatch({
       tradingListLoading: true,
     });
-    const res = await web3.smpc.getCurNodeSignInfo(account);
     dispatch({
       tradingList: res?.Data || [],
       tradingListLoading: false,
     });
   };
+  const getData = () => {
+    if (!rpc || !account) return;
+    web3.setProvider(rpc);
+    const batch = new web3.BatchRequest();
+    batch.add(
+      web3.smpc.getCurNodeReqAddrInfo.request(
+        account,
+        getCurNodeReqAddrInfoResponse
+      )
+    );
+    batch.add(
+      web3.smpc.getCurNodeSignInfo.request(account, getCurNodeSignInfoResponse)
+    );
+    batch.execute();
+    dispatch({
+      approveListLoading: true,
+    });
+  };
   useEffect(() => {
-    if (!rpc) return;
-    getApproveList();
-    getCurNodeSignInfo();
+    if (!rpc || !account) return;
+    getData();
+    let interval: any;
+    clearInterval(interval);
+    // 20秒调一次交易账户审批列表和交易审批列表
+    interval = setInterval(() => {
+      getData();
+    }, 20000);
   }, [account]);
 
-  useEffect(() => {
-    if (!rpc) return;
-    const interval = setInterval(() => {
-      getApproveList();
-      getCurNodeSignInfo();
-    }, 20000);
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
-
-  return { ...state, getApproveList, getCurNodeSignInfo };
+  return { ...state, getData };
 }

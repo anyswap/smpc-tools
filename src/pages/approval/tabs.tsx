@@ -7,18 +7,16 @@ import { useIntl, useModel } from "umi";
 
 const Index = () => {
   const [spin, setSpin] = useState(false);
-  const { getApproveList, getCurNodeSignInfo, approveList, tradingList } =
-    useModel(
-      "approval",
-      ({ getApproveList, getCurNodeSignInfo, approveList, tradingList }) => {
-        return { getApproveList, getCurNodeSignInfo, approveList, tradingList };
-      }
-    );
+  const { getData, approveList, tradingList } = useModel(
+    "approval",
+    ({ getData, approveList, tradingList }) => {
+      return { getData, approveList, tradingList };
+    }
+  );
 
   const refresh = () => {
     setSpin(true);
-    getApproveList();
-    getCurNodeSignInfo();
+    getData();
     setTimeout(() => {
       setSpin(false);
     }, 500);
