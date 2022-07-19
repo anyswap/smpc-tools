@@ -13,6 +13,7 @@ const initialState = {
 export default function Index() {
   const [state, dispatch] = useReducer(reducer, initialState);
   const account = window.ethereum?.selectedAddress;
+
   const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
 
   const getCurNodeReqAddrInfoResponse = (e: any, res: any) => {
@@ -36,6 +37,7 @@ export default function Index() {
     });
   };
   const getData = () => {
+    const account = window.ethereum?.selectedAddress;
     if (!rpc || !account) return;
     web3.setProvider(rpc);
     const batch = new web3.BatchRequest();
@@ -54,12 +56,16 @@ export default function Index() {
     });
   };
   useEffect(() => {
-    if (!rpc || !account) return;
     getData();
+  }, []);
+  useEffect(() => {
+    // if (!rpc || !account) return;
     let interval: any;
     clearInterval(interval);
     // 20秒调一次交易账户审批列表和交易审批列表
     interval = setInterval(() => {
+      console.info(new Date(), interval);
+      console.info(rpc, account);
       getData();
     }, 20000);
   }, [account]);

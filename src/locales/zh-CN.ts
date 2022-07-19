@@ -24,6 +24,7 @@ export default {
   "accountList.createDate": "创建时间",
   "approval.agree": "同意",
   "approval.disagree": "不同意",
+  "approval.history": "审批历史",
   connectThePurse: "连接钱包",
   welcome: "欢迎使用密钥管家1.0",
   welcomeOpt: "请创建一个钱包或者导入一个钱包",

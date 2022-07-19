@@ -125,7 +125,7 @@ const Index = () => {
     }
   };
   useEffect(() => {
-    const Account = GAccount;
+    const Account = GAccount.filter((item: any) => item.Status === "Success");
     web3.setProvider("https://api.mycryptoapi.com/eth");
     Account.forEach((item: any) => {
       const address = ethers.utils.computeAddress("0x" + item.PubKey);

@@ -21,33 +21,21 @@ const Index = () => {
   // }, [pollingRsvInfo]);
   // console.info("RsvInfo", RsvInfo);
   return (
-    // <Tabs defaultActiveKey={"0"}>
-    //   <Tabs.TabPane
-    //     key={"0"}
-    //     tab={
-    //       <Badge count={pollingPubKeyInfo} overflowCount={100}>
-    //         <Button type="text">
-    //           {useIntl().formatHTMLMessage({ id: "accountApproval" })}
-    //         </Button>
-    //       </Badge>
-    //     }
-    //   >
-    //     <AccountList />
-    //   </Tabs.TabPane>
-    //   <Tabs.TabPane
-    //     key={"1"}
-    //     tab={
-    //       <Badge count={pollingRsvInfo} overflowCount={100}>
-    //         <Button type="text">
-    //           {useIntl().formatHTMLMessage({ id: "tradingApproval" })}
-    //         </Button>
-    //       </Badge>
-    //     }
-    //   >
-    //     <TradingList />
-    //   </Tabs.TabPane>
-    // </Tabs>
-    <TradingList />
+    <Tabs defaultActiveKey={"0"}>
+      <Tabs.TabPane
+        key={"0"}
+        tab={useIntl().formatHTMLMessage({ id: "accountApproval" })}
+      >
+        <AccountList />
+      </Tabs.TabPane>
+      <Tabs.TabPane
+        key={"1"}
+        tab={useIntl().formatHTMLMessage({ id: "nav.approvedTransaction" })}
+      >
+        <TradingList />
+      </Tabs.TabPane>
+    </Tabs>
+    // <TradingList />
   );
 };
 

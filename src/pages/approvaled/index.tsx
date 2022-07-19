@@ -31,14 +31,8 @@ const Index = () => {
       render: (t: string) => cutOut(t, 6, 4),
     },
     {
-      title: "GroupID",
-      dataIndex: "GroupID",
-      render: (t: string) => cutOut(t, 6, 4),
-    },
-    {
-      title: "Key",
-      dataIndex: "Key",
-      render: (t: string) => cutOut(t, 6, 4),
+      title: "Status",
+      dataIndex: "Status",
     },
     {
       title: "TimeStamp",
@@ -49,14 +43,11 @@ const Index = () => {
       title: useIntl().formatHTMLMessage({ id: "createGrounp.model" }),
       dataIndex: "ThresHold",
     },
-    {
-      title: "Nonce",
-      dataIndex: "Nonce",
-    },
+
     {
       title: useIntl().formatHTMLMessage({ id: "g.action" }),
-      dataIndex: "status",
-      render: (t) => action[t],
+      dataIndex: "AllReply",
+      render: (t: any) => t.map((item: any) => <p>{item.Status}</p>),
     },
   ];
 
@@ -66,9 +57,7 @@ const Index = () => {
       <Table
         columns={columns}
         rowKey="PubKey"
-        dataSource={JSON.parse(
-          localStorage.getItem("accountApprovaled") || "[]"
-        )}
+        dataSource={JSON.parse(localStorage.getItem("Account") || "[]")}
         pagination={false}
       />
     </div>

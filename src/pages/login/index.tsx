@@ -14,7 +14,9 @@ const Index = () => {
   const [value, setValue] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
-  const { account, activate } = useActiveWeb3React();
+  // const { account, activate } = useActiveWeb3React();
+  const { activate } = useActiveWeb3React();
+  const account = window.ethereum?.selectedAddress;
   const { nodeList, isDay, globalDispatch, loginAccount } = useModel(
     "global",
     ({ isDay, nodeList, globalDispatch, address, loginAccount }) => ({
@@ -37,11 +39,11 @@ const Index = () => {
     });
   }, []);
 
-  useEffect(() => {
-    if (!account) {
-      history.push("/");
-    }
-  }, [account]);
+  // useEffect(() => {
+  //   if (!account) {
+  //     history.push("/");
+  //   }
+  // }, [account]);
 
   const getSignEnode = () => {
     if (!execute) return;

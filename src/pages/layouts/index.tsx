@@ -27,7 +27,9 @@ const Index = (props: any) => {
   const [prefix, setPrefix] = useState(
     localStorage.getItem("prefix") || "custom-default"
   );
-  const { account, library, activate } = useActiveWeb3React();
+  // const { account, library, activate } = useActiveWeb3React();
+  const { library, activate } = useActiveWeb3React();
+  const account = window.ethereum?.selectedAddress;
   const { rpc = "", signEnode = "" } = JSON.parse(
     localStorage.getItem("loginAccount") || "{}"
   );
@@ -189,7 +191,7 @@ const Index = (props: any) => {
                 }
                 onClick={() => history.push("/approvaled")}
               >
-                {useIntl().formatHTMLMessage({ id: "nav.approvedTransaction" })}
+                {useIntl().formatHTMLMessage({ id: "approval.history" })}
               </div>
             </Badge>
           </div>

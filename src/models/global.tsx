@@ -34,7 +34,6 @@ const initState = {
 };
 
 export default function Index() {
-  const account = window.ethereum?.selectedAddress;
   const [state, dispatch] = useReducer(reducer, initState);
   const {
     pollingRsv,
@@ -45,21 +44,21 @@ export default function Index() {
     Account: GAccount,
   } = state;
 
-  const getNodeList = async () => {
-    const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
-    if (!rpc) return;
-    const res = await nodeListService();
-    dispatch({
-      nodeList: res.info,
-    });
-  };
+  // const getNodeList = async () => {
+  //   const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
+  //   if (!rpc) return;
+  //   const res = await nodeListService();
+  //   dispatch({
+  //     nodeList: res.info,
+  //   });
+  // };
 
-  useEffect(() => {
-    const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
-    if (!rpc) return;
-    // '/nodes/list'
-    getNodeList();
-  }, []);
+  // useEffect(() => {
+  //   const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
+  //   if (!rpc) return;
+  //   // '/nodes/list'
+  //   getNodeList();
+  // }, []);
 
   //获取 发起交易的审批结果 轮询
   const pollingRsvInterval = (fn: any, params: any, data: any, i: any) => {
@@ -242,40 +241,27 @@ export default function Index() {
       });
     }
   };
-  //监听要轮询的队列
-  useEffect(() => {
-    // const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
-    // if (!rpc || pollingPubKey.length) return;
-    // pollingPubKey.forEach(({ fn, params, data }: any, i: number) => {
-    //   pollingPubKeyInterval(web3.smpc[fn], params, data, i);
-    // });
-    // dispatch({
-    //   pollingPubKey: [],
-    // });
-  }, [pollingPubKey]);
 
+  //监听轮询创建帐户任务
   useEffect(() => {
     const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
-    if (!rpc || !account || !pollingPubKey.length) return;
+    const account = window.ethereum?.selectedAddress;
+    console.info(rpc, account);
+    if (!rpc || !account) return;
+    console.info("pollingPubKey", pollingPubKey);
     let interval: any;
     clearInterval(interval);
+    if (!pollingPubKey.length) return;
     interval = setInterval(() => {
-      console.info("pollingPubKey", pollingPubKey);
+      console.info("interval", interval);
       web3.setProvider(rpc);
       const batch = new web3.BatchRequest();
+      debugger;
       pollingPubKey.forEach(({ fn, params, data }: any) => {
-        batch.add(
-          web3.smpc[fn].request(...params, (e, res) => {
-            if (e) return;
-            pollingPubKeyResponse(res, params, data);
-          })
-        );
+        batch.add(web3.smpc[fn].request(...params));
       });
       batch.requestManager.sendBatch(batch.requests, (err, resArr) => {
-        console.info(3333, err, resArr);
-
         if (err) return;
-
         let newPollingPubKey = pollingPubKey.map((item: any, i: Number) => {
           const { count = 0 } = item;
           const res = resArr[i].result;
@@ -292,7 +278,7 @@ export default function Index() {
         });
         const needRemovePollingPubKeyItem = [];
         resArr.forEach((item, i) => {
-          const res = resArr[i].result;
+          const res = item.result;
           const result = JSON.parse(res?.Data?.result || "{}");
           const isFailure = result.Status === "Failure";
           const isTimeout = result.Status === "Timeout";
@@ -302,29 +288,43 @@ export default function Index() {
             needRemovePollingPubKeyItem.push(i);
           }
         });
-        debugger;
+        if (needRemovePollingPubKeyItem.length) {
+          clearInterval(interval);
+          console.info("interval", interval);
+          console.info("pollingPubKey", pollingPubKey);
+          debugger;
+        }
         newPollingPubKey = newPollingPubKey.filter((item, i) => {
           const { count = 0 } = item;
           return !needRemovePollingPubKeyItem.includes(i) && count < 40;
         });
+        const successArr = resArr.filter((item, i) => {
+          const result = JSON.parse(item.result?.Data?.result || "{}");
+          const { count = 0 } = item;
+          return (
+            result.Status === "Success" ||
+            needRemovePollingPubKeyItem.includes(i) ||
+            count > 40
+          );
+        });
+
+        const newAccound = [
+          ...successArr.map((item) =>
+            JSON.parse(item?.result?.Data?.result || "{}")
+          ),
+          ...GAccount,
+        ];
         dispatch({
           pollingPubKey: newPollingPubKey,
-          pollingPubKeyInfo: needRemovePollingPubKeyItem.length,
+          pollingPubKeyInfo: successArr.length,
+          Account: newAccound,
         });
-        localStorage.setItem("pollingPubKey", newPollingPubKey);
-        localStorage.setItem(
-          "pollingPubKeyInfo",
-          needRemovePollingPubKeyItem.length
-        );
+        localStorage.setItem("pollingPubKey", JSON.stringify(newPollingPubKey));
+        localStorage.setItem("pollingPubKeyInfo", successArr.length);
+        localStorage.setItem("Account", JSON.stringify(newAccound));
       });
     }, 30000);
-  }, [account, pollingPubKey]);
-
-  useEffect(() => {
-    setInterval(() => {
-      console.info("OOpollingPubKey", pollingPubKey);
-    }, 30000);
-  }, []);
+  }, [pollingPubKey]);
 
   return { ...state, globalDispatch: dispatch };
 }

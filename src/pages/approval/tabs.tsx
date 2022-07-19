@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Tabs, Badge } from "antd";
 import { RedoOutlined } from "@ant-design/icons";
 import AccountList from "./index";
@@ -21,6 +21,7 @@ const Index = () => {
       setSpin(false);
     }, 500);
   };
+
   return (
     <Tabs
       defaultActiveKey={"0"}

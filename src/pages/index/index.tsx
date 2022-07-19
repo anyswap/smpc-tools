@@ -8,7 +8,9 @@ import { injected } from "@/connectors";
 import "./index.less";
 
 const Index = () => {
-  const { account, activate } = useActiveWeb3React();
+  // const { account, activate } = useActiveWeb3React();
+  const { activate } = useActiveWeb3React();
+  const account = window.ethereum?.selectedAddress;
   const { isDay } = useModel("global", ({ isDay }) => ({ isDay }));
 
   useEffect(() => {
@@ -26,6 +28,7 @@ const Index = () => {
   }, [account]);
 
   const enable = useCallback(() => {
+    debugger;
     if (!account && activate) {
       activate(injected);
     }

@@ -24,6 +24,7 @@ export default {
   "accountList.createDate": "create date",
   "approval.agree": "Confirm",
   "approval.disagree": "Reject",
+  "approval.history": "Approval history",
   connectThePurse: "Connect the purse",
   welcome: "Welcome to SMPC Wallet 1.0",
   welcomeOpt: "Create a wallet or import a wallet",
