@@ -31,6 +31,8 @@ const initState = {
   sendApprovaled: JSON.parse(localStorage.getItem("sendApprovaled") || "[]"),
   // 账户列表数据（审批通过的才展示）
   Account: JSON.parse(localStorage.getItem("Account") || "[]"),
+
+  getRsvSpin: false,
 };
 
 export default function Index() {
@@ -60,7 +62,7 @@ export default function Index() {
   //   getNodeList();
   // }, []);
 
-  //获取 发起交易的审批结果 轮询
+  //获取 发起交易的审批结果轮询
   const pollingRsvInterval = (fn: any, params: any, data: any, i: any) => {
     const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
     const localStoragePollingRsv = JSON.parse(
@@ -132,17 +134,17 @@ export default function Index() {
       }
     }, 30000);
   };
-  //监听要轮询的队列
-  useEffect(() => {
-    const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
-    if (!rpc || !pollingRsv.length) return;
-    pollingRsv.forEach(({ fn, params, data }: any, i: number) => {
-      pollingRsvInterval(web3.smpc[fn], params, data, i);
-    });
-    dispatch({
-      pollingRsv: [],
-    });
-  }, [pollingRsv]);
+  //监听要轮询的队列rsv
+  // useEffect(() => {
+  //   const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
+  //   if (!rpc || !pollingRsv.length) return;
+  //   pollingRsv.forEach(({ fn, params, data }: any, i: number) => {
+  //     pollingRsvInterval(web3.smpc[fn], params, data, i);
+  //   });
+  //   dispatch({
+  //     pollingRsv: [],
+  //   });
+  // }, [pollingRsv]);
 
   //获取 发起创建账户后的审批结果 轮询
   const pollingPubKeyResponse = (res, params: any, data: any) => {
@@ -256,75 +258,121 @@ export default function Index() {
       console.info("interval", interval);
       web3.setProvider(rpc);
       const batch = new web3.BatchRequest();
-      debugger;
       pollingPubKey.forEach(({ fn, params, data }: any) => {
         batch.add(web3.smpc[fn].request(...params));
       });
-      batch.requestManager.sendBatch(batch.requests, (err, resArr) => {
-        if (err) return;
-        let newPollingPubKey = pollingPubKey.map((item: any, i: Number) => {
-          const { count = 0 } = item;
-          const res = resArr[i].result;
-          const result = JSON.parse(resArr[i].Data?.result || "{}");
-          if (
-            res.Status === "Success" &&
-            result.Status === "Pending" &&
-            result.AllReply.every((it: any) => it.Status === "AGREE")
-          ) {
-            return { ...item, count: count + 1 };
-          } else {
-            return item;
+      batch.requestManager.sendBatch(
+        batch.requests,
+        (err: any, resArr: any) => {
+          if (err) return;
+          let newPollingPubKey = pollingPubKey.map((item: any, i: Number) => {
+            const { count = 0 } = item;
+            const res = resArr[i].result;
+            const result = JSON.parse(resArr[i].Data?.result || "{}");
+            if (
+              res.Status === "Success" &&
+              result.Status === "Pending" &&
+              result.AllReply.filter((it: any) => it.Status === "AGREE")
+                .length >= Number(result.ThresHold[0])
+            ) {
+              return { ...item, count: count + 1 };
+            } else {
+              return item;
+            }
+          });
+          const needRemovePollingPubKeyItem = [];
+          resArr.forEach((item, i) => {
+            const res = item.result;
+            const result = JSON.parse(res?.Data?.result || "{}");
+            const isFailure = result.Status === "Failure";
+            const isTimeout = result.Status === "Timeout";
+            const isSuccess =
+              res.Status === "Success" && result.Status === "Success";
+            if (isFailure || isTimeout || isSuccess) {
+              needRemovePollingPubKeyItem.push(i);
+            }
+          });
+          if (needRemovePollingPubKeyItem.length) {
+            clearInterval(interval);
+            console.info("interval", interval);
+            console.info("pollingPubKey", pollingPubKey);
+            debugger;
           }
-        });
-        const needRemovePollingPubKeyItem = [];
-        resArr.forEach((item, i) => {
-          const res = item.result;
-          const result = JSON.parse(res?.Data?.result || "{}");
-          const isFailure = result.Status === "Failure";
-          const isTimeout = result.Status === "Timeout";
-          const isSuccess =
-            res.Status === "Success" && result.Status === "Success";
-          if (isFailure || isTimeout || isSuccess) {
-            needRemovePollingPubKeyItem.push(i);
-          }
-        });
-        if (needRemovePollingPubKeyItem.length) {
-          clearInterval(interval);
-          console.info("interval", interval);
-          console.info("pollingPubKey", pollingPubKey);
-          debugger;
-        }
-        newPollingPubKey = newPollingPubKey.filter((item, i) => {
-          const { count = 0 } = item;
-          return !needRemovePollingPubKeyItem.includes(i) && count < 40;
-        });
-        const successArr = resArr.filter((item, i) => {
-          const result = JSON.parse(item.result?.Data?.result || "{}");
-          const { count = 0 } = item;
-          return (
-            result.Status === "Success" ||
-            needRemovePollingPubKeyItem.includes(i) ||
-            count > 40
-          );
-        });
+          newPollingPubKey = newPollingPubKey.filter((item, i) => {
+            const { count = 0 } = item;
+            return !needRemovePollingPubKeyItem.includes(i) && count < 40;
+          });
+          const successArr = resArr.filter((item, i) => {
+            const result = JSON.parse(item.result?.Data?.result || "{}");
+            const { count = 0 } = item;
+            return (
+              result.Status === "Success" ||
+              needRemovePollingPubKeyItem.includes(i) ||
+              count > 40
+            );
+          });
 
-        const newAccound = [
-          ...successArr.map((item) =>
-            JSON.parse(item?.result?.Data?.result || "{}")
-          ),
-          ...GAccount,
-        ];
-        dispatch({
-          pollingPubKey: newPollingPubKey,
-          pollingPubKeyInfo: successArr.length,
-          Account: newAccound,
-        });
-        localStorage.setItem("pollingPubKey", JSON.stringify(newPollingPubKey));
-        localStorage.setItem("pollingPubKeyInfo", successArr.length);
-        localStorage.setItem("Account", JSON.stringify(newAccound));
-      });
+          const newAccound = [
+            ...successArr.map((item) =>
+              JSON.parse(item?.result?.Data?.result || "{}")
+            ),
+            ...GAccount,
+          ];
+          dispatch({
+            pollingPubKey: newPollingPubKey,
+            pollingPubKeyInfo: successArr.length,
+            Account: newAccound,
+          });
+          localStorage.setItem(
+            "pollingPubKey",
+            JSON.stringify(newPollingPubKey)
+          );
+          localStorage.setItem("pollingPubKeyInfo", successArr.length);
+          localStorage.setItem("Account", JSON.stringify(newAccound));
+        }
+      );
     }, 30000);
   }, [pollingPubKey]);
 
-  return { ...state, globalDispatch: dispatch };
+  //批量查询Rsv进度
+  const getRsv = async () => {
+    const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
+    web3.setProvider(rpc);
+    const account = window.ethereum?.selectedAddress;
+    let pollingRsv = JSON.parse(localStorage.getItem("pollingRsv") || "[]");
+    if (!rpc || !account || !pollingRsv.length) return;
+    dispatch({ getRsvSpin: true });
+    const batch = new web3.BatchRequest();
+    pollingRsv.forEach(({ fn, params }: any) => {
+      batch.add(web3.smpc[fn].request(...params));
+    });
+    batch.requestManager.sendBatch(batch.requests, (err: any, resArr: any) => {
+      if (err) return;
+      resArr.forEach((item: any, i: number) => {
+        if (item.result.Status !== "Success") return;
+        const result = JSON.parse(item.result.Data.result);
+        if (["Success", "Failure", "Timeout"].includes(result.Status)) {
+          const newSendApprovaled = [result, ...sendApprovaled];
+          dispatch({
+            sendApprovaled: newSendApprovaled,
+          });
+          localStorage.setItem(
+            "sendApprovaled",
+            JSON.stringify(newSendApprovaled)
+          );
+          pollingRsv = pollingRsv.filter(
+            (item: any, index: number) => i !== index
+          );
+        }
+      });
+    });
+    dispatch({ getRsvSpin: false });
+    localStorage.setItem("pollingRsv", JSON.stringify(pollingRsv));
+  };
+
+  useEffect(() => {
+    getRsv();
+  }, []);
+
+  return { ...state, globalDispatch: dispatch, getRsv };
 }

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Button, message, Table, Tag } from "antd";
+import { Button, message, Table, Tag, Collapse } from "antd";
 import { useActiveWeb3React } from "@/hooks";
 import { useModel, useIntl } from "umi";
 import moment from "moment";
 import "./style.less";
 import { cutOut } from "@/utils";
+import { SettingOutlined } from "@ant-design/icons";
 
 const Index = () => {
   const { globalDispatch } = useModel("global", ({ globalDispatch }) => ({
@@ -27,7 +28,7 @@ const Index = () => {
   const columns = [
     {
       title: "Account",
-      dataIndex: "Account",
+      dataIndex: "From",
       render: (t: string) => cutOut(t, 6, 4),
     },
     {
@@ -47,7 +48,14 @@ const Index = () => {
     {
       title: useIntl().formatHTMLMessage({ id: "g.action" }),
       dataIndex: "AllReply",
-      render: (t: any) => t.map((item: any) => <p>{item.Status}</p>),
+      width: "32%",
+      render: (t: any) =>
+        t.map((item: any) => (
+          <p>
+            {item.Approver}:{"  "}
+            {item.Status}
+          </p>
+        )),
     },
   ];
 

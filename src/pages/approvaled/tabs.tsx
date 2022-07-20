@@ -4,24 +4,34 @@ import { Tabs } from "antd";
 import AccountList from "./index";
 import TradingList from "./trading";
 import { useIntl, useModel } from "umi";
+import { RedoOutlined } from "@ant-design/icons";
 
 const Index = () => {
-  const { pollingRsvInfo, pollingPubKeyInfo } = useModel(
+  const { getRsvSpin, getRsv } = useModel(
     "global",
-    ({ pollingRsvInfo, pollingPubKeyInfo }) => ({
-      pollingRsvInfo,
-      pollingPubKeyInfo,
+    ({ getRsvSpin, getRsv }: any) => ({
+      getRsvSpin,
+      getRsv,
     })
   );
-  // const [RsvInfo, setRsvInfoInfo] = useState(pollingRsvInfo);
+  const [activeKey, setActiveKey] = useState("0");
 
-  // useEffect(() => {
-  //   setRsvInfoInfo(pollingRsvInfo);
-  //   debugger;
-  // }, [pollingRsvInfo]);
-  // console.info("RsvInfo", RsvInfo);
   return (
-    <Tabs defaultActiveKey={"0"}>
+    <Tabs
+      defaultActiveKey={"0"}
+      onChange={setActiveKey}
+      tabBarExtraContent={
+        activeKey === "1" && (
+          <span className="mr5">
+            <RedoOutlined
+              spin={getRsvSpin}
+              className="fs18 cursor_pointer"
+              onClick={getRsv}
+            />
+          </span>
+        )
+      }
+    >
       <Tabs.TabPane
         key={"0"}
         tab={useIntl().formatHTMLMessage({ id: "accountApproval" })}

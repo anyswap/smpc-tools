@@ -138,6 +138,37 @@ const Index = () => {
     },
   ];
 
+  // const getRsv = async () => {
+  //   const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
+  //   web3.setProvider(rpc);
+  //   const account = window.ethereum?.selectedAddress;
+  //   let pollingRsv = JSON.parse(localStorage.getItem("pollingRsv") || "[]");
+  //   if (!rpc || !account || !pollingRsv.length) return;
+
+  //   const batch = new web3.BatchRequest();
+  //   pollingRsv.forEach(({ fn, params }: any) => {
+  //     batch.add(web3.smpc[fn].request(...params));
+  //   });
+  //   batch.requestManager.sendBatch(batch.requests, (err: any, resArr: any) => {
+  //     if (err) return;
+  //     console.info("resArr", resArr);
+  //     resArr.forEach((item: any, i: number) => {
+  //       if (item.result.Status !== "Success") return;
+  //       const result = JSON.parse(item.result.Data.result);
+  //       if (["Success", "Failure", "Timeout"].includes(result.Status)) {
+  //         pollingRsv = pollingRsv.filter(
+  //           (item: any, index: number) => i !== index
+  //         );
+  //       }
+  //     });
+  //   });
+  //   localStorage.setItem("pollingRsv", JSON.stringify(pollingRsv));
+  // };
+
+  // useEffect(() => {
+  //   getRsv();
+  // }, []);
+
   return (
     <div
       className="approval"

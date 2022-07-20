@@ -516,7 +516,6 @@ export function useGetSign(rpc: string | undefined): {
         let signTx = tx1.serialize().toString("hex");
         signTx = signTx.indexOf("0x") === 0 ? signTx : "0x" + signTx;
         const cbData = await web3.smpc.sign(signTx);
-
         if (cbData.Data?.result) {
           globalDispatch({
             pollingRsv: [
@@ -542,6 +541,8 @@ export function useGetSign(rpc: string | undefined): {
           //   console.info("cbRsv", cbRsv);
           //   debugger;
           // }, 2000);
+        } else {
+          message.error(cbData.Error || cbData.Tip);
         }
         return cbData;
       },
