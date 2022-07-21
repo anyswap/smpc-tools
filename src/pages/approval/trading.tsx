@@ -8,12 +8,13 @@ import moment from "moment";
 const Index = () => {
   const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
   const { execute } = acceptSign(rpc);
-  const { tradingList, tradingListLoading, getData } = useModel(
+  const { tradingList, tradingListLoading, getData, globalDispatch } = useModel(
     "approval",
-    ({ tradingList, tradingListLoading, getData }) => ({
+    ({ tradingList, tradingListLoading, getData, globalDispatch }: any) => ({
       tradingList,
       tradingListLoading,
       getData,
+      globalDispatch,
     })
   );
 
@@ -30,8 +31,26 @@ const Index = () => {
       //   JSON.stringify([{ ...r, status: Accept }, ...approvaled])
       // );
       getData();
-      // const res = await web3.smpc.getSignStatus(r.Key);
-      // // res->rsv
+
+      const historyPollingRsv = JSON.parse(
+        localStorage.getItem("pollingRsv") || "[]"
+      ).filter((item: any) => item.params[0] !== r.Key);
+      globalDispatch({
+        pollingRsv: [
+          {
+            fn: "getSignStatus",
+            params: [r.Key],
+          },
+          ...historyPollingRsv,
+        ],
+      });
+      localStorage.setItem(
+        "pollingRsv",
+        JSON.stringify([
+          { fn: "getSignStatus", params: [r.Key] },
+          ...historyPollingRsv,
+        ])
+      );
       return;
     }
     message.error("Error");

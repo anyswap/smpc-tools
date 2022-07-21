@@ -19,7 +19,8 @@ export enum WrapType {
   NOCONNECT,
 }
 
-const CHAINID = "30400";
+const CHAINID = "4";
+// const CHAINID = "30400";
 
 const NOCONNECT = { wrapType: WrapType.NOCONNECT };
 
@@ -428,8 +429,9 @@ function useMsgData(): {
           from: address,
           // to: "0xC03033d8b833fF7ca08BF2A58C9BC9d711257249",
           to,
-          chainId: web3.utils.toHex(4),
-          // chainId: web3.utils.toHex(56),
+          // chainId: web3.utils.toHex(CHAINID),
+          chainId: web3.utils.toHex(4), //eth测试风
+          // chainId: web3.utils.toHex(56), eth正式
           // value: "1",
           value,
           nonce: "",
@@ -493,7 +495,7 @@ export function useGetSign(rpc: string | undefined): {
           TimeStamp: Date.now().toString(),
         };
         const rawTx: any = {
-          from: account,
+          // from: account,
           value: "0x0",
           chainId: web3.utils.toHex(CHAINID),
           nonce: web3.utils.toHex(nonce),
@@ -508,6 +510,13 @@ export function useGetSign(rpc: string | undefined): {
           message.info("no sign");
           return;
         }
+        const rr = await web3.eth.accounts.recover({
+          messageHash: hash,
+          v: "0x" + result.v,
+          r: "0x" + result.r,
+          s: "0x" + result.s,
+        });
+        debugger;
         rawTx.r = "0x" + result.r;
         rawTx.s = "0x" + result.s;
         rawTx.v = "0x" + result.v;
@@ -524,7 +533,7 @@ export function useGetSign(rpc: string | undefined): {
                 params: [cbData.Data?.result],
                 data: { ...r, to, value, MsgContext, MsgHash: data.MsgHash },
               },
-              // ...JSON.parse(localStorage.getItem("pollingRsv") || "[]"),
+              ...JSON.parse(localStorage.getItem("pollingRsv") || "[]"),
             ],
           });
           localStorage.setItem(

@@ -101,18 +101,18 @@ const Index = () => {
   const columns = [
     {
       title: "from",
-      dataIndex: "MsgContext",
-      render: (t: any) => cutOut(t.from, 6, 4),
+      dataIndex: "From",
+      render: (t: any) => cutOut(t, 6, 4),
     },
     {
       title: "to",
       dataIndex: "MsgContext",
-      render: (t: any) => cutOut(t.to, 6, 4),
+      // render: (t: any) => cutOut(t.to, 6, 4),
     },
     {
       title: "value",
       dataIndex: "MsgContext",
-      render: (t: any) => t.value,
+      render: (t: any) => t?.value,
     },
     {
       title: "GroupID",

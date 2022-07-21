@@ -20,11 +20,14 @@ const Index = () => {
     globalDispatch,
     Account: GAccount,
     pollingPubKeyInfo,
-  } = useModel("global", ({ globalDispatch, Account, pollingPubKeyInfo }) => ({
-    globalDispatch,
-    Account,
-    pollingPubKeyInfo,
-  }));
+  } = useModel(
+    "global",
+    ({ globalDispatch, Account, pollingPubKeyInfo }: any) => ({
+      globalDispatch,
+      Account,
+      pollingPubKeyInfo,
+    })
+  );
 
   const { execute } = useGetSign(rpc);
   const { account } = useActiveWeb3React();
