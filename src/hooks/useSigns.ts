@@ -24,6 +24,46 @@ const CHAINID = "4";
 
 const NOCONNECT = { wrapType: WrapType.NOCONNECT };
 
+export function signData(data: any) {
+  return new Promise((resolve, reject) => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    const rawTx = {
+      value: "0x0",
+      chainId: "0x0",
+      nonce: "0x0",
+      // data: ethers.utils.toUtf8Bytes(JSON.stringify(data)).toString('hex'),
+      data: JSON.stringify(data),
+      // data: web3.utils.utf8ToHex(JSON.stringify(data)),
+    };
+    console.log(rawTx);
+    const tx = new Tx(rawTx);
+    let hash = Buffer.from(tx.hash(false)).toString("hex");
+    hash = hash.indexOf("0x") === 0 ? hash : "0x" + hash;
+    signer
+      .signMessage(JSON.stringify(data))
+      .then((res: any) => {
+        const rsv = res.indexOf("0x") === 0 ? res.replace("0x", "") : res;
+        const result = {
+          rsv: rsv,
+          r: rsv.substr(0, 64),
+          s: rsv.substr(64, 64),
+          v: rsv.substr(128),
+        };
+        tx.r = "0x" + result.r;
+        tx.s = "0x" + result.s;
+        tx.v = "0x" + result.v;
+        // rawTx.hash = '\x19Ethereum Signed Message:\n' + hash
+        let signTx = tx.serialize().toString("hex");
+        signTx = signTx.indexOf("0x") === 0 ? signTx : "0x" + signTx;
+        resolve(signTx);
+      })
+      .catch((error: any) => {
+        reject(error);
+      });
+  });
+}
+
 export function eNodeCut(enode: any) {
   const obj = {
     key: "",
@@ -243,50 +283,29 @@ export function useReqSmpcAddress(
         // web3.setProvider('http://47.114.115.33:5913/')
         web3.setProvider(rpc);
         const nonce = await getNonce(account, rpc);
-        console.log("nonce", nonce);
-        // let nonce = nonceResult
-        // if (nonceResult.Status !== "Error") {
-        //   nonce = nonceResult.Data.result;
-        // }
-        // const getNonce = await getNonce(account, rpc);
         const data = {
           TxType: "REQSMPCADDR",
+          Account: account,
+          Nonce: nonce,
+          keytype,
           GroupId: gID,
           ThresHold: ThresHold,
           Mode: "0",
+          AcceptTimeOut: "604800", // AcceptTimeOut: "60", // 测试超时用
           TimeStamp: Date.now().toString(),
-          Sigs: Sigs,
-          keytype,
-          AcceptTimeOut: "604800",
-          // AcceptTimeOut: "60", // 测试超时用
+          Sigs,
         };
-        const rawTx: any = {
-          from: account,
-          value: "0x0",
-          chainId: web3.utils.toHex(CHAINID),
-
-          // gas: '0x0',
-          // gasPrice: "0x0",
-          // nonce: nonce,
-          nonce: web3.utils.toHex(nonce),
-          data: JSON.stringify(data),
-        };
-        console.log(rawTx);
-        const tx = new Tx(rawTx);
-        // const hash = "0x" + tx.hash().toString("hex");
-        let hash = Buffer.from(tx.hash(false)).toString("hex");
-        hash = hash.indexOf("0x") === 0 ? hash : "0x" + hash;
-        console.log(hash);
-        const result = await signMessage(hash);
-        rawTx.r = "0x" + result.r;
-        rawTx.s = "0x" + result.s;
-        rawTx.v = "0x" + result.v;
-        const tx1 = new Tx(rawTx);
-        console.log(rawTx);
-        console.log(tx1);
-        let signTx = tx1.serialize().toString("hex");
-        signTx = signTx.indexOf("0x") === 0 ? signTx : "0x" + signTx;
-        let cbData = await web3.smpc.reqSmpcAddr(signTx);
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        let rsv = await signer.signMessage(JSON.stringify(data, null, 8));
+        debugger;
+        // 如果v是1b换成00 如果v是1c换成01
+        rsv = rsv.slice(0, 130) + (rsv.slice(130) === "1b" ? "00" : "01");
+        debugger;
+        let cbData = await web3.smpc.reqKeyGen(
+          rsv,
+          JSON.stringify(data, null, 8)
+        );
         let resultData: any = {};
         if (cbData && typeof cbData === "string") {
           cbData = JSON.parse(cbData);
@@ -296,9 +315,7 @@ export function useReqSmpcAddress(
         } else {
           resultData = { msg: cbData.Error || "Error", error: cbData.Tip };
         }
-        console.log(signTx);
         console.log(resultData);
-        console.log(result);
         return resultData;
       },
     };
@@ -328,62 +345,27 @@ export function useApproveReqSmpcAddress(rpc: string | undefined): {
         // const signer = provider.getSigner();
         // web3.setProvider('http://47.114.115.33:5913/')
         web3.setProvider(rpc);
-        const nonce = await getNonce(account, rpc);
+        const Noce = await getNonce(account, rpc);
         console.log("nonce", nonce);
         const data = {
           TxType: "ACCEPTREQADDR",
+          Account: account,
+          Noce,
           Key,
-          GroupID,
-          Mode,
-          ThresHold,
-          Keytype,
           Accept: type, // DISAGREE
           TimeStamp: Date.now().toString(),
-          MsgHash: [toTxnHash({})],
-          MsgContext: JSON.stringify({
-            chainId: web3.utils.toHex(CHAINID),
-            gas: "",
-            gasPrice: "",
-            nonce: "",
-            to: "",
-            value: "0",
-            data: {},
-          }),
-          nonce: "",
         };
-        const rawTx: any = {
-          from: account,
-          value: "0x0",
-          chainId: web3.utils.toHex(CHAINID),
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        let rsv = await signer.signMessage(JSON.stringify(data, null, 8));
+        debugger;
+        // 如果v是1b换成00 如果v是1c换成01
+        rsv = rsv.slice(0, 130) + (rsv.slice(130) === "1b" ? "00" : "01");
+        let cbData = await web3.smpc.acceptKeyGen(
+          rsv,
+          JSON.stringify(data, null, 8)
+        );
 
-          // gas: '0x0',
-          // gasPrice: "0x0",
-          // nonce: nonce,
-          nonce: web3.utils.toHex(nonce),
-          data: JSON.stringify(data),
-        };
-        console.log(rawTx);
-        const tx = new Tx(rawTx);
-        // const hash = "0x" + tx.hash().toString("hex");
-        let hash = Buffer.from(tx.hash(false)).toString("hex");
-        hash = hash.indexOf("0x") === 0 ? hash : "0x" + hash;
-        console.log(hash);
-        const result = await signMessage(hash);
-        if (!result) {
-          message.info("no sign");
-          return;
-        }
-        rawTx.r = "0x" + result.r;
-        rawTx.s = "0x" + result.s;
-        rawTx.v = "0x" + result.v;
-        console.log("rawTx", rawTx);
-        const tx1 = new Tx(rawTx);
-
-        console.log(tx1);
-        let signTx = tx1.serialize().toString("hex");
-        signTx = signTx.indexOf("0x") === 0 ? signTx : "0x" + signTx;
-        console.info("signTxsignTxsignTx", signTx);
-        let cbData = await web3.smpc.acceptReqAddr(signTx);
         // let cbData = await web3.smpc.acceptReqAddr(signTx);
         let resultData: any = {};
         if (cbData && typeof cbData === "string") {
@@ -394,9 +376,7 @@ export function useApproveReqSmpcAddress(rpc: string | undefined): {
         } else {
           resultData = { msg: "Error", error: cbData.Tip };
         }
-        console.log(signTx);
         console.log(resultData);
-        console.log(result);
         return resultData;
       },
     };
@@ -478,53 +458,36 @@ export function useGetSign(rpc: string | undefined): {
         const { GroupID, PubKey, ThresHold, address } = r;
         web3.setProvider(rpc);
         const MsgContext = await execute(to, value, address);
-        const nonce = await getSignNonce(account, rpc);
+        const Noce = await getSignNonce(account, rpc);
         console.info("nonce", nonce);
         // to 0xC03033d8b833fF7ca08BF2A58C9BC9d711257249
         const data = {
           TxType: "SIGN",
+          Account: account,
+          Noce,
           PubKey,
           MsgHash: [toTxnHash(MsgContext)],
           MsgContext: [JSON.stringify(MsgContext)],
+          Keytype: "EC256K1",
           GroupID,
           ThresHold,
-          Keytype: "EC256K1",
           Mode: "0",
           // AcceptTimeOut: "60", // 测试超时用
           AcceptTimeOut: "604800",
           TimeStamp: Date.now().toString(),
         };
-        const rawTx: any = {
-          // from: account,
-          value: "0x0",
-          chainId: web3.utils.toHex(CHAINID),
-          nonce: web3.utils.toHex(nonce),
-          data: JSON.stringify(data),
-        };
-        const tx = new Tx(rawTx);
-        let hash = Buffer.from(tx.hash()).toString("hex");
-        hash = hash.indexOf("0x") === 0 ? hash : "0x" + hash;
 
-        const result = await signMessage(hash);
-        if (!result) {
-          message.info("no sign");
-          return;
-        }
-        const rr = await web3.eth.accounts.recover({
-          messageHash: hash,
-          v: "0x" + result.v,
-          r: "0x" + result.r,
-          s: "0x" + result.s,
-        });
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        let rsv = await signer.signMessage(JSON.stringify(data, null, 8));
         debugger;
-        rawTx.r = "0x" + result.r;
-        rawTx.s = "0x" + result.s;
-        rawTx.v = "0x" + result.v;
-        console.info("rawTx", rawTx);
-        const tx1 = new Tx(rawTx);
-        let signTx = tx1.serialize().toString("hex");
-        signTx = signTx.indexOf("0x") === 0 ? signTx : "0x" + signTx;
-        const cbData = await web3.smpc.sign(signTx);
+        // 如果v是1b换成00 如果v是1c换成01
+        rsv = rsv.slice(0, 130) + (rsv.slice(130) === "1b" ? "00" : "01");
+
+        const cbData = await web3.smpc.signing(
+          rsv,
+          JSON.stringify(data, null, 8)
+        );
         if (cbData.Data?.result) {
           globalDispatch({
             pollingRsv: [
@@ -574,52 +537,28 @@ export function acceptSign(rpc: string): {
     return {
       execute: async (Accept, r) => {
         web3.setProvider(rpc);
-        const nonce = await getNonce(account, rpc);
+        const Nonce = await getNonce(account, rpc);
         const { Key } = r;
         const data = {
           TxType: "ACCEPTSIGN",
+          Account: account,
+          Nonce,
           Key,
           Accept,
           TimeStamp: Date.now().toString(),
-          MsgHash: [toTxnHash({})],
-          MsgContext: [
-            JSON.stringify({
-              chainId: web3.utils.toHex(CHAINID),
-              gas: "",
-              gasPrice: "",
-              nonce: "",
-              to: "",
-              value: "0",
-              data: {},
-            }),
-          ],
         };
-        const rawTx: any = {
-          from: account,
-          value: "0x0",
-          chainId: web3.utils.toHex(CHAINID),
-          nonce: web3.utils.toHex(nonce),
-          data: JSON.stringify(data),
-        };
-        const tx = new Tx(rawTx);
-        // const hash = "0x" + tx.hash().toString("hex");
-        let hash = Buffer.from(tx.hash(false)).toString("hex");
-        hash = hash.indexOf("0x") === 0 ? hash : "0x" + hash;
-        const result = await signMessage(hash);
-        if (!result) {
-          message.info("no sign");
-          return;
-        }
-        rawTx.r = "0x" + result.r;
-        rawTx.s = "0x" + result.s;
-        rawTx.v = "0x" + result.v;
-        console.log("rawTx", rawTx);
-        const tx1 = new Tx(rawTx);
-        console.log(tx1);
-        let signTx = tx1.serialize().toString("hex");
-        signTx = signTx.indexOf("0x") === 0 ? signTx : "0x" + signTx;
-        console.info("signTxsignTxsignTx", signTx);
-        let cbData = await web3.smpc.acceptSign(signTx);
+
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        let rsv = await signer.signMessage(JSON.stringify(data, null, 8));
+        debugger;
+        // 如果v是1b换成00 如果v是1c换成01
+        rsv = rsv.slice(0, 130) + (rsv.slice(130) === "1b" ? "00" : "01");
+
+        let cbData = await web3.smpc.acceptSigning(
+          rsv,
+          JSON.stringify(data, null, 8)
+        );
         if (cbData.Data?.result) {
           debugger;
           // // rsv

@@ -33,6 +33,36 @@ web3.extend({
       outputFormatter: null,
     },
     {
+      name: "reqKeyGen",
+      call: "smpc_reqKeyGen",
+      params: 2,
+      inputFormatter: [null, null],
+      outputFormatter: null,
+    },
+
+    {
+      name: "acceptKeyGen",
+      call: "smpc_acceptKeyGen",
+      params: 2,
+      inputFormatter: [null, null],
+      outputFormatter: null,
+    },
+    {
+      name: "signing",
+      call: "smpc_signing",
+      params: 2,
+      inputFormatter: [null, null],
+      outputFormatter: null,
+    },
+    {
+      name: "acceptSigning",
+      call: "smpc_acceptSigning",
+      params: 2,
+      inputFormatter: [null, null],
+      outputFormatter: null,
+    },
+
+    {
       name: "acceptLockOut",
       call: "smpc_acceptLockOut",
       params: 1,

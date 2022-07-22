@@ -264,7 +264,6 @@ export default function Index() {
       batch.requestManager.sendBatch(
         batch.requests,
         (err: any, resArr: any) => {
-          debugger;
           if (err) return;
           let newPollingPubKey = pollingPubKey.map((item: any, i: Number) => {
             const { count = 0 } = item;
@@ -354,7 +353,6 @@ export default function Index() {
         const result = JSON.parse(item.result.Data.result);
         if (["Success", "Failure", "Timeout"].includes(result.Status)) {
           console.info("result.Status");
-          debugger;
           const newSendApprovaled = [result, ...GsendApprovaled];
           dispatch({
             sendApprovaled: newSendApprovaled,
