@@ -2,21 +2,26 @@ import { Table, Button, message } from "antd";
 import React from "react";
 import { acceptSign } from "@/hooks/useSigns";
 import { useIntl, useModel } from "umi";
-import { cutOut } from "@/utils";
+import { cutOut, copyTxt } from "@/utils";
 import moment from "moment";
+import { useActiveWeb3React } from "@/hooks";
 
 const Index = () => {
   const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
+  const { account } = useActiveWeb3React();
   const { execute } = acceptSign(rpc);
-  const { tradingList, tradingListLoading, getData, globalDispatch } = useModel(
+  const { tradingList, tradingListLoading, getData } = useModel(
     "approval",
-    ({ tradingList, tradingListLoading, getData, globalDispatch }: any) => ({
+    ({ tradingList, tradingListLoading, getData }: any) => ({
       tradingList,
       tradingListLoading,
       getData,
-      globalDispatch,
     })
   );
+
+  const { globalDispatch } = useModel("global", ({ globalDispatch }: any) => ({
+    globalDispatch,
+  }));
 
   const action = async (Accept: string, r: any) => {
     if (!execute) return;
@@ -74,9 +79,9 @@ const Index = () => {
       dataIndex: "KeyType",
     },
     {
-      title: "Raw",
+      title: "Rsv",
       dataIndex: "Raw",
-      render: (t: string) => cutOut(t, 6, 8),
+      render: (t: string) => cutOut(JSON.parse(t).Rsv, 6, 8),
     },
     {
       title: "PubKey",
@@ -94,20 +99,23 @@ const Index = () => {
     },
     {
       title: useIntl().formatHTMLMessage({ id: "g.action" }),
-      render: (r: any, i: number) => (
-        <span>
-          <Button
-            onClick={() => action("AGREE", r)}
-            className="mr8"
-            type="primary"
-          >
-            {useIntl().formatHTMLMessage({ id: "approval.agree" })}
-          </Button>
-          <Button onClick={() => action("DISAGREE", r)}>
-            {useIntl().formatHTMLMessage({ id: "approval.disagree" })}
-          </Button>
-        </span>
-      ),
+      render: (r: any, i: number) =>
+        r.Account === account ? (
+          <span>自己创建</span>
+        ) : (
+          <span>
+            <Button
+              onClick={() => action("AGREE", r)}
+              className="mr8"
+              type="primary"
+            >
+              {useIntl().formatHTMLMessage({ id: "approval.agree" })}
+            </Button>
+            <Button onClick={() => action("DISAGREE", r)}>
+              {useIntl().formatHTMLMessage({ id: "approval.disagree" })}
+            </Button>
+          </span>
+        ),
     },
   ];
   return (

@@ -21,7 +21,7 @@ const Index = () => {
   );
   const { approveList, approveListLoading, getData } = useModel(
     "approval",
-    ({ approveList, approveListLoading, getData }) => ({
+    ({ approveList, approveListLoading, getData }: any) => ({
       approveList,
       approveListLoading,
       getData,

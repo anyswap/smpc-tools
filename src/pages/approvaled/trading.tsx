@@ -97,7 +97,7 @@ const Index = () => {
         message.error(e.message);
       });
   };
-
+  console.info("GsendApprovaled", GsendApprovaled);
   const columns = [
     {
       title: "from",

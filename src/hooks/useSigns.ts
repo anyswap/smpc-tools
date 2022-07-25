@@ -346,7 +346,6 @@ export function useApproveReqSmpcAddress(rpc: string | undefined): {
         // web3.setProvider('http://47.114.115.33:5913/')
         web3.setProvider(rpc);
         const Noce = await getNonce(account, rpc);
-        console.log("nonce", nonce);
         const data = {
           TxType: "ACCEPTREQADDR",
           Account: account,
@@ -459,7 +458,6 @@ export function useGetSign(rpc: string | undefined): {
         web3.setProvider(rpc);
         const MsgContext = await execute(to, value, address);
         const Noce = await getSignNonce(account, rpc);
-        console.info("nonce", nonce);
         // to 0xC03033d8b833fF7ca08BF2A58C9BC9d711257249
         const data = {
           TxType: "SIGN",
@@ -535,7 +533,7 @@ export function acceptSign(rpc: string): {
   const { signMessage } = useSign();
   return useMemo(() => {
     return {
-      execute: async (Accept, r) => {
+      execute: async (Accept: any, r: any) => {
         web3.setProvider(rpc);
         const Nonce = await getNonce(account, rpc);
         const { Key } = r;
@@ -546,6 +544,18 @@ export function acceptSign(rpc: string): {
           Key,
           Accept,
           TimeStamp: Date.now().toString(),
+          MsgHash: [toTxnHash({})],
+          MsgContext: [
+            JSON.stringify({
+              chainId: web3.utils.toHex(CHAINID),
+              gas: "",
+              gasPrice: "",
+              nonce: "",
+              to: "",
+              value: "0",
+              data: {},
+            }),
+          ],
         };
 
         const provider = new ethers.providers.Web3Provider(window.ethereum);
