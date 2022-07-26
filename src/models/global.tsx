@@ -332,7 +332,7 @@ export default function Index() {
         }
       );
     }, 30000);
-  }, [pollingPubKey]);
+  }, []);
 
   //批量查询Rsv进度
   const getRsv = async () => {

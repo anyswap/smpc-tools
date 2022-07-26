@@ -1,5 +1,7 @@
 import { defineConfig } from "umi";
 
+const isProd = process.env.NODE_ENV === "production";
+
 export default defineConfig({
   favicon: "./favicon.ico",
   title: "Multichain - SMPC",
@@ -7,6 +9,7 @@ export default defineConfig({
   nodeModulesTransform: {
     type: "none",
   },
+  extraBabelPlugins: [isProd ? "transform-remove-console" : ""],
   routes: [
     {
       path: "/",

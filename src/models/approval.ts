@@ -59,16 +59,15 @@ export default function Index() {
     getData();
   }, []);
   useEffect(() => {
-    // if (!rpc || !account) return;
     let interval: any;
     clearInterval(interval);
     // 20秒调一次交易账户审批列表和交易审批列表
     interval = setInterval(() => {
-      console.info(new Date(), interval);
       console.info(rpc, account);
+      if (!rpc || !account) return;
       getData();
     }, 20000);
-  }, [account]);
+  }, []);
 
   return { ...state, getData };
 }

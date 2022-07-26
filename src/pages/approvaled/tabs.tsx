@@ -15,7 +15,7 @@ const Index = () => {
     })
   );
   const [activeKey, setActiveKey] = useState("0");
-
+  console.info("process.env.NODE_ENV", process.env.NODE_ENV);
   return (
     <Tabs
       defaultActiveKey={"0"}
