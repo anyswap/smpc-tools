@@ -283,8 +283,10 @@ export default function Index() {
             const result = JSON.parse(res?.Data?.result || "{}");
             const isFailure = result.Status === "Failure";
             const isTimeout = result.Status === "Timeout";
-            const isSuccess =
-              res.Status === "Success" && result.Status === "Success";
+            const isSuccess = result.Status === "Success";
+            if (res.Status !== "Success") {
+              return;
+            }
             if (isFailure || isTimeout || isSuccess) {
               needRemovePollingPubKeyItem.push(i);
             }
