@@ -251,11 +251,8 @@ export default function Index() {
     console.info(rpc, account);
     if (!rpc || !account) return;
     console.info("pollingPubKey", pollingPubKey);
-    let interval: any;
-    clearInterval(interval);
     if (!pollingPubKey.length) return;
-    interval = setInterval(() => {
-      console.info("interval", interval);
+    const interval = setInterval(() => {
       web3.setProvider(rpc);
       const batch = new web3.BatchRequest();
       pollingPubKey.forEach(({ fn, params, data }: any) => {
@@ -280,29 +277,29 @@ export default function Index() {
               return item;
             }
           });
-          const needRemovePollingPubKeyItem = [];
-          resArr.forEach((item, i) => {
+          const needRemovePollingPubKeyItem: any = [];
+          resArr.forEach((item: any, i: any) => {
             const res = item.result;
             const result = JSON.parse(res?.Data?.result || "{}");
             const isFailure = result.Status === "Failure";
             const isTimeout = result.Status === "Timeout";
-            const isSuccess =
-              res.Status === "Success" && result.Status === "Success";
+            const isSuccess = result.Status === "Success";
+            if (res.Status !== "Success") {
+              return;
+            }
             if (isFailure || isTimeout || isSuccess) {
               needRemovePollingPubKeyItem.push(i);
             }
           });
           if (needRemovePollingPubKeyItem.length) {
-            clearInterval(interval);
-            console.info("interval", interval);
             console.info("pollingPubKey", pollingPubKey);
             debugger;
           }
-          newPollingPubKey = newPollingPubKey.filter((item, i) => {
+          newPollingPubKey = newPollingPubKey.filter((item: any, i: any) => {
             const { count = 0 } = item;
             return !needRemovePollingPubKeyItem.includes(i) && count < 40;
           });
-          const successArr = resArr.filter((item, i) => {
+          const successArr = resArr.filter((item: any, i: any) => {
             const result = JSON.parse(item.result?.Data?.result || "{}");
             const { count = 0 } = item;
             return (
@@ -313,24 +310,32 @@ export default function Index() {
           });
 
           const newAccound = [
-            ...successArr.map((item) =>
+            ...successArr.map((item: any) =>
               JSON.parse(item?.result?.Data?.result || "{}")
             ),
             ...GAccount,
           ];
+          const addAccountLength = resArr.filter((item: any, i: any) => {
+            const res = item.result;
+            const result = JSON.parse(res?.Data?.result || "{}");
+            return res.Status === "Success" && result.Status === "Success";
+          }).length;
           dispatch({
             pollingPubKey: newPollingPubKey,
-            pollingPubKeyInfo: successArr.length,
+            pollingPubKeyInfo: addAccountLength,
             Account: newAccound,
           });
           localStorage.setItem(
             "pollingPubKey",
             JSON.stringify(newPollingPubKey)
           );
-          localStorage.setItem("pollingPubKeyInfo", successArr.length);
+          localStorage.setItem("pollingPubKeyInfo", addAccountLength);
           localStorage.setItem("Account", JSON.stringify(newAccound));
         }
       );
+      return () => {
+        clearInterval(interval);
+      };
     }, 30000);
   }, []);
 
