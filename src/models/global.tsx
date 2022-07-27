@@ -312,9 +312,13 @@ export default function Index() {
           });
 
           const newAccound = [
-            ...successArr.map((item) =>
-              JSON.parse(item?.result?.Data?.result || "{}")
-            ),
+            ...successArr
+              .map((item: any) =>
+                JSON.parse(item?.result?.Data?.result || "{}")
+              )
+              .filter((item: any) =>
+                GAccount.every((it: any) => item.PubKey !== it.PubKey)
+              ),
             ...GAccount,
           ];
           const addAccountLength = resArr.filter((item: any, i: any) => {
