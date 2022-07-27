@@ -2,12 +2,14 @@ import { Table, Button, message } from "antd";
 import React from "react";
 import { acceptSign } from "@/hooks/useSigns";
 import { useIntl, useModel } from "umi";
+import { useActiveWeb3React } from "@/hooks";
 import { cutOut } from "@/utils";
 import moment from "moment";
 
 const Index = () => {
   const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
   const { execute } = acceptSign(rpc);
+  const { account } = useActiveWeb3React();
   const { tradingList, tradingListLoading, getData, globalDispatch } = useModel(
     "approval",
     ({ tradingList, tradingListLoading, getData, globalDispatch }: any) => ({
@@ -74,9 +76,9 @@ const Index = () => {
       dataIndex: "KeyType",
     },
     {
-      title: "Raw",
+      title: "Rsv",
       dataIndex: "Raw",
-      render: (t: string) => cutOut(t, 6, 8),
+      render: (t: string) => cutOut(JSON.parse(t).Rsv, 6, 8),
     },
     {
       title: "PubKey",
@@ -94,20 +96,23 @@ const Index = () => {
     },
     {
       title: useIntl().formatHTMLMessage({ id: "g.action" }),
-      render: (r: any, i: number) => (
-        <span>
-          <Button
-            onClick={() => action("AGREE", r)}
-            className="mr8"
-            type="primary"
-          >
-            {useIntl().formatHTMLMessage({ id: "approval.agree" })}
-          </Button>
-          <Button onClick={() => action("DISAGREE", r)}>
-            {useIntl().formatHTMLMessage({ id: "approval.disagree" })}
-          </Button>
-        </span>
-      ),
+      render: (r: any, i: number) =>
+        account === r.Account ? (
+          <span>自己创建</span>
+        ) : (
+          <span>
+            <Button
+              onClick={() => action("AGREE", r)}
+              className="mr8"
+              type="primary"
+            >
+              {useIntl().formatHTMLMessage({ id: "approval.agree" })}
+            </Button>
+            <Button onClick={() => action("DISAGREE", r)}>
+              {useIntl().formatHTMLMessage({ id: "approval.disagree" })}
+            </Button>
+          </span>
+        ),
     },
   ];
   return (

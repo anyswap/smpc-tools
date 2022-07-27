@@ -19,8 +19,8 @@ export enum WrapType {
   NOCONNECT,
 }
 
-const CHAINID = "4";
-// const CHAINID = "30400";
+// const CHAINID = "4";
+const CHAINID = "30400";
 
 const NOCONNECT = { wrapType: WrapType.NOCONNECT };
 
@@ -430,7 +430,7 @@ function useMsgData(): {
           // to: "0xC03033d8b833fF7ca08BF2A58C9BC9d711257249",
           to,
           // chainId: web3.utils.toHex(CHAINID),
-          chainId: web3.utils.toHex(4), //eth测试风
+          chainId: web3.utils.toHex(CHAINID), //eth测试网
           // chainId: web3.utils.toHex(56), eth正式
           // value: "1",
           value,

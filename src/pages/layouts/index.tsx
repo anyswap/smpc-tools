@@ -33,14 +33,21 @@ const Index = (props: any) => {
   const { rpc = "", signEnode = "" } = JSON.parse(
     localStorage.getItem("loginAccount") || "{}"
   );
-  const { globalDispatch, pollingRsvInfo, pollingPubKeyInfo } = useModel(
-    "global",
-    ({ globalDispatch, pollingRsvInfo, pollingPubKeyInfo }) => ({
-      globalDispatch,
-      pollingRsvInfo,
-      pollingPubKeyInfo,
-    })
-  );
+  const { globalDispatch, pollingRsvInfo, pollingPubKeyInfo, pollingPubKey } =
+    useModel(
+      "global",
+      ({
+        globalDispatch,
+        pollingRsvInfo,
+        pollingPubKeyInfo,
+        pollingPubKey,
+      }) => ({
+        globalDispatch,
+        pollingRsvInfo,
+        pollingPubKeyInfo,
+        pollingPubKey,
+      })
+    );
   const _local: any = {
     "zh-CN": zhCN,
     "en-US": enUS,
@@ -100,6 +107,7 @@ const Index = (props: any) => {
       tradingList,
     })
   );
+
   return (
     <ConfigProvider locale={local} prefixCls={prefix}>
       <div className={prefix === "custom-default" ? "layouts" : "layouts dark"}>

@@ -250,12 +250,9 @@ export default function Index() {
     const account = window.ethereum?.selectedAddress;
     console.info(rpc, account);
     if (!rpc || !account) return;
-    console.info("pollingPubKey", pollingPubKey);
-    let interval: any;
-    clearInterval(interval);
     if (!pollingPubKey.length) return;
-    interval = setInterval(() => {
-      console.info("interval", interval);
+    let interval = setInterval(() => {
+      console.info("pollingPubKey", pollingPubKey);
       web3.setProvider(rpc);
       const batch = new web3.BatchRequest();
       pollingPubKey.forEach(({ fn, params, data }: any) => {
@@ -264,7 +261,6 @@ export default function Index() {
       batch.requestManager.sendBatch(
         batch.requests,
         (err: any, resArr: any) => {
-          debugger;
           if (err) return;
           let newPollingPubKey = pollingPubKey.map((item: any, i: Number) => {
             const { count = 0 } = item;
@@ -281,7 +277,7 @@ export default function Index() {
               return item;
             }
           });
-          const needRemovePollingPubKeyItem = [];
+          const needRemovePollingPubKeyItem: any = [];
           resArr.forEach((item, i) => {
             const res = item.result;
             const result = JSON.parse(res?.Data?.result || "{}");
@@ -293,12 +289,12 @@ export default function Index() {
               needRemovePollingPubKeyItem.push(i);
             }
           });
-          if (needRemovePollingPubKeyItem.length) {
-            clearInterval(interval);
-            console.info("interval", interval);
-            console.info("pollingPubKey", pollingPubKey);
-            debugger;
-          }
+          // if (needRemovePollingPubKeyItem.length) {
+          //   console.info("interval", interval);
+          //   console.info("pollingPubKey", pollingPubKey);
+          //   debugger;
+          // }
+          debugger;
           newPollingPubKey = newPollingPubKey.filter((item, i) => {
             const { count = 0 } = item;
             return !needRemovePollingPubKeyItem.includes(i) && count < 40;
@@ -319,20 +315,28 @@ export default function Index() {
             ),
             ...GAccount,
           ];
+          const addAccountLength = resArr.filter((item: any, i: any) => {
+            const res = item.result;
+            const result = JSON.parse(res?.Data?.result || "{}");
+            return res.Status === "Success" && result.Status === "Success";
+          }).length;
           dispatch({
             pollingPubKey: newPollingPubKey,
-            pollingPubKeyInfo: successArr.length,
+            pollingPubKeyInfo: addAccountLength,
             Account: newAccound,
           });
           localStorage.setItem(
             "pollingPubKey",
             JSON.stringify(newPollingPubKey)
           );
-          localStorage.setItem("pollingPubKeyInfo", successArr.length);
+          localStorage.setItem("pollingPubKeyInfo", addAccountLength);
           localStorage.setItem("Account", JSON.stringify(newAccound));
         }
       );
     }, 30000);
+    return () => {
+      clearInterval(interval);
+    };
   }, [pollingPubKey]);
 
   //批量查询Rsv进度
@@ -354,7 +358,6 @@ export default function Index() {
         const result = JSON.parse(item.result.Data.result);
         if (["Success", "Failure", "Timeout"].includes(result.Status)) {
           console.info("result.Status");
-          debugger;
           const newSendApprovaled = [result, ...GsendApprovaled];
           dispatch({
             sendApprovaled: newSendApprovaled,
