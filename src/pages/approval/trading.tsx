@@ -10,13 +10,15 @@ const Index = () => {
   const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
   const { execute } = acceptSign(rpc);
   const { account } = useActiveWeb3React();
-  const { tradingList, tradingListLoading, getData, globalDispatch } = useModel(
+  const { globalDispatch } = useModel("global", ({ globalDispatch }: any) => ({
+    globalDispatch,
+  }));
+  const { tradingList, tradingListLoading, getData } = useModel(
     "approval",
-    ({ tradingList, tradingListLoading, getData, globalDispatch }: any) => ({
+    ({ tradingList, tradingListLoading, getData }: any) => ({
       tradingList,
       tradingListLoading,
       getData,
-      globalDispatch,
     })
   );
 

@@ -504,19 +504,12 @@ export function useGetSign(rpc: string | undefined): {
         const tx = new Tx(rawTx);
         let hash = Buffer.from(tx.hash()).toString("hex");
         hash = hash.indexOf("0x") === 0 ? hash : "0x" + hash;
-
+        debugger;
         const result = await signMessage(hash);
         if (!result) {
           message.info("no sign");
           return;
         }
-        const rr = await web3.eth.accounts.recover({
-          messageHash: hash,
-          v: "0x" + result.v,
-          r: "0x" + result.r,
-          s: "0x" + result.s,
-        });
-        debugger;
         rawTx.r = "0x" + result.r;
         rawTx.s = "0x" + result.s;
         rawTx.v = "0x" + result.v;

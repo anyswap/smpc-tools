@@ -296,7 +296,6 @@ export default function Index() {
           //   console.info("pollingPubKey", pollingPubKey);
           //   debugger;
           // }
-          debugger;
           newPollingPubKey = newPollingPubKey.filter((item, i) => {
             const { count = 0 } = item;
             return !needRemovePollingPubKeyItem.includes(i) && count < 40;
