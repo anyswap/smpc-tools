@@ -286,6 +286,7 @@ export function useReqSmpcAddress(
         console.log(tx1);
         let signTx = tx1.serialize().toString("hex");
         signTx = signTx.indexOf("0x") === 0 ? signTx : "0x" + signTx;
+        debugger;
         let cbData = await web3.smpc.reqSmpcAddr(signTx);
         let resultData: any = {};
         if (cbData && typeof cbData === "string") {
@@ -502,21 +503,21 @@ export function useGetSign(rpc: string | undefined): {
           data: JSON.stringify(data),
         };
         const tx = new Tx(rawTx);
-        let hash = Buffer.from(tx.hash()).toString("hex");
+        let hash = Buffer.from(tx.hash(false)).toString("hex");
         hash = hash.indexOf("0x") === 0 ? hash : "0x" + hash;
-        debugger;
         const result = await signMessage(hash);
         if (!result) {
           message.info("no sign");
           return;
         }
-        tx.r = "0x" + result.r;
-        tx.s = "0x" + result.s;
-        tx.v = "0x" + result.v1;
+        rawTx.r = "0x" + result.r;
+        rawTx.s = "0x" + result.s;
+        rawTx.v = "0x" + result.v;
         console.info("rawTx", rawTx);
-        // const tx1 = new Tx(rawTx);
-        let signTx = tx.serialize().toString("hex");
+        const tx1 = new Tx(rawTx);
+        let signTx = tx1.serialize().toString("hex");
         signTx = signTx.indexOf("0x") === 0 ? signTx : "0x" + signTx;
+        debugger;
         const cbData = await web3.smpc.sign(signTx);
         if (cbData.Data?.result) {
           globalDispatch({
