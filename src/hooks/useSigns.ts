@@ -510,12 +510,12 @@ export function useGetSign(rpc: string | undefined): {
           message.info("no sign");
           return;
         }
-        rawTx.r = "0x" + result.r;
-        rawTx.s = "0x" + result.s;
-        rawTx.v = "0x" + result.v;
+        tx.r = "0x" + result.r;
+        tx.s = "0x" + result.s;
+        tx.v = "0x" + result.v1;
         console.info("rawTx", rawTx);
-        const tx1 = new Tx(rawTx);
-        let signTx = tx1.serialize().toString("hex");
+        // const tx1 = new Tx(rawTx);
+        let signTx = tx.serialize().toString("hex");
         signTx = signTx.indexOf("0x") === 0 ? signTx : "0x" + signTx;
         const cbData = await web3.smpc.sign(signTx);
         if (cbData.Data?.result) {
