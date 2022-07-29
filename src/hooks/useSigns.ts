@@ -54,7 +54,7 @@ async function getNonce(account: any, rpc: any) {
 
 const getSignNonce = async (account: any, rpc: any) => {
   web3.setProvider(rpc);
-  const nonceResult = await web3.smpc.getReqAddrNonce(account);
+  const nonceResult = await web3.smpc.getSignNonce(account);
   return nonceResult.Data.result;
 };
 
@@ -431,7 +431,7 @@ function useMsgData(): {
           // to: "0xC03033d8b833fF7ca08BF2A58C9BC9d711257249",
           to,
           // chainId: web3.utils.toHex(CHAINID),
-          chainId: web3.utils.toHex(CHAINID), //eth测试网
+          chainId: web3.utils.toHex(4), //eth测试网 4
           // chainId: web3.utils.toHex(56), eth正式
           // value: "1",
           value,
@@ -480,7 +480,8 @@ export function useGetSign(rpc: string | undefined): {
         web3.setProvider(rpc);
         const MsgContext = await execute(to, value, address);
         const nonce = await getSignNonce(account, rpc);
-        console.info("nonce", nonce);
+        // const nonceResult = await web3.smpc.getSignNonce(account);
+        // const noce = console.info("nonce", nonce);
         // to 0xC03033d8b833fF7ca08BF2A58C9BC9d711257249
         const data = {
           TxType: "SIGN",
@@ -513,7 +514,6 @@ export function useGetSign(rpc: string | undefined): {
         rawTx.r = "0x" + result.r;
         rawTx.s = "0x" + result.s;
         rawTx.v = "0x" + result.v;
-        console.info("rawTx", rawTx);
         const tx1 = new Tx(rawTx);
         let signTx = tx1.serialize().toString("hex");
         signTx = signTx.indexOf("0x") === 0 ? signTx : "0x" + signTx;

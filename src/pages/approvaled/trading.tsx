@@ -45,24 +45,27 @@ const Index = () => {
     web3.setProvider(
       "https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"
     );
-    const Rsv = JSON.parse(r.Rsv).Rsv[0];
+    debugger;
+    const Rsv = r.Rsv[0];
     const v = Number(4) * 2 + 35 + Number(Rsv.substr(128, 2));
+    // const nonce = await web3.eth.getTransactionCount(account);
     let rawTx = {
-      from: r.MsgContext.from,
-      to: r.MsgContext.to,
-      value: r.MsgContext.value,
-      gas: r.MsgContext.gas,
-      gasPrice: r.MsgContext.gasPrice,
-      nonce: r.MsgContext.nonce,
+      from: JSON.parse(r.MsgContext[0]).from,
+      to: JSON.parse(r.MsgContext[0]).to,
+      value: JSON.parse(r.MsgContext[0]).value,
+      gas: JSON.parse(r.MsgContext[0]).gas,
+      gasPrice: JSON.parse(r.MsgContext[0]).gasPrice,
+      nonce: JSON.parse(r.MsgContext[0]).nonce,
       data: "",
       // r: "0x" + Rsv.substr(0, 64),
       // s: "0x" + Rsv.substr(64, 64),
       // v: web3.utils.toHex(v),
-      chainId: r.MsgContext.chainId,
+      chainId: JSON.parse(r.MsgContext[0]).chainId,
     };
     let tx = new Tx(rawTx);
     let hash = Buffer.from(tx.hash(false)).toString("hex");
     hash = hash.indexOf("0x") === 0 ? hash : "0x" + hash;
+    debugger;
     if (hash !== r.MsgHash[0]) {
       message.error("Error: hash");
     }
@@ -107,12 +110,12 @@ const Index = () => {
     {
       title: "to",
       dataIndex: "MsgContext",
-      // render: (t: any) => cutOut(t.to, 6, 4),
+      render: (t: any) => cutOut(JSON.parse(t[0])?.to, 6, 4),
     },
     {
       title: "value",
       dataIndex: "MsgContext",
-      render: (t: any) => t?.value,
+      render: (t: any) => JSON.parse(t[0]).value,
     },
     {
       title: "GroupID",

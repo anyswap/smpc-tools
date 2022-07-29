@@ -251,7 +251,7 @@ export default function Index() {
     console.info(rpc, account);
     if (!rpc || !account) return;
     if (!pollingPubKey.length) return;
-    let interval = setInterval(() => {
+    const interval = setInterval(() => {
       console.info("pollingPubKey", pollingPubKey);
       web3.setProvider(rpc);
       const batch = new web3.BatchRequest();
@@ -374,16 +374,17 @@ export default function Index() {
           pollingRsv = pollingRsv.filter(
             (item: any, index: number) => i !== index
           );
+
+          localStorage.setItem("pollingRsv", JSON.stringify(pollingRsv));
         }
+        dispatch({ getRsvSpin: false });
       });
     });
-    dispatch({ getRsvSpin: false });
-    localStorage.setItem("pollingRsv", JSON.stringify(pollingRsv));
   };
 
-  useEffect(() => {
-    getRsv();
-  }, []);
+  // useEffect(() => {
+  //   getRsv();
+  // }, []);
 
   return { ...state, globalDispatch: dispatch, getRsv };
 }

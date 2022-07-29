@@ -16,6 +16,10 @@ const Index = () => {
   );
   const [activeKey, setActiveKey] = useState("0");
 
+  useEffect(() => {
+    if (activeKey == "1") getRsv();
+  }, [activeKey]);
+
   return (
     <Tabs
       defaultActiveKey={"0"}
