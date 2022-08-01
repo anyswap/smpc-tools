@@ -16,7 +16,7 @@ export default {
   "nav.createAccount": "Create MPC",
   "nav.approval": "Approval",
   "nav.approvaled": "Transactionsed List",
-  "nav.approvedTransaction": "History",
+  "nav.approvedTransaction": "Approved Transaction",
   "nav.accountList": "MPC account",
   "createGrounp.admin": "Admin",
   "createGrounp.model": "ThresHold",

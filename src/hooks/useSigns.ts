@@ -357,7 +357,6 @@ export function useApproveReqSmpcAddress(rpc: string | undefined): {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
         let rsv = await signer.signMessage(JSON.stringify(data, null, 8));
-        debugger;
         // 如果v是1b换成00 如果v是1c换成01
         rsv = rsv.slice(0, 130) + (rsv.slice(130) === "1b" ? "00" : "01");
         let cbData = await web3.smpc.acceptKeyGen(

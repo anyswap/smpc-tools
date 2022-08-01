@@ -248,12 +248,13 @@ export default function Index() {
   //监听轮询创建帐户任务
   useEffect(() => {
     const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
-
+    const account = window.ethereum?.selectedAddress;
     console.info(rpc, account);
     if (!rpc || !account) return;
-    console.info("pollingPubKey", pollingPubKey);
+    console.info("11pollingPubKey", pollingPubKey);
     if (!pollingPubKey.length) return;
     const interval = setInterval(() => {
+      console.info("22pollingPubKey", pollingPubKey);
       web3.setProvider(rpc);
       const batch = new web3.BatchRequest();
       pollingPubKey.forEach(({ fn, params, data }: any) => {
@@ -316,10 +317,10 @@ export default function Index() {
                 JSON.parse(item?.result?.Data?.result || "{}")
               )
               .filter((item: any) =>
-                GAccount.every((it: any) => item.PubKey !== it.PubKey)
+                GAccount.every((it: any) => item.KeyID !== it.KeyID)
               ),
             ...GAccount,
-          ];
+          ].sort((a: any, b: any) => b.TimeStamp - a.TimeStamp);
           const addAccountLength = resArr.filter((item: any, i: any) => {
             const res = item.result;
             const result = JSON.parse(res?.Data?.result || "{}");
@@ -338,10 +339,11 @@ export default function Index() {
           localStorage.setItem("Account", JSON.stringify(newAccound));
         }
       );
-      return () => {
-        clearInterval(interval);
-      };
     }, 30000);
+    return () => {
+      debugger;
+      clearInterval(interval);
+    };
   }, [pollingPubKey]);
 
   //批量查询Rsv进度
@@ -373,11 +375,11 @@ export default function Index() {
           pollingRsv = pollingRsv.filter(
             (item: any, index: number) => i !== index
           );
+          dispatch({ getRsvSpin: false });
+          localStorage.setItem("pollingRsv", JSON.stringify(pollingRsv));
         }
       });
     });
-    dispatch({ getRsvSpin: false });
-    localStorage.setItem("pollingRsv", JSON.stringify(pollingRsv));
   };
 
   useEffect(() => {

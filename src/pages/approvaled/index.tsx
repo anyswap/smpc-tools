@@ -8,9 +8,13 @@ import { cutOut } from "@/utils";
 import { SettingOutlined } from "@ant-design/icons";
 
 const Index = () => {
-  const { globalDispatch } = useModel("global", ({ globalDispatch }) => ({
-    globalDispatch,
-  }));
+  const { globalDispatch, Account } = useModel(
+    "global",
+    ({ globalDispatch, Account }) => ({
+      globalDispatch,
+      Account,
+    })
+  );
 
   useEffect(() => {
     localStorage.setItem("pollingRsvInfo", "0");
@@ -64,8 +68,8 @@ const Index = () => {
       {/* <Button onClick={getApproveList}>get</Button>{" "} */}
       <Table
         columns={columns}
-        rowKey="PubKey"
-        dataSource={JSON.parse(localStorage.getItem("Account") || "[]")}
+        rowKey="KeyID"
+        dataSource={Account}
         pagination={false}
       />
     </div>

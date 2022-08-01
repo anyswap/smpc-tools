@@ -223,6 +223,7 @@ const Index = () => {
                 options={admin.map((item: any, i: number) => ({
                   value: `${i + 1}/${admin.length}`,
                   label: `${i + 1}/${admin.length}`,
+                  disabled: i === 0,
                 }))}
               />
             </Form.Item>

@@ -70,7 +70,7 @@ const Index = () => {
           signEnode: loginAccount.enode + res,
         },
       });
-      history.push("/account");
+      history.push("/createGrounp");
     });
   };
 

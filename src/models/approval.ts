@@ -12,7 +12,6 @@ const initialState = {
 
 export default function Index() {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const account = window.ethereum?.selectedAddress;
 
   const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
 
@@ -59,14 +58,15 @@ export default function Index() {
     getData();
   }, []);
   useEffect(() => {
-    let interval: any;
-    clearInterval(interval);
     // 20秒调一次交易账户审批列表和交易审批列表
-    interval = setInterval(() => {
-      console.info(rpc, account);
+    const interval = setInterval(() => {
+      const account = window.ethereum?.selectedAddress;
       if (!rpc || !account) return;
       getData();
     }, 20000);
+    return () => {
+      clearInterval(interval);
+    };
   }, []);
 
   return { ...state, getData };
