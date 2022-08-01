@@ -37,6 +37,7 @@ const initState = {
 
 export default function Index() {
   const [state, dispatch] = useReducer(reducer, initState);
+  const account = window.ethereum?.selectedAddress;
   const {
     pollingRsv,
     pollingPubKey,
@@ -247,7 +248,7 @@ export default function Index() {
   //监听轮询创建帐户任务
   useEffect(() => {
     const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
-    const account = window.ethereum?.selectedAddress;
+
     console.info(rpc, account);
     if (!rpc || !account) return;
     console.info("pollingPubKey", pollingPubKey);
@@ -341,13 +342,12 @@ export default function Index() {
         clearInterval(interval);
       };
     }, 30000);
-  }, []);
+  }, [pollingPubKey]);
 
   //批量查询Rsv进度
   const getRsv = async () => {
     const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
     web3.setProvider(rpc);
-    const account = window.ethereum?.selectedAddress;
     let pollingRsv = JSON.parse(localStorage.getItem("pollingRsv") || "[]");
     if (!rpc || !account || !pollingRsv.length) return;
     dispatch({ getRsvSpin: true });
@@ -382,7 +382,7 @@ export default function Index() {
 
   useEffect(() => {
     getRsv();
-  }, []);
+  }, [account]);
 
   return { ...state, globalDispatch: dispatch, getRsv };
 }
