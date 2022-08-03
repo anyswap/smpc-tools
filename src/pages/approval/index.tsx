@@ -47,6 +47,14 @@ const Index = () => {
   // useEffect(() => {
   //   getApproveList();
   // }, [account, Account]);
+  const createGrounpModel = useIntl().formatHTMLMessage({
+    id: "createGrounp.model",
+  });
+  const gAction = useIntl().formatHTMLMessage({ id: "g.action" });
+  const approvalAgree = useIntl().formatHTMLMessage({ id: "approval.agree" });
+  const approvalDisagree = useIntl().formatHTMLMessage({
+    id: "approval.disagree",
+  });
 
   const columns: any = [
     {
@@ -72,7 +80,7 @@ const Index = () => {
       render: (t: string) => moment(Number(t)).format("YYYY-MM-DD HH:mm:ss"),
     },
     {
-      title: useIntl().formatHTMLMessage({ id: "createGrounp.model" }),
+      title: createGrounpModel,
       dataIndex: "ThresHold",
     },
     {
@@ -80,7 +88,7 @@ const Index = () => {
       dataIndex: "Nonce",
     },
     {
-      title: useIntl().formatHTMLMessage({ id: "g.action" }),
+      title: gAction,
       render: (r: any, i: number) => (
         <span>
           {account === r.Account ? (
@@ -92,10 +100,10 @@ const Index = () => {
                 onClick={() => approve(r, "AGREE")}
                 className="mr8"
               >
-                {useIntl().formatHTMLMessage({ id: "approval.agree" })}
+                {approvalAgree}
               </Button>
               <Button onClick={() => approve(r, "DISAGREE")}>
-                {useIntl().formatHTMLMessage({ id: "approval.disagree" })}
+                {approvalDisagree}
               </Button>
             </span>
           )}

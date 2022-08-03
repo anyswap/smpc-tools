@@ -12,7 +12,7 @@ const initialState = {
 
 export default function Index() {
   const [state, dispatch] = useReducer(reducer, initialState);
-
+  const account = window.ethereum?.selectedAddress;
   const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
 
   const getCurNodeReqAddrInfoResponse = (e: any, res: any) => {
@@ -55,8 +55,8 @@ export default function Index() {
     });
   };
   useEffect(() => {
-    getData();
-  }, []);
+    if (account) getData();
+  }, [account]);
   useEffect(() => {
     // 20秒调一次交易账户审批列表和交易审批列表
     const interval = setInterval(() => {

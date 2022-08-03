@@ -39,4 +39,5 @@ export default {
   tradingApproval: "Sign approval",
   Create_confirmation: "Create a confirmation",
   initiator: "Initiator",
+  sendToEth: "Send to eth",
 };

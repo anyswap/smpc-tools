@@ -39,4 +39,5 @@ export default {
   tradingApproval: "交易审批",
   Create_confirmation: "创建确认",
   initiator: "发起者",
+  sendToEth: "发到链上",
 };

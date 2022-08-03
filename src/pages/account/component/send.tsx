@@ -66,7 +66,7 @@ const Index = (props: {
               required: true,
               type: "number",
               validator: (r, v, c) => {
-                if (!isNaN(v)) {
+                if (!isNaN(v) && Number(v) > 0) {
                   c();
                 }
                 c(rules2 as string);

@@ -45,20 +45,20 @@ const Index = () => {
     web3.setProvider(
       "https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"
     );
-    const Rsv = JSON.parse(r.Rsv).Rsv[0];
+    const Rsv = r.Rsv[0];
     const v = Number(4) * 2 + 35 + Number(Rsv.substr(128, 2));
     let rawTx = {
-      from: r.MsgContext.from,
-      to: r.MsgContext.to,
-      value: r.MsgContext.value,
-      gas: r.MsgContext.gas,
-      gasPrice: r.MsgContext.gasPrice,
-      nonce: r.MsgContext.nonce,
+      from: JSON.parse(r.MsgContext[0]).from,
+      to: JSON.parse(r.MsgContext[0]).to,
+      value: JSON.parse(r.MsgContext[0]).value,
+      gas: JSON.parse(r.MsgContext[0]).gas,
+      gasPrice: JSON.parse(r.MsgContext[0]).gasPrice,
+      nonce: JSON.parse(r.MsgContext[0]).nonce,
       data: "",
       // r: "0x" + Rsv.substr(0, 64),
       // s: "0x" + Rsv.substr(64, 64),
       // v: web3.utils.toHex(v),
-      chainId: r.MsgContext.chainId,
+      chainId: JSON.parse(r.MsgContext[0]).chainId,
     };
     let tx = new Tx(rawTx);
     let hash = Buffer.from(tx.hash(false)).toString("hex");
@@ -97,22 +97,22 @@ const Index = () => {
         message.error(e.message);
       });
   };
-  console.info("GsendApprovaled", GsendApprovaled);
+  const sendToEth = useIntl().formatHTMLMessage({ id: "sendToEth" });
   const columns = [
     {
-      title: "from",
+      title: "From",
       dataIndex: "From",
       render: (t: any) => cutOut(t, 6, 4),
     },
     {
-      title: "to",
+      title: "To",
       dataIndex: "MsgContext",
-      // render: (t: any) => cutOut(t.to, 6, 4),
+      render: (t: any) => cutOut(JSON.parse(t).to, 6, 4),
     },
     {
-      title: "value",
+      title: "Value",
       dataIndex: "MsgContext",
-      render: (t: any) => t?.value,
+      render: (t: any) => JSON.parse(t).value,
     },
     {
       title: "GroupID",
@@ -133,7 +133,7 @@ const Index = () => {
       title: useIntl().formatHTMLMessage({ id: "g.action" }),
       // render: (t) => action[t],
       render: (t: any, r: any, i: any) => {
-        return <a onClick={() => send(r, i)}>发到链上</a>;
+        return <a onClick={() => send(r, i)}>{sendToEth}</a>;
       },
     },
   ];
