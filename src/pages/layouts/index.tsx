@@ -101,7 +101,7 @@ const Index = (props: any) => {
     })
   );
   return (
-    <ConfigProvider locale={local} prefixCls={prefix}>
+    <ConfigProvider prefixCls={prefix}>
       <div className={prefix === "custom-default" ? "layouts" : "layouts dark"}>
         <div className="head">
           <div className="left">

@@ -55,7 +55,7 @@ const Index = () => {
   const intl_transaction = useIntl().formatHTMLMessage({ id: "transaction" });
   const columns = [
     {
-      title: "publickey",
+      title: "Publickey",
       dataIndex: "PubKey",
       width: "25%",
       render: (t: string) => {
@@ -63,7 +63,7 @@ const Index = () => {
       },
     },
     {
-      title: "address",
+      title: "Address",
       dataIndex: "PubKey",
       width: "25%",
       render: (t: string) => {

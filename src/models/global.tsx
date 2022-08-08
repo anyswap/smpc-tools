@@ -249,12 +249,9 @@ export default function Index() {
   useEffect(() => {
     const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
     const account = window.ethereum?.selectedAddress;
-    console.info(rpc, account);
     if (!rpc || !account) return;
-    console.info("11pollingPubKey", pollingPubKey);
     if (!pollingPubKey.length) return;
     const interval = setInterval(() => {
-      console.info("22pollingPubKey", pollingPubKey);
       web3.setProvider(rpc);
       const batch = new web3.BatchRequest();
       pollingPubKey.forEach(({ fn, params, data }: any) => {
@@ -294,7 +291,7 @@ export default function Index() {
             }
           });
           if (needRemovePollingPubKeyItem.length) {
-            console.info("pollingPubKey", pollingPubKey);
+            // console.info("pollingPubKey", pollingPubKey);
             debugger;
           }
           newPollingPubKey = newPollingPubKey.filter((item: any, i: any) => {
@@ -375,10 +372,14 @@ export default function Index() {
           pollingRsv = pollingRsv.filter(
             (item: any, index: number) => i !== index
           );
-          dispatch({ getRsvSpin: false });
+
           localStorage.setItem("pollingRsv", JSON.stringify(pollingRsv));
+        } else {
+          alert("!!");
+          console.info("result", result);
         }
       });
+      dispatch({ getRsvSpin: false });
     });
   };
 

@@ -115,6 +115,18 @@ const Index = () => {
       render: (t: any) => JSON.parse(t).value,
     },
     {
+      title: "Status",
+      dataIndex: "Status",
+      render: (t: any, r: any) => {
+        return (
+          <div>
+            {t}
+            {r.Error && <p>Reason: {r.Error}</p>}
+          </div>
+        );
+      },
+    },
+    {
       title: "GroupID",
       dataIndex: "GroupID",
       render: (t: string) => cutOut(t, 6, 4),

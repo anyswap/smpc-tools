@@ -86,7 +86,6 @@ let nonceLocal = 0;
 async function getNonce(account: any, rpc: any) {
   web3.setProvider(rpc);
   const nonceResult = await web3.smpc.getReqAddrNonce(account);
-  console.log(nonceResult);
   nonceLocal++;
   // return nonceLocal;
   return nonceResult.Data.result;
@@ -295,6 +294,7 @@ export function useReqSmpcAddress(
           TimeStamp: Date.now().toString(),
           Sigs,
         };
+        console.info("Sigs", Sigs);
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
         let rsv = await signer.signMessage(JSON.stringify(data, null, 8));
@@ -315,7 +315,6 @@ export function useReqSmpcAddress(
         } else {
           resultData = { msg: cbData.Error || "Error", error: cbData.Tip };
         }
-        console.log(resultData);
         return resultData;
       },
     };
@@ -374,7 +373,6 @@ export function useApproveReqSmpcAddress(rpc: string | undefined): {
         } else {
           resultData = { msg: "Error", error: cbData.Tip };
         }
-        console.log(resultData);
         return resultData;
       },
     };

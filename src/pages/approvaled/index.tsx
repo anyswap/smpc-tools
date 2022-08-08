@@ -38,6 +38,15 @@ const Index = () => {
     {
       title: "Status",
       dataIndex: "Status",
+      width: "25%",
+      render: (t: any, r: any) => {
+        return (
+          <div>
+            {t}
+            {r.Error && <p>Reason: {r.Error}</p>}
+          </div>
+        );
+      },
     },
     {
       title: "TimeStamp",
