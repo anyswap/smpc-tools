@@ -211,18 +211,22 @@ export function useSignEnode(enode: string | undefined): {
         // const hash = eNodeKey;
         // const result = await signer.signMessage(eNodeKey);
         // const result = await signer.signMessage(hash);
-        const result = await signMessage(hash);
-        if (!result) {
-          message.info("no sign");
-          return;
-        }
-        // console.log(signer)
-        // console.log(result);
-        // console.log(hash);
-        // console.log(ethers.utils.toUtf8Bytes(eNodeKey))
 
-        const rsvFormat = "0x" + result.r + result.s + result.v0;
-        return rsvFormat;
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        let rsv = await signer.signMessage(eNodeKey);
+        rsv = rsv.slice(0, 130) + (rsv.slice(130) === "1b" ? "00" : "01");
+        debugger;
+        return rsv;
+
+        // const result = await signMessage(hash);
+        // if (!result) {
+        //   message.info("no sign");
+        //   return;
+        // }
+
+        // const rsvFormat = "0x" + result.r + result.s + result.v0;
+        // return rsvFormat;
       },
     };
   }, [enode, library, account]);

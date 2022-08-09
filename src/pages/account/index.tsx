@@ -167,7 +167,7 @@ const Index = () => {
         dataSource={data
           .sort((a: any, b: any) => b.TimeStamp - a.TimeStamp)
           .map((item: any, i) => ({ ...item, k: i }))}
-        rowKey="k"
+        rowKey="PubKey"
         key={Object.values(details).length}
         pagination={{
           total: data.length,

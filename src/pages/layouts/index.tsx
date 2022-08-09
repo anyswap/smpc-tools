@@ -29,7 +29,8 @@ const Index = (props: any) => {
   );
   // const { account, library, activate } = useActiveWeb3React();
   const { library, activate } = useActiveWeb3React();
-  const account = window.ethereum?.selectedAddress;
+  // const account = window.ethereum?.selectedAddress;
+  const { account } = useActiveWeb3React();
   const { rpc = "", signEnode = "" } = JSON.parse(
     localStorage.getItem("loginAccount") || "{}"
   );
@@ -77,6 +78,7 @@ const Index = (props: any) => {
   // }, []);
 
   useEffect(() => {
+    console.info("444account", account);
     if (!account) {
       history.push("/");
       return;
@@ -84,7 +86,7 @@ const Index = (props: any) => {
     if (!rpc || !signEnode) {
       history.push("/login");
     }
-  }, [account, rpc]);
+  }, [account, rpc, signEnode]);
 
   const cutOutSign = cutOut("0x" + signEnode.split("0x")[1], 6, 4);
 

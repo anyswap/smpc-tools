@@ -10,7 +10,9 @@ import "./index.less";
 const Index = () => {
   // const { account, activate } = useActiveWeb3React();
   const { activate } = useActiveWeb3React();
-  const account = window.ethereum?.selectedAddress;
+  // const account = window.ethereum?.selectedAddress;
+  const { account } = useActiveWeb3React();
+
   const { isDay } = useModel("global", ({ isDay }) => ({ isDay }));
 
   useEffect(() => {

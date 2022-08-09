@@ -16,7 +16,8 @@ const Index = () => {
   const [form] = Form.useForm();
   // const { account, activate } = useActiveWeb3React();
   const { activate } = useActiveWeb3React();
-  const account = window.ethereum?.selectedAddress;
+  // const account = window.ethereum?.selectedAddress;
+  const { account } = useActiveWeb3React();
   const { nodeList, isDay, globalDispatch, loginAccount } = useModel(
     "global",
     ({ isDay, nodeList, globalDispatch, address, loginAccount }) => ({

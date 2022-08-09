@@ -5,6 +5,7 @@ import { useEffect, useReducer } from "react";
 import moment from "moment";
 import web3 from "@/assets/js/web3";
 import { message } from "antd";
+import { useActiveWeb3React } from "@/hooks";
 const Web3 = require("web3");
 
 const initState = {
@@ -38,6 +39,7 @@ const initState = {
 export default function Index() {
   const [state, dispatch] = useReducer(reducer, initState);
   const account = window.ethereum?.selectedAddress;
+  // const { account } = useActiveWeb3React();
   const {
     pollingRsv,
     pollingPubKey,
@@ -248,7 +250,6 @@ export default function Index() {
   //监听轮询创建帐户任务
   useEffect(() => {
     const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
-    const account = window.ethereum?.selectedAddress;
     if (!rpc || !account) return;
     if (!pollingPubKey.length) return;
     const interval = setInterval(() => {
@@ -338,7 +339,6 @@ export default function Index() {
       );
     }, 30000);
     return () => {
-      debugger;
       clearInterval(interval);
     };
   }, [pollingPubKey]);
