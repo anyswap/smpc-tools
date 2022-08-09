@@ -348,11 +348,11 @@ export function useApproveReqSmpcAddress(rpc: string | undefined): {
         // const signer = provider.getSigner();
         // web3.setProvider('http://47.114.115.33:5913/')
         web3.setProvider(rpc);
-        const Noce = await getNonce(account, rpc);
+        const Nonce = await getNonce(account, rpc);
         const data = {
           TxType: "ACCEPTREQADDR",
           Account: account,
-          Noce,
+          Nonce,
           Key,
           Accept: type, // DISAGREE
           TimeStamp: Date.now().toString(),
@@ -458,12 +458,12 @@ export function useGetSign(rpc: string | undefined): {
         const { GroupID, PubKey, ThresHold, address } = r;
         web3.setProvider(rpc);
         const MsgContext = await execute(to, value, address);
-        const Noce = await getSignNonce(account, rpc);
+        const Nonce = await getSignNonce(account, rpc);
         // to 0xC03033d8b833fF7ca08BF2A58C9BC9d711257249
         const data = {
           TxType: "SIGN",
           Account: account,
-          Noce,
+          Nonce,
           PubKey,
           MsgHash: [toTxnHash(MsgContext)],
           MsgContext: [JSON.stringify(MsgContext)],
