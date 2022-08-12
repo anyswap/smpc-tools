@@ -60,7 +60,13 @@ const Index = () => {
     }
     message.error("Error");
   };
-
+  const createGrounpModel = useIntl().formatHTMLMessage({
+    id: "createGrounp.model",
+  });
+  const approvalAgree = useIntl().formatHTMLMessage({ id: "approval.agree" });
+  const approvalDisagree = useIntl().formatHTMLMessage({
+    id: "approval.disagree",
+  });
   const columns: any = [
     {
       title: "Key",
@@ -89,7 +95,7 @@ const Index = () => {
       render: (t: string) => cutOut(t, 6, 8),
     },
     {
-      title: useIntl().formatHTMLMessage({ id: "createGrounp.model" }),
+      title: createGrounpModel,
       dataIndex: "ThresHold",
     },
     {
@@ -109,10 +115,10 @@ const Index = () => {
               className="mr8"
               type="primary"
             >
-              {useIntl().formatHTMLMessage({ id: "approval.agree" })}
+              {approvalAgree}
             </Button>
             <Button onClick={() => action("DISAGREE", r)}>
-              {useIntl().formatHTMLMessage({ id: "approval.disagree" })}
+              {approvalDisagree}
             </Button>
           </span>
         ),

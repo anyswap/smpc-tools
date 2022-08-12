@@ -49,21 +49,21 @@ export default function Index() {
     Account: GAccount,
   } = state;
 
-  // const getNodeList = async () => {
-  //   const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
-  //   if (!rpc) return;
-  //   const res = await nodeListService();
-  //   dispatch({
-  //     nodeList: res.info,
-  //   });
-  // };
+  const getNodeList = async () => {
+    const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
+    if (!rpc) return;
+    const res = await nodeListService();
+    dispatch({
+      nodeList: res.info,
+    });
+  };
 
-  // useEffect(() => {
-  //   const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
-  //   if (!rpc) return;
-  //   // '/nodes/list'
-  //   getNodeList();
-  // }, []);
+  useEffect(() => {
+    const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
+    if (!rpc) return;
+    // '/nodes/list'
+    getNodeList();
+  }, []);
 
   //获取 发起交易的审批结果轮询
   const pollingRsvInterval = (fn: any, params: any, data: any, i: any) => {
