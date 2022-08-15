@@ -38,7 +38,7 @@ const initState = {
 
 export default function Index() {
   const [state, dispatch] = useReducer(reducer, initState);
-  const account = window.ethereum?.selectedAddress;
+  // const account = window.ethereum?.selectedAddress;
   // const { account } = useActiveWeb3React();
   const {
     pollingRsv,
@@ -62,7 +62,7 @@ export default function Index() {
     const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
     if (!rpc) return;
     // '/nodes/list'
-    getNodeList();
+    // getNodeList();
   }, []);
 
   //获取 发起交易的审批结果轮询
@@ -250,6 +250,7 @@ export default function Index() {
   //监听轮询创建帐户任务
   useEffect(() => {
     const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
+    const account = window.ethereum?.selectedAddress;
     if (!rpc || !account) return;
     if (!pollingPubKey.length) return;
     const interval = setInterval(() => {
@@ -348,6 +349,7 @@ export default function Index() {
     const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
     web3.setProvider(rpc);
     let pollingRsv = JSON.parse(localStorage.getItem("pollingRsv") || "[]");
+    const account = window.ethereum?.selectedAddress;
     if (!rpc || !account || !pollingRsv.length) return;
     dispatch({ getRsvSpin: true });
     const batch = new web3.BatchRequest();
@@ -375,8 +377,8 @@ export default function Index() {
 
           localStorage.setItem("pollingRsv", JSON.stringify(pollingRsv));
         } else {
-          alert("!!");
-          console.info("result", result);
+          // alert("!!");
+          console.info("pendding result", result);
         }
       });
       dispatch({ getRsvSpin: false });
@@ -385,7 +387,7 @@ export default function Index() {
 
   useEffect(() => {
     getRsv();
-  }, [account]);
+  }, []);
 
   return { ...state, globalDispatch: dispatch, getRsv };
 }

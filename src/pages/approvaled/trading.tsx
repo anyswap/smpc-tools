@@ -65,6 +65,8 @@ const Index = () => {
     hash = hash.indexOf("0x") === 0 ? hash : "0x" + hash;
     if (hash !== r.MsgHash[0]) {
       message.error("Error: hash");
+      debugger;
+      return;
     }
     let accountsRecover = web3.eth.accounts.recover({
       messageHash: hash,
@@ -144,8 +146,13 @@ const Index = () => {
     {
       title: useIntl().formatHTMLMessage({ id: "g.action" }),
       // render: (t) => action[t],
+      dataIndex: "Status",
       render: (t: any, r: any, i: any) => {
-        return <a onClick={() => send(r, i)}>{sendToEth}</a>;
+        return t === "Success" ? (
+          <a onClick={() => send(r, i)}>{sendToEth}</a>
+        ) : (
+          "--"
+        );
       },
     },
   ];

@@ -216,7 +216,6 @@ export function useSignEnode(enode: string | undefined): {
         const signer = provider.getSigner();
         let rsv = await signer.signMessage(eNodeKey);
         rsv = rsv.slice(0, 130) + (rsv.slice(130) === "1b" ? "00" : "01");
-        debugger;
         return rsv;
 
         // const result = await signMessage(hash);
@@ -293,7 +292,7 @@ export function useReqSmpcAddress(
           keytype,
           GroupId: gID,
           ThresHold: ThresHold,
-          Mode: "0",
+          Mode: "2",
           AcceptTimeOut: "604800", // AcceptTimeOut: "60", // 测试超时用
           TimeStamp: Date.now().toString(),
           Sigs,
@@ -470,7 +469,7 @@ export function useGetSign(rpc: string | undefined): {
           Keytype: "EC256K1",
           GroupID,
           ThresHold,
-          Mode: "0",
+          Mode: "2",
           // AcceptTimeOut: "60", // 测试超时用
           AcceptTimeOut: "604800",
           TimeStamp: Date.now().toString(),
@@ -562,7 +561,6 @@ export function acceptSign(rpc: string): {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
         let rsv = await signer.signMessage(JSON.stringify(data, null, 8));
-        debugger;
         // 如果v是1b换成00 如果v是1c换成01
         rsv = rsv.slice(0, 130) + (rsv.slice(130) === "1b" ? "00" : "01");
 
@@ -571,7 +569,6 @@ export function acceptSign(rpc: string): {
           JSON.stringify(data, null, 8)
         );
         if (cbData.Data?.result) {
-          debugger;
           // // rsv
           // const intervel = setInterval(async () => {
           //   const cbRsv = await web3.smpc.getSignStatus(cbData.Data?.result);
