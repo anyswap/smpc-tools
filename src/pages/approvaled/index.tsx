@@ -28,6 +28,10 @@ const Index = () => {
     AGREE: useIntl().formatHTMLMessage({ id: "approval.agree" }),
     DISAGREE: useIntl().formatHTMLMessage({ id: "approval.disagree" }),
   };
+  const createGrounpModel = useIntl().formatHTMLMessage({
+    id: "createGrounp.model",
+  });
+  const gAction = useIntl().formatHTMLMessage({ id: "g.action" });
 
   const columns = [
     {
@@ -54,17 +58,17 @@ const Index = () => {
       render: (t: string) => moment(Number(t)).format("YYYY-MM-DD HH:mm:ss"),
     },
     {
-      title: useIntl().formatHTMLMessage({ id: "createGrounp.model" }),
+      title: createGrounpModel,
       dataIndex: "ThresHold",
     },
 
     {
-      title: useIntl().formatHTMLMessage({ id: "g.action" }),
+      title: gAction,
       dataIndex: "AllReply",
       width: "32%",
       render: (t: any) =>
         t.map((item: any) => (
-          <p>
+          <p key={item.Approver}>
             {item.Approver}:{"  "}
             {item.Status}
           </p>

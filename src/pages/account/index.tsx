@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Button, message, Modal, Table, Spin } from "antd";
 import { useIntl, useModel } from "umi";
+import classNames from "classnames/bind";
 import web3 from "@/assets/js/web3";
 // import web3Fn from "@/libs/web3/index.js";
 import { useActiveWeb3React } from "@/hooks";
@@ -75,7 +76,7 @@ const Index = () => {
       title: intl_balance,
       dataIndex: "PubKey",
       width: "10%",
-      render: (t: string) => JSON.parse(details)[t]?.balance,
+      render: (t: string) => JSON.parse(details)[t]?.balance + "eth",
     },
     {
       title: intl_createDate,
@@ -91,7 +92,9 @@ const Index = () => {
       title: intl_action,
       width: "10%",
       render: (r: any) => (
-        <a
+        <Button
+          type="link"
+          // disabled={!Number(JSON.parse(details)[r["PubKey"]]?.balance)}
           onClick={
             () => {
               setActive({
@@ -109,7 +112,7 @@ const Index = () => {
           }
         >
           {intl_transaction}
-        </a>
+        </Button>
       ),
     },
   ];
@@ -119,7 +122,7 @@ const Index = () => {
     web3.setProvider("https://api.mycryptoapi.com/eth");
     const res = await web3.eth.getBalance(address);
     detailsObj[PubKey] = {
-      balance: res + "eth",
+      balance: res,
     };
     if (
       Object.entries(detailsObj).length === Object.entries(detailsObj).length
@@ -177,7 +180,12 @@ const Index = () => {
           showQuickJumper: true,
         }}
       />
-      <Send visible={visible} onSend={onSend} setVisible={setVisible} />
+      <Send
+        visible={visible}
+        onSend={onSend}
+        setVisible={setVisible}
+        balance={JSON.parse(details)[active["PubKey"]]?.balance}
+      />
     </div>
   );
 };

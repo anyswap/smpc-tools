@@ -63,6 +63,7 @@ const Index = () => {
     let tx = new Tx(rawTx);
     let hash = Buffer.from(tx.hash(false)).toString("hex");
     hash = hash.indexOf("0x") === 0 ? hash : "0x" + hash;
+    debugger;
     if (hash !== r.MsgHash[0]) {
       message.error("Error: hash");
       debugger;

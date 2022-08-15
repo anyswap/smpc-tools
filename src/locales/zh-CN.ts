@@ -40,4 +40,5 @@ export default {
   Create_confirmation: "创建确认",
   initiator: "发起者",
   sendToEth: "发到链上",
+  createYourOwn: "自己创建",
 };

@@ -40,4 +40,5 @@ export default {
   Create_confirmation: "Create a confirmation",
   initiator: "Initiator",
   sendToEth: "Send to Ethereum",
+  createYourOwn: "Create your own",
 };

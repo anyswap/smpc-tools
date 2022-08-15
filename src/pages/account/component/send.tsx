@@ -6,8 +6,10 @@ const Index = (props: {
   visible: boolean;
   onSend: any;
   setVisible: (visible: boolean) => void;
+  balance: number;
 }) => {
-  const { visible, onSend, setVisible } = props;
+  const { visible, onSend, setVisible, balance } = props;
+  console.info("balancebalance", balance);
 
   const [form] = Form.useForm();
 
@@ -63,9 +65,9 @@ const Index = (props: {
               }) as string,
             },
             {
-              required: true,
               type: "number",
               validator: (r, v, c) => {
+                // if (!isNaN(v) && Number(v) > 0 && balance >= Number(v)) {
                 if (!isNaN(v) && Number(v) > 0) {
                   c();
                 }

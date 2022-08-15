@@ -67,6 +67,7 @@ const Index = () => {
   const approvalDisagree = useIntl().formatHTMLMessage({
     id: "approval.disagree",
   });
+  const createYourOwn = useIntl().formatHTMLMessage({ id: "createYourOwn" });
   const columns: any = [
     {
       title: "Key",
@@ -107,7 +108,7 @@ const Index = () => {
       title: useIntl().formatHTMLMessage({ id: "g.action" }),
       render: (r: any, i: number) =>
         r.Account === account ? (
-          <span>自己创建</span>
+          <span>{createYourOwn}</span>
         ) : (
           <span>
             <Button
