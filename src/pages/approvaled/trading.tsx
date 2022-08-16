@@ -7,6 +7,7 @@ import moment from "moment";
 import web3 from "@/assets/js/web3";
 import "./style.less";
 import { cutOut } from "@/utils";
+import { chainInfo } from "@/config/chainConfig";
 
 const Index = () => {
   const { account } = useActiveWeb3React();
@@ -40,11 +41,14 @@ const Index = () => {
   }, []);
 
   const send = async (r: any, i: any) => {
+    const rpc =
+      chainInfo[JSON.parse(r.MsgContext[0]).chainId.replace("0x", "")].nodeRpc;
+    debugger;
     console.info("i", i);
     console.info("r", r);
-    web3.setProvider(
-      "https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"
-    );
+    web3.setProvider(rpc);
+    // web3.setProvider("https://rinkeby.infura.io/v3/");
+    // "https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"
     const Rsv = r.Rsv[0];
     const v = Number(4) * 2 + 35 + Number(Rsv.substr(128, 2));
     let rawTx = {
@@ -75,6 +79,7 @@ const Index = () => {
       r: "0x" + Rsv.substr(0, 64),
       s: "0x" + Rsv.substr(64, 64),
     });
+    debugger;
     if (accountsRecover) {
       console.info("accountsRecover", accountsRecover);
     }

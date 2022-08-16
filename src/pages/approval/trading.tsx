@@ -131,6 +131,7 @@ const Index = () => {
       dataSource={tradingList}
       loading={tradingListLoading}
       pagination={false}
+      rowKey="Key"
     />
   );
 };

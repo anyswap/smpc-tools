@@ -149,7 +149,7 @@ export function useSendTxDemo(): {
     if (!account || !library || !signMessage) return {};
     return {
       execute: async () => {
-        web3.setProvider("https://bsc-dataseed1.defibit.io/");
+        // web3.setProvider("https://bsc-dataseed1.defibit.io/");
         const data = {
           from: account,
           to: "0xC03033d8b833fF7ca08BF2A58C9BC9d711257249",
@@ -404,6 +404,7 @@ function useMsgData(): {
         web3.setProvider(
           "https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"
         );
+        // web3.setProvider("https://rinkeby.infura.io/v3/");
         const data: any = {
           from: address,
           // to: "0xC03033d8b833fF7ca08BF2A58C9BC9d711257249",
@@ -455,9 +456,9 @@ export function useGetSign(rpc: string | undefined): {
     return {
       execute: async (r: GetSignType, to: string, value: string) => {
         const { GroupID, PubKey, ThresHold, address } = r;
-        web3.setProvider(rpc);
         const MsgContext = await execute(to, value, address);
         const Nonce = await getSignNonce(account, rpc);
+        web3.setProvider(rpc);
         // to 0xC03033d8b833fF7ca08BF2A58C9BC9d711257249
         const data = {
           TxType: "SIGN",

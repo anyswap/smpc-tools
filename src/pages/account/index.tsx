@@ -7,9 +7,10 @@ import web3 from "@/assets/js/web3";
 import { useActiveWeb3React } from "@/hooks";
 import { useGetSign } from "@/hooks/useSigns";
 import moment from "moment";
-import { cutOut } from "@/utils";
+import { cutOut, getWeb3, formatUnits } from "@/utils";
 import Send from "./component/send";
 import { ethers } from "ethers";
+import { chainInfo } from "@/config/chainConfig";
 // const keccak256 = require("js-sha3").keccak256;
 
 const Index = () => {
@@ -31,7 +32,7 @@ const Index = () => {
   );
 
   const { execute } = useGetSign(rpc);
-  const { account } = useActiveWeb3React();
+  const { account, library, chainId } = useActiveWeb3React();
 
   const [data, setData] = useState([]);
   const [active, setActive] = useState<any>({});
@@ -76,7 +77,9 @@ const Index = () => {
       title: intl_balance,
       dataIndex: "PubKey",
       width: "10%",
-      render: (t: string) => JSON.parse(details)[t]?.balance + "eth",
+      render: (t: string) =>
+        formatUnits(JSON.parse(details)[t]?.balance || 0, 18) +
+        chainInfo[chainId].symbol,
     },
     {
       title: intl_createDate,
@@ -119,8 +122,13 @@ const Index = () => {
 
   const detailsObj: any = {};
   const getBalance = async (address: string, PubKey: string) => {
-    web3.setProvider("https://api.mycryptoapi.com/eth");
-    const res = await web3.eth.getBalance(address);
+    console.info("librarylibrary.providers", library.provider);
+    // web3.setProvider("https://api.mycryptoapi.com/eth");
+
+    const provider = library ? library?.provider : "";
+    const newWeb3 = getWeb3("", provider);
+
+    const res = await newWeb3.eth.getBalance(address);
     detailsObj[PubKey] = {
       balance: res,
     };
@@ -138,7 +146,7 @@ const Index = () => {
       getBalance(address, item.PubKey);
     });
     setData(Account);
-  }, [GAccount]);
+  }, [GAccount, library]);
 
   const onSend = async (to: string, value: string) => {
     if (!execute) return;

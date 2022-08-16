@@ -1,5 +1,9 @@
 import { getAddress } from "@ethersproject/address";
 import { message } from "antd";
+import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
+import { formatFixed, parseFixed } from "@ethersproject/bignumber";
+
+const names = ["wei", "kwei", "mwei", "gwei", "szabo", "finney", "ether"];
 
 export const reducer = (state = {}, action: any) => {
   return { ...state, ...action };
@@ -39,3 +43,32 @@ export const copyTxt = (cont) => {
   _input = null;
   id = null;
 };
+
+const Web3 = require("web3");
+
+export function getWeb3(rpc: any, provider: any) {
+  rpc = rpc ? rpc : "";
+  if (provider) {
+    // console.log(library)
+    const wFn = new Web3(provider);
+    // console.log(wFn)
+    return wFn;
+  } else {
+    // console.log(rpc)
+    const wFn = new Web3(new Web3.providers.HttpProvider(rpc));
+    return wFn;
+  }
+}
+
+export function formatUnits(
+  value: BigNumberish,
+  unitName?: string | BigNumberish
+): string {
+  if (typeof unitName === "string") {
+    const index = names.indexOf(unitName);
+    if (index !== -1) {
+      unitName = 3 * index;
+    }
+  }
+  return formatFixed(value, unitName != null ? unitName : 18);
+}
