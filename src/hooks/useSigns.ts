@@ -1,5 +1,6 @@
 import { useActiveWeb3React } from "@/hooks";
 import { useCallback, useMemo } from "react";
+const BigNumber = require("bignumber.js");
 
 import { ethers } from "ethers";
 
@@ -11,6 +12,7 @@ import web3 from "@/assets/js/web3";
 import Tx from "ethereumjs-tx";
 import { message } from "antd";
 import { useModel } from "umi";
+import { chainInfo } from "@/config/chainConfig";
 // console.log(Tx)
 export enum WrapType {
   NOT_APPLICABLE,
@@ -19,7 +21,7 @@ export enum WrapType {
   NOCONNECT,
 }
 
-const CHAINID = "4";
+// const CHAINID = "4";
 // const CHAINID = "30400";
 
 const NOCONNECT = { wrapType: WrapType.NOCONNECT };
@@ -98,7 +100,8 @@ const getSignNonce = async (account: any, rpc: any) => {
 };
 
 export function useSign(): any {
-  const { account, library } = useActiveWeb3React();
+  const { account, library, chainId } = useActiveWeb3React();
+
   const signMessage = useCallback(
     (hash: any) => {
       return new Promise((resolve) => {
@@ -113,7 +116,7 @@ export function useSign(): any {
               // return result;
               const rsv = res.indexOf("0x") === 0 ? res.replace("0x", "") : res;
               const v0 = parseInt("0x" + rsv.substr(128));
-              const v = Number(CHAINID) * 2 + 35 + Number(v0) - 27;
+              const v = Number(chainId) * 2 + 35 + Number(v0) - 27;
               const result = {
                 rsv: res,
                 r: rsv.substr(0, 64),
@@ -395,34 +398,38 @@ function useMsgData(): {
     | ((to: string, value: string, address: string) => Promise<any>);
 } {
   // web3.setProvider('https://bsc-dataseed1.defibit.io/')
-  const { account, library } = useActiveWeb3React();
+  const { account, library, chainId } = useActiveWeb3React();
   const { signMessage } = useSign();
   return useMemo(() => {
     if (!account || !library) return {};
     return {
       execute: async (to: string, value: string, address: string) => {
-        web3.setProvider(
-          "https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"
-        );
         // web3.setProvider("https://rinkeby.infura.io/v3/");
+        debugger;
         const data: any = {
           from: address,
           // to: "0xC03033d8b833fF7ca08BF2A58C9BC9d711257249",
           to,
           // chainId: web3.utils.toHex(CHAINID),
-          chainId: web3.utils.toHex(4), //eth测试风
+          chainId: web3.utils.toHex(chainId),
           // chainId: web3.utils.toHex(56), eth正式
           // value: "1",
-          value,
+          // value:
+          //   "0x" +
+          //   new BigNumber(value).multipliedBy(Math.pow(10, 18)).toString(16),
+          value: web3.utils.toHex(web3.utils.toWei(value, "ether")),
           nonce: "",
           gas: "",
           gasPrice: "",
-          data: "",
+          data: "{}",
         };
-        data.nonce = await web3.eth.getTransactionCount(account);
+        console.info("chainInfochainInfo", chainInfo);
+        web3.setProvider(chainInfo[chainId].nodeRpc);
+        data.nonce = await web3.eth.getTransactionCount(address);
         data.gas = await web3.eth.estimateGas({ to: data.to });
+        data.gas = data.gas * 2;
         data.gasPrice = await web3.eth.getGasPrice();
-        data.gasPrice = Number(data.gasPrice);
+        data.gasPrice = Number(data.gasPrice) * 2;
         return data;
       },
     };
@@ -479,7 +486,6 @@ export function useGetSign(rpc: string | undefined): {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
         let rsv = await signer.signMessage(JSON.stringify(data, null, 8));
-        debugger;
         // 如果v是1b换成00 如果v是1c换成01
         rsv = rsv.slice(0, 130) + (rsv.slice(130) === "1b" ? "00" : "01");
 
@@ -530,11 +536,13 @@ type AcceptSign = {
 export function acceptSign(rpc: string): {
   execute: undefined | ((Accept: string, r: AcceptSign) => Promise<any>);
 } {
-  const { account, library } = useActiveWeb3React();
+  const { account, library, chainId } = useActiveWeb3React();
+
   const { signMessage } = useSign();
   return useMemo(() => {
     return {
       execute: async (Accept: any, r: any) => {
+        debugger;
         web3.setProvider(rpc);
         const Nonce = await getNonce(account, rpc);
         const { Key } = r;
@@ -545,18 +553,8 @@ export function acceptSign(rpc: string): {
           Key,
           Accept,
           TimeStamp: Date.now().toString(),
-          MsgHash: [toTxnHash({})],
-          MsgContext: [
-            JSON.stringify({
-              chainId: web3.utils.toHex(CHAINID),
-              gas: "",
-              gasPrice: "",
-              nonce: "",
-              to: "",
-              value: "0",
-              data: {},
-            }),
-          ],
+          MsgHash: r.MsgHash,
+          MsgContext: r.MsgContext,
         };
 
         const provider = new ethers.providers.Web3Provider(window.ethereum);

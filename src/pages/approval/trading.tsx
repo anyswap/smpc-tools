@@ -69,15 +69,15 @@ const Index = () => {
   });
   const createYourOwn = useIntl().formatHTMLMessage({ id: "createYourOwn" });
   const columns: any = [
+    // {
+    //   title: "Key",
+    //   dataIndex: "Key",
+    //   render: (t: string) => (
+    //     <a onClick={() => copyTxt(t)}>{cutOut(t, 6, 8)}</a>
+    //   ),
+    // },
     {
-      title: "Key",
-      dataIndex: "Key",
-      render: (t: string) => (
-        <a onClick={() => copyTxt(t)}>{cutOut(t, 6, 8)}</a>
-      ),
-    },
-    {
-      title: "Account",
+      title: "Initiator",
       dataIndex: "Account",
       render: (t: string) => cutOut(t, 6, 8),
     },

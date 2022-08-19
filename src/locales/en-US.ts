@@ -41,4 +41,5 @@ export default {
   initiator: "Initiator",
   sendToEth: "Send to Ethereum",
   createYourOwn: "Create your own",
+  transactionHash: "transactionHash",
 };

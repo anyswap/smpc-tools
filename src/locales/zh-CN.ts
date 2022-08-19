@@ -41,4 +41,5 @@ export default {
   initiator: "发起者",
   sendToEth: "发到链上",
   createYourOwn: "自己创建",
+  transactionHash: "交易哈希",
 };

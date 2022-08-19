@@ -16,6 +16,9 @@ const Index = () => {
   );
   const [activeKey, setActiveKey] = useState("0");
   console.info("process.env.NODE_ENV", process.env.NODE_ENV);
+  useEffect(() => {
+    if (activeKey === "1") getRsv();
+  }, [activeKey]);
   return (
     <Tabs
       defaultActiveKey={"0"}

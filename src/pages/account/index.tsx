@@ -41,6 +41,8 @@ const Index = () => {
   const [details, setDetails] = useState<any>("{}");
 
   useEffect(() => {
+    console.info("chainInfo", chainInfo);
+    console.info("chainId", chainId);
     localStorage.setItem("pollingPubKeyInfo", "0");
     globalDispatch({
       pollingPubKeyInfo: 0,
@@ -97,7 +99,7 @@ const Index = () => {
       render: (r: any) => (
         <Button
           type="link"
-          // disabled={!Number(JSON.parse(details)[r["PubKey"]]?.balance)}
+          disabled={!Number(JSON.parse(details)[r["PubKey"]]?.balance)}
           onClick={
             () => {
               setActive({

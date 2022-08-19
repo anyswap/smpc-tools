@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, message, Table, Tag } from "antd";
+import { Button, message, Table, Tag, Spin, Modal } from "antd";
 import { useActiveWeb3React } from "@/hooks";
 import { useModel, history, useIntl } from "umi";
 import Tx from "ethereumjs-tx";
@@ -33,24 +33,35 @@ const Index = () => {
     JSON.parse(localStorage.getItem("sendApprovaled") || "[]")
   );
 
+  const [spinning, setSpinning] = useState(false);
+
   useEffect(() => {
     localStorage.setItem("pollingRsvInfo", "0");
     globalDispatch({
       pollingRsvInfo: 0,
     });
   }, []);
-
+  const sendToEth = useIntl().formatHTMLMessage({ id: "sendToEth" });
+  const operationIsSuccessful = useIntl().formatHTMLMessage({
+    id: "operationIsSuccessful",
+  });
+  const transactionHash = useIntl().formatHTMLMessage({
+    id: "transactionHash",
+  });
   const send = async (r: any, i: any) => {
+    setSpinning(true);
     const rpc =
       chainInfo[JSON.parse(r.MsgContext[0]).chainId.replace("0x", "")].nodeRpc;
-    debugger;
-    console.info("i", i);
+    console.info(" rpc", rpc);
     console.info("r", r);
     web3.setProvider(rpc);
     // web3.setProvider("https://rinkeby.infura.io/v3/");
     // "https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"
     const Rsv = r.Rsv[0];
-    const v = Number(4) * 2 + 35 + Number(Rsv.substr(128, 2));
+    const v =
+      Number(JSON.parse(r.MsgContext[0]).chainId.replace("0x", "")) * 2 +
+      35 +
+      Number(Rsv.substr(128, 2));
     let rawTx = {
       from: JSON.parse(r.MsgContext[0]).from,
       to: JSON.parse(r.MsgContext[0]).to,
@@ -58,7 +69,7 @@ const Index = () => {
       gas: JSON.parse(r.MsgContext[0]).gas,
       gasPrice: JSON.parse(r.MsgContext[0]).gasPrice,
       nonce: JSON.parse(r.MsgContext[0]).nonce,
-      data: "",
+      data: JSON.parse(r.MsgContext[0]).data,
       // r: "0x" + Rsv.substr(0, 64),
       // s: "0x" + Rsv.substr(64, 64),
       // v: web3.utils.toHex(v),
@@ -67,10 +78,8 @@ const Index = () => {
     let tx = new Tx(rawTx);
     let hash = Buffer.from(tx.hash(false)).toString("hex");
     hash = hash.indexOf("0x") === 0 ? hash : "0x" + hash;
-    debugger;
     if (hash !== r.MsgHash[0]) {
       message.error("Error: hash");
-      debugger;
       return;
     }
     let accountsRecover = web3.eth.accounts.recover({
@@ -79,7 +88,6 @@ const Index = () => {
       r: "0x" + Rsv.substr(0, 64),
       s: "0x" + Rsv.substr(64, 64),
     });
-    debugger;
     if (accountsRecover) {
       console.info("accountsRecover", accountsRecover);
     }
@@ -88,29 +96,94 @@ const Index = () => {
     tx.v = web3.utils.toHex(v);
     let signTx = tx.serialize().toString("hex");
     signTx = signTx.indexOf("0x") === 0 ? signTx : "0x" + signTx;
+
+    const hash2 = Buffer.from(tx.hash(false)).toString("hex");
+    console.info("hash2", hash2);
+    // web3.eth
+    //   .sendSignedTransaction(signTx)
+    //   .on("receipt", (receipt) => {
+    //     debugger;
+    //     console.log(receipt);
+    //     console.log(receipt.transactionHash);
+    //   })
+    //   .on("error", (e) => {
+    //     debugger;
+    //     console.error(e);
+    //   });
+
+    // return;
+    // console.info("res1111111", res);
+    // debugger;
+    // const rrr = await web3.eth.sendSignedTransaction(signTx);
+    // debugger;
+    // console.info("rrrr", rrr);
+
     web3.eth
       .sendSignedTransaction(signTx)
-      .then((res: any) => {
-        message.success("Send success");
-        const newData = GsendApprovaled.filter(
-          (it: any, index: number) => index !== i
-        );
+      .on("transactionHash", function (transactionHash: any) {
+        console.log("transactionHash");
+        console.log(transactionHash);
+        message.success(operationIsSuccessful);
+        setSpinning(false);
+        const newData = GsendApprovaled.map((item: any, index: number) => ({
+          ...item,
+          transactionHash: index === i ? transactionHash : null,
+        }));
         setData(newData);
         globalDispatch({
           sendApprovaled: newData,
         });
         localStorage.setItem("sendApprovaled", JSON.stringify(newData));
-      })
-      .catch((e: any) => {
-        message.error(e.message);
       });
+    // .on("receipt", function (receipt) {
+    //   debugger;
+    //   console.log("receipt");
+    //   console.log(receipt);
+    // });
+
+    debugger;
+    // web3.eth
+    //   .sendSignedTransaction(signTx)
+    //   .then((res) => {
+    //     debugger;
+    //     console.info("res", res);
+    //   })
+    //   .catch((e: any) => {
+    //     debugger;
+    //     message.error(e.message);
+    //   });
+    // web3.eth.sendSignedTransaction(signTx).on("receipt", (e) => {
+    //   console.info("e", e);
+    //   debugger;
+    // });
+    //     .then((res: any) => {
+    //       debugger;
+    //       const { transactionHash } = res.result;
+    //       message.success("Send success");
+    //       const newData = GsendApprovaled.map((item: any, index: number) => ({
+    //         ...item,
+    //         transactionHash: index === i ? transactionHash : null,
+    //       }));
+    //       // const newData = GsendApprovaled.filter(
+    //       //   (it: any, index: number) => index !== i
+    //       // );
+    //       setData(newData);
+    //       globalDispatch({
+    //         sendApprovaled: newData,
+    //       });
+    //       localStorage.setItem("sendApprovaled", JSON.stringify(newData));
+    //     })
+    //     .catch((e: any) => {
+    //       debugger;
+    //       message.error(e.message);
+    //     });
   };
-  const sendToEth = useIntl().formatHTMLMessage({ id: "sendToEth" });
+
   const columns = [
     {
       title: "From",
-      dataIndex: "From",
-      render: (t: any) => cutOut(t, 6, 4),
+      dataIndex: "MsgContext",
+      render: (t: any) => cutOut(JSON.parse(t).from, 6, 4),
     },
     {
       title: "To",
@@ -120,7 +193,14 @@ const Index = () => {
     {
       title: "Value",
       dataIndex: "MsgContext",
-      render: (t: any) => JSON.parse(t).value,
+      render: (t: any, r: any) => {
+        const value = JSON.parse(t).value / Math.pow(10, 18);
+        return (
+          value +
+          chainInfo[JSON.parse(r.MsgContext[0]).chainId.replace("0x", "")]
+            .symbol
+        );
+      },
     },
     {
       title: "Status",
@@ -154,10 +234,22 @@ const Index = () => {
       // render: (t) => action[t],
       dataIndex: "Status",
       render: (t: any, r: any, i: any) => {
-        return t === "Success" ? (
-          <a onClick={() => send(r, i)}>{sendToEth}</a>
-        ) : (
-          "--"
+        if (t !== "Success") return "--";
+        if (!r.transactionHash) {
+          return <a onClick={() => send(r, i)}>{sendToEth}</a>;
+        }
+        return (
+          <Button
+            onClick={() =>
+              Modal.info({
+                title: "Transaction hash",
+                icon: null,
+                content: r.transactionHash,
+              })
+            }
+          >
+            {transactionHash}
+          </Button>
         );
       },
     },
@@ -195,25 +287,27 @@ const Index = () => {
   // }, []);
 
   return (
-    <div
-      className="approval"
-      onMouseMove={() => {
-        if (pollingRsvInfo) {
-          globalDispatch({
-            pollingRsvInfo: 0,
-          });
-          localStorage.setItem("pollingPubKeyInfo", "0");
-        }
-      }}
-    >
-      {/* <Button onClick={getApproveList}>get</Button>{" "} */}
-      <Table
-        columns={columns}
-        rowKey="PubKey"
-        dataSource={GsendApprovaled}
-        pagination={false}
-      />
-    </div>
+    <Spin tip="Loading..." spinning={spinning}>
+      <div
+        className="approval"
+        onMouseMove={() => {
+          if (pollingRsvInfo) {
+            globalDispatch({
+              pollingRsvInfo: 0,
+            });
+            localStorage.setItem("pollingPubKeyInfo", "0");
+          }
+        }}
+      >
+        {/* <Button onClick={getApproveList}>get</Button>{" "} */}
+        <Table
+          columns={columns}
+          rowKey="KeyID"
+          dataSource={GsendApprovaled}
+          pagination={false}
+        />
+      </div>
+    </Spin>
   );
 };
 

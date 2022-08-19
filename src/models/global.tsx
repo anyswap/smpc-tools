@@ -363,7 +363,10 @@ export default function Index() {
         const result = JSON.parse(item.result.Data.result);
         if (["Success", "Failure", "Timeout"].includes(result.Status)) {
           console.info("result.Status");
-          const newSendApprovaled = [result, ...GsendApprovaled];
+          const newSendApprovaled = [
+            result,
+            ...GsendApprovaled.filter((item) => item.KeyID !== result.KeyID),
+          ];
           dispatch({
             sendApprovaled: newSendApprovaled,
           });
@@ -385,9 +388,9 @@ export default function Index() {
     });
   };
 
-  useEffect(() => {
-    getRsv();
-  }, []);
+  // useEffect(() => {
+  //   getRsv();
+  // }, []);
 
   return { ...state, globalDispatch: dispatch, getRsv };
 }

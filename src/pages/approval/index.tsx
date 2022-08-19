@@ -59,7 +59,7 @@ const Index = () => {
 
   const columns: any = [
     {
-      title: "Account",
+      title: "Initiator",
       dataIndex: "Account",
       render: (t: string) => cutOut(t, 6, 4),
     },

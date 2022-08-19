@@ -78,8 +78,7 @@ const Index = (props: any) => {
   // }, []);
 
   useEffect(() => {
-    console.info("444account", account);
-    if (!account) {
+    if (!account || !library) {
       history.push("/");
       return;
     }
