@@ -210,9 +210,19 @@ const Index = () => {
           <div>
             {t}
             {r.Error && <p>Reason: {r.Error}</p>}
+            {r.AllReply.map((item: any) => (
+              <div>
+                {item.Approver}:{item.Status}
+              </div>
+            ))}
           </div>
         );
       },
+    },
+    {
+      title: "Nonce",
+      dataIndex: "MsgContext",
+      render: (t) => JSON.parse(t[0]).nonce,
     },
     {
       title: "GroupID",

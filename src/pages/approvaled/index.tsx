@@ -35,7 +35,7 @@ const Index = () => {
 
   const columns = [
     {
-      title: "Account",
+      title: "Initiator",
       dataIndex: "From",
       render: (t: string) => cutOut(t, 6, 4),
     },

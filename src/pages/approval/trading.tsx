@@ -86,7 +86,7 @@ const Index = () => {
       dataIndex: "KeyType",
     },
     {
-      title: "Rsv",
+      title: "RSV",
       dataIndex: "Raw",
       render: (t: string) => cutOut(JSON.parse(t).Rsv, 6, 8),
     },

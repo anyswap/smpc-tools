@@ -162,7 +162,7 @@ const Index = () => {
     <div className="create-grounp">
       <Form layout="vertical" form={form} onFinish={onFinish}>
         <div>
-          <Form.Item name="keytype" label="Mpc Type" initialValue="EC256K1">
+          <Form.Item name="keytype" label="MpcType" initialValue="EC256K1">
             <Select
               options={[
                 {

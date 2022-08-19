@@ -68,13 +68,13 @@ const Index = () => {
       dataIndex: "GroupID",
       render: (t: string) => cutOut(t, 6, 4),
     },
-    {
-      title: "Key",
-      dataIndex: "Key",
-      render: (t: string) => (
-        <a onClick={() => copyTxt(t)}>{cutOut(t, 6, 4)}</a>
-      ),
-    },
+    // {
+    //   title: "Key",
+    //   dataIndex: "Key",
+    //   render: (t: string) => (
+    //     <a onClick={() => copyTxt(t)}>{cutOut(t, 6, 4)}</a>
+    //   ),
+    // },
     {
       title: "TimeStamp",
       dataIndex: "TimeStamp",
@@ -83,10 +83,6 @@ const Index = () => {
     {
       title: createGrounpModel,
       dataIndex: "ThresHold",
-    },
-    {
-      title: "Nonce",
-      dataIndex: "Nonce",
     },
     {
       title: gAction,
