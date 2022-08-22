@@ -42,4 +42,5 @@ export default {
   sendToEth: "Send to Ethereum",
   createYourOwn: "Create your own",
   transactionHash: "transactionHash",
+  logOut: "Log Out",
 };

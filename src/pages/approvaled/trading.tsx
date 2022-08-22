@@ -255,13 +255,20 @@ const Index = () => {
         }
         return (
           <Button
-            onClick={() =>
-              Modal.info({
-                title: "Transaction hash",
-                icon: null,
-                content: r.transactionHash,
-              })
-            }
+            onClick={() => {
+              const name =
+                chainInfo[JSON.parse(r.MsgContext[0]).chainId.replace("0x", "")]
+                  .name;
+
+              window.open(
+                `https://${name}.etherscan.io/tx/${r.transactionHash}`
+              );
+              // Modal.info({
+              //   title: "Transaction hash",
+              //   icon: null,
+              //   content: r.transactionHash,
+              // })
+            }}
           >
             {transactionHash}
           </Button>

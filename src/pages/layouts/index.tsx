@@ -209,7 +209,7 @@ const Index = (props: any) => {
               <div className="flex_SB">
                 <span>{rpc}</span>
                 <Button type="link" onClick={logout}>
-                  退出
+                  {useIntl().formatHTMLMessage({ id: "logOut" })}
                 </Button>
               </div>
               <div>
