@@ -41,8 +41,6 @@ const Index = () => {
   const [details, setDetails] = useState<any>("{}");
 
   useEffect(() => {
-    console.info("chainInfo", chainInfo);
-    console.info("chainId", chainId);
     localStorage.setItem("pollingPubKeyInfo", "0");
     globalDispatch({
       pollingPubKeyInfo: 0,
@@ -80,8 +78,7 @@ const Index = () => {
       dataIndex: "PubKey",
       width: "10%",
       render: (t: string) =>
-        formatUnits(JSON.parse(details)[t]?.balance || 0, 18) +
-        chainInfo[chainId].symbol,
+        formatUnits(details[t]?.balance || 0, 18) + chainInfo[chainId].symbol,
     },
     {
       title: intl_createDate,
@@ -99,7 +96,7 @@ const Index = () => {
       render: (r: any) => (
         <Button
           type="link"
-          disabled={!Number(JSON.parse(details)[r["PubKey"]]?.balance)}
+          disabled={!Number(details[r["PubKey"]]?.balance)}
           onClick={
             () => {
               setActive({
@@ -122,32 +119,26 @@ const Index = () => {
     },
   ];
 
-  const detailsObj: any = {};
-  const getBalance = async (address: string, PubKey: string) => {
-    console.info("librarylibrary.providers", library.provider);
-    // web3.setProvider("https://api.mycryptoapi.com/eth");
-
-    const provider = library ? library?.provider : "";
-    const newWeb3 = getWeb3("", provider);
-
-    const res = await newWeb3.eth.getBalance(address);
-    detailsObj[PubKey] = {
-      balance: res,
-    };
-    if (
-      Object.entries(detailsObj).length === Object.entries(detailsObj).length
-    ) {
-      setDetails(JSON.stringify(detailsObj));
-    }
-  };
   useEffect(() => {
     const Account = GAccount.filter((item: any) => item.Status === "Success");
-    web3.setProvider("https://api.mycryptoapi.com/eth");
+    setData(Account);
+    const provider = library ? library?.provider : "";
+    const newWeb3 = getWeb3("", provider);
+    const batch = new newWeb3.BatchRequest();
     Account.forEach((item: any) => {
       const address = ethers.utils.computeAddress("0x" + item.PubKey);
-      getBalance(address, item.PubKey);
+      batch.add(newWeb3.eth.getBalance.request(address));
     });
-    setData(Account);
+    batch.requestManager.sendBatch(batch.requests, (e: any, resArr: any) => {
+      if (e) return;
+      const detailsObj: any = {};
+      resArr.forEach((item: any, i: number) => {
+        detailsObj[Account[i].PubKey] = {
+          balance: item.result,
+        };
+      });
+      setDetails(detailsObj);
+    });
   }, [GAccount, library]);
 
   const onSend = async (to: string, value: string) => {
@@ -194,7 +185,7 @@ const Index = () => {
         visible={visible}
         onSend={onSend}
         setVisible={setVisible}
-        balance={JSON.parse(details)[active["PubKey"]]?.balance}
+        balance={details[active["PubKey"]]?.balance}
       />
     </div>
   );

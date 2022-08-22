@@ -179,6 +179,11 @@ const Index = () => {
     //     });
   };
 
+  const createGrounpModel = useIntl().formatHTMLMessage({
+    id: "createGrounp.model",
+  });
+  const gAction = useIntl().formatHTMLMessage({ id: "g.action" });
+
   const columns = [
     {
       title: "From",
@@ -211,7 +216,7 @@ const Index = () => {
             {t}
             {r.Error && <p>Reason: {r.Error}</p>}
             {r.AllReply.map((item: any) => (
-              <div>
+              <div key={item.Approver}>
                 {item.Approver}:{item.Status}
               </div>
             ))}
@@ -222,7 +227,7 @@ const Index = () => {
     {
       title: "Nonce",
       dataIndex: "MsgContext",
-      render: (t) => JSON.parse(t[0]).nonce,
+      render: (t: any) => JSON.parse(t[0]).nonce,
     },
     {
       title: "GroupID",
@@ -235,12 +240,12 @@ const Index = () => {
       render: (t: string) => moment(Number(t)).format("YYYY-MM-DD HH:mm:ss"),
     },
     {
-      title: useIntl().formatHTMLMessage({ id: "createGrounp.model" }),
+      title: createGrounpModel,
       dataIndex: "ThresHold",
     },
 
     {
-      title: useIntl().formatHTMLMessage({ id: "g.action" }),
+      title: gAction,
       // render: (t) => action[t],
       dataIndex: "Status",
       render: (t: any, r: any, i: any) => {

@@ -82,7 +82,7 @@ const Index = () => {
       render: (t: string) => cutOut(t, 6, 8),
     },
     {
-      title: "KeyType",
+      title: "Mpc Type",
       dataIndex: "KeyType",
     },
     {
