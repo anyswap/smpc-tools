@@ -71,6 +71,7 @@ const Index = () => {
           signEnode: loginAccount.enode + res,
         },
       });
+      console.info("createGrounp", "createGrounp");
       history.push("/createGrounp");
     });
   };

@@ -405,7 +405,6 @@ function useMsgData(): {
     return {
       execute: async (to: string, value: string, address: string) => {
         // web3.setProvider("https://rinkeby.infura.io/v3/");
-        debugger;
         const data: any = {
           from: address,
           // to: "0xC03033d8b833fF7ca08BF2A58C9BC9d711257249",
@@ -542,7 +541,6 @@ export function acceptSign(rpc: string): {
   return useMemo(() => {
     return {
       execute: async (Accept: any, r: any) => {
-        debugger;
         web3.setProvider(rpc);
         const Nonce = await getNonce(account, rpc);
         const { Key } = r;

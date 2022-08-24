@@ -358,32 +358,66 @@ export default function Index() {
     });
     batch.requestManager.sendBatch(batch.requests, (err: any, resArr: any) => {
       if (err) return;
-      resArr.forEach((item: any, i: number) => {
-        if (item.result.Status !== "Success") return;
+      // resArr.forEach((item: any, i: number) => {
+      //   if (item.result.Status !== "Success") {
+      //     debugger;
+      //     return;
+      //   }
+      //   const result = JSON.parse(item.result.Data.result);
+      //   if (["Success", "Failure", "Timeout"].includes(result.Status)) {
+      //     console.info("result.Status");
+      //     const newSendApprovaled = [
+      //       result,
+      //       // ...GsendApprovaled.filter((item) => item.KeyID !== result.KeyID),
+      //       ...GsendApprovaled,
+      //     ];
+      //     dispatch({
+      //       sendApprovaled: newSendApprovaled,
+      //     });
+      //     localStorage.setItem(
+      //       "sendApprovaled",
+      //       JSON.stringify(newSendApprovaled)
+      //     );
+      //     pollingRsv = pollingRsv.filter(
+      //       (item: any, index: number) => item.params[0] !== result.KeyID
+      //     );
+
+      //     localStorage.setItem("pollingRsv", JSON.stringify(pollingRsv));
+      //   } else {
+      //     // alert("!!");
+      //     console.info("pendding result", result);
+      //   }
+      // });
+      const endResArr = resArr.filter((item) => {
+        if (item.result.Status !== "Success") {
+          return false;
+        }
         const result = JSON.parse(item.result.Data.result);
         if (["Success", "Failure", "Timeout"].includes(result.Status)) {
-          console.info("result.Status");
-          const newSendApprovaled = [
-            result,
-            ...GsendApprovaled.filter((item) => item.KeyID !== result.KeyID),
-          ];
-          dispatch({
-            sendApprovaled: newSendApprovaled,
-          });
-          localStorage.setItem(
-            "sendApprovaled",
-            JSON.stringify(newSendApprovaled)
-          );
-          pollingRsv = pollingRsv.filter(
-            (item: any, index: number) => i !== index
-          );
-
-          localStorage.setItem("pollingRsv", JSON.stringify(pollingRsv));
-        } else {
-          // alert("!!");
-          console.info("pendding result", result);
+          return true;
         }
       });
+
+      if (endResArr.length) {
+        const newSendApprovaled = [
+          ...endResArr.map((item) => JSON.parse(item.result.Data.result)),
+          ...GsendApprovaled,
+        ];
+        dispatch({
+          sendApprovaled: newSendApprovaled,
+        });
+        localStorage.setItem(
+          "sendApprovaled",
+          JSON.stringify(newSendApprovaled)
+        );
+        debugger;
+        pollingRsv = pollingRsv.filter((item: any, index: number) =>
+          newSendApprovaled.every((it) => it.KeyID !== item.params[0])
+        );
+
+        localStorage.setItem("pollingRsv", JSON.stringify(pollingRsv));
+      }
+
       dispatch({ getRsvSpin: false });
     });
   };

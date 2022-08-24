@@ -66,8 +66,14 @@ const Index = (props: {
             {
               required: true,
               validator: (r, v, c) => {
-                // if (!isNaN(v) && Number(v) > 0 && balance >= Number(v)) {
-                if (!isNaN(v) && Number(v) > 0) {
+                if (
+                  !isNaN(v) &&
+                  Number(v) > 0 &&
+                  balance / Math.pow(10, 18) >= Number(v)
+                ) {
+                  // if (!isNaN(v) && Number(v) > 0) {
+                  console.info("balance", balance);
+                  console.info("v", v);
                   c();
                   return;
                 }
