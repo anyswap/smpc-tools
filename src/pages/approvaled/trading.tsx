@@ -134,6 +134,10 @@ const Index = () => {
           sendApprovaled: newData,
         });
         localStorage.setItem("sendApprovaled", JSON.stringify(newData));
+      })
+      .catch((e: any) => {
+        setSpinning(false);
+        message.error(e.message);
       });
     // .on("receipt", function (receipt) {
     //   debugger;
