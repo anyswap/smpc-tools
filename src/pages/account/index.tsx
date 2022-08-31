@@ -186,6 +186,7 @@ const Index = () => {
         onSend={onSend}
         setVisible={setVisible}
         balance={details[active["PubKey"]]?.balance}
+        active={active}
       />
     </div>
   );
