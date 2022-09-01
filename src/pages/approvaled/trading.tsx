@@ -5,6 +5,7 @@ import { useModel, history, useIntl } from "umi";
 import Tx from "ethereumjs-tx";
 import moment from "moment";
 import web3 from "@/assets/js/web3";
+
 import "./style.less";
 import { cutOut } from "@/utils";
 import { chainInfo } from "@/config/chainConfig";
@@ -48,37 +49,48 @@ const Index = () => {
   const transactionHash = useIntl().formatHTMLMessage({
     id: "transactionHash",
   });
+
   const send = async (r: any, i: any) => {
     setSpinning(true);
-    const rpc =
-      chainInfo[JSON.parse(r.MsgContext[0]).chainId.replace("0x", "")].nodeRpc;
-    console.info(" rpc", rpc);
-    console.info("r", r);
-    web3.setProvider(rpc);
+    const MsgContext = JSON.parse(r.MsgContext[0]);
+    const { TokenAddress, chainId, to, value } = MsgContext;
+    console.info("chainInfo", chainInfo);
+    debugger;
+    const nodeRpc = chainInfo[web3.utils.hexToNumber(chainId)].nodeRpc;
+
+    console.info("chainId", chainId);
+    console.info("nodeRpc", nodeRpc);
+    web3.setProvider(nodeRpc);
     // web3.setProvider("https://rinkeby.infura.io/v3/");
     // "https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"
+    debugger;
     const Rsv = r.Rsv[0];
+    debugger;
     const v =
-      Number(JSON.parse(r.MsgContext[0]).chainId.replace("0x", "")) * 2 +
+      Number(web3.utils.hexToNumber(chainId)) * 2 +
       35 +
       Number(Rsv.substr(128, 2));
     let rawTx = {
-      from: JSON.parse(r.MsgContext[0]).from,
-      to: JSON.parse(r.MsgContext[0]).to,
-      value: JSON.parse(r.MsgContext[0]).value,
-      gas: JSON.parse(r.MsgContext[0]).gas,
-      gasPrice: JSON.parse(r.MsgContext[0]).gasPrice,
-      nonce: JSON.parse(r.MsgContext[0]).nonce,
-      data: JSON.parse(r.MsgContext[0]).data,
+      from: MsgContext.from,
+      to,
+      value,
+      gas: MsgContext.gas,
+      gasPrice: MsgContext.gasPrice,
+      nonce: MsgContext.nonce,
+      data: MsgContext.data,
       // r: "0x" + Rsv.substr(0, 64),
       // s: "0x" + Rsv.substr(64, 64),
       // v: web3.utils.toHex(v),
-      chainId: JSON.parse(r.MsgContext[0]).chainId,
+      chainId,
+      TokenAddress,
     };
+
     let tx = new Tx(rawTx);
     let hash = Buffer.from(tx.hash(false)).toString("hex");
     hash = hash.indexOf("0x") === 0 ? hash : "0x" + hash;
+    debugger;
     if (hash !== r.MsgHash[0]) {
+      debugger;
       message.error("Error: hash");
       return;
     }
@@ -97,8 +109,7 @@ const Index = () => {
     let signTx = tx.serialize().toString("hex");
     signTx = signTx.indexOf("0x") === 0 ? signTx : "0x" + signTx;
 
-    const hash2 = Buffer.from(tx.hash(false)).toString("hex");
-    console.info("hash2", hash2);
+    // const hash2 = Buffer.from(tx.hash(false)).toString("hex");
     // web3.eth
     //   .sendSignedTransaction(signTx)
     //   .on("receipt", (receipt) => {
@@ -204,10 +215,9 @@ const Index = () => {
       dataIndex: "MsgContext",
       render: (t: any, r: any) => {
         const value = JSON.parse(t).value / Math.pow(10, 18);
+        console.info();
         return (
-          value +
-          chainInfo[JSON.parse(r.MsgContext[0]).chainId.replace("0x", "")]
-            .symbol
+          value + chainInfo[web3.utils.hexToNumber(r.MsgContext[0].chainId)]
         );
       },
     },
@@ -261,8 +271,9 @@ const Index = () => {
           <Button
             onClick={() => {
               const name =
-                chainInfo[JSON.parse(r.MsgContext[0]).chainId.replace("0x", "")]
-                  .name;
+                chainInfo[
+                  web3.utils.hexToNumber(JSON.parse(r.MsgContext[0]).chainId)
+                ].name;
 
               window.open(
                 `https://${name}.etherscan.io/tx/${r.transactionHash}`

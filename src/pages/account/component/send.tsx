@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Modal, Form, Input, Tabs, message } from "antd";
 import { useIntl } from "umi";
 import { abi } from "@/assets/js/web3";
-// import { useActiveWeb3React } from "@/hooks";
+import { useActiveWeb3React } from "@/hooks";
+import { chainInfo } from "@/config/chainConfig";
 const Web3 = require("web3");
 
 type Iprops = {
@@ -21,31 +22,38 @@ type FormParams = {
 
 const Index: React.FC<Iprops> = (props) => {
   const { visible, onSend, setVisible, balance, active } = props;
+  const { chainId }: any = useActiveWeb3React();
   const { address } = active;
 
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("Coin");
 
   const tokenFinish = (v: FormParams) => {
-    debugger;
     let web3;
     let currentProvider = new Web3.providers.HttpProvider(
-      "https://bsc-dataseed1.defibit.io/"
+      chainInfo[chainId].nodeRpc
     );
     try {
       web3 = new Web3(currentProvider);
     } catch (error) {
       web3 = new Web3();
     }
-
     const contract = new web3.eth.Contract(abi);
-    contract.options.address = "0x55d398326f99059ff775485246999027b3197955";
-    contract.methods.balanceOf(address).call((e: any, r: any) => {
+    contract.options.address = v.TokenAddress;
+    contract.methods.balanceOf(address).call(async (e: any, r: any) => {
       if (e) return;
-      if (!Number(r)) {
-        message.error(`balance: ${r}`);
-      }
+      const balance = Math.pow(10, 18) / Number(r);
+      // if (!Number(r)) {
+      //   message.error(`balance: ${r}`);
+      //   return;
+      // }
       debugger;
+      if (Number(v.value) > balance) {
+        message.error(`Not sufficient funds, Balance: ${balance}`);
+        return;
+      }
+      const res = await onSend(v.to, v.value, v.TokenAddress);
+      if (res) setVisible(false);
     });
   };
 
@@ -61,6 +69,7 @@ const Index: React.FC<Iprops> = (props) => {
   const gRequired = useIntl().formatHTMLMessage({
     id: "g.required",
   });
+  const gPlaceholder1 = useIntl().formatHTMLMessage({ id: "g.placeholder1" });
 
   useEffect(() => {
     if (!visible) form.resetFields();
@@ -93,11 +102,7 @@ const Index: React.FC<Iprops> = (props) => {
             name="TokenAddress"
             rules={[{ required: true }]}
           >
-            <Input
-              placeholder={
-                useIntl().formatHTMLMessage({ id: "g.placeholder1" }) as string
-              }
-            />
+            <Input placeholder={gPlaceholder1 as string} />
           </Form.Item>
         )}
         <Form.Item
@@ -106,17 +111,11 @@ const Index: React.FC<Iprops> = (props) => {
           rules={[
             {
               required: true,
-              message: useIntl().formatHTMLMessage({
-                id: "g.required",
-              }) as string,
+              message: gRequired as string,
             },
           ]}
         >
-          <Input
-            placeholder={
-              useIntl().formatHTMLMessage({ id: "g.placeholder1" }) as string
-            }
-          />
+          <Input placeholder={gPlaceholder1 as string} />
         </Form.Item>
 
         <Form.Item
@@ -160,11 +159,7 @@ const Index: React.FC<Iprops> = (props) => {
             },
           ]}
         >
-          <Input
-            placeholder={
-              useIntl().formatHTMLMessage({ id: "g.placeholder1" }) as string
-            }
-          />
+          <Input placeholder={gPlaceholder1 as string} />
         </Form.Item>
       </Form>
     </Modal>

@@ -32,7 +32,7 @@ const Index = () => {
   );
 
   const { execute } = useGetSign(rpc);
-  const { account, library, chainId } = useActiveWeb3React();
+  const { account, library, chainId }: any = useActiveWeb3React();
 
   const [data, setData] = useState([]);
   const [active, setActive] = useState<any>({});
@@ -141,9 +141,13 @@ const Index = () => {
     });
   }, [GAccount, library]);
 
-  const onSend = async (to: string, value: string) => {
+  const onSend = async (
+    to: string,
+    value: string,
+    TokenAddress: string | null
+  ) => {
     if (!execute) return;
-    const res = await execute(active, to, value);
+    const res = await execute(active, to, value, TokenAddress);
     if (!res) {
       message.info("no sign");
     }

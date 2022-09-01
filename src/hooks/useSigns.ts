@@ -3,8 +3,9 @@ import { useCallback, useMemo } from "react";
 const BigNumber = require("bignumber.js");
 
 import { ethers } from "ethers";
-
+import { abi } from "@/assets/js/web3";
 import web3 from "@/assets/js/web3";
+const Web3 = require("web3");
 // const Web3 = require("web3");
 // let web3Fn = new Web3(new Web3.providers.HttpProvider('http://81.69.176.223:5917'));
 
@@ -166,6 +167,7 @@ export function useSendTxDemo(): {
         };
         data.nonce = await web3.eth.getTransactionCount(account);
         data.gas = await web3.eth.estimateGas({ to: data.to });
+        data.gas = data.gas * 2;
         data.gasPrice = await web3.eth.getGasPrice();
         data.gasPrice = Number(data.gasPrice);
         console.log(data);
@@ -392,43 +394,70 @@ type GetSignType = {
   address: string;
 };
 
+const buildTxnsData = (
+  TokenAddress: string,
+  nodeRpc: string,
+  to: string,
+  value: string
+) => {
+  let newWeb3;
+  let currentProvider = new Web3.providers.HttpProvider(nodeRpc);
+  try {
+    newWeb3 = new Web3(currentProvider);
+  } catch (error) {
+    newWeb3 = new Web3();
+  }
+  const contract = new newWeb3.eth.Contract(abi);
+  contract.options.address = TokenAddress;
+  const data = contract.methods
+    .transfer(to, Number(value) * Math.pow(10, 18))
+    .encodeABI();
+  return data;
+};
+
 function useMsgData(): {
   execute?:
     | undefined
-    | ((to: string, value: string, address: string) => Promise<any>);
+    | ((
+        to: string,
+        value: string,
+        address: string,
+        TokenAddress: string | null
+      ) => Promise<any>);
 } {
   // web3.setProvider('https://bsc-dataseed1.defibit.io/')
-  const { account, library, chainId } = useActiveWeb3React();
+  const { account, library, chainId }: any = useActiveWeb3React();
   const { signMessage } = useSign();
   return useMemo(() => {
     if (!account || !library) return {};
     return {
-      execute: async (to: string, value: string, address: string) => {
+      execute: async (to, value, address, TokenAddress) => {
         // web3.setProvider("https://rinkeby.infura.io/v3/");
+
+        const nodeRpc = chainInfo[chainId].nodeRpc;
+        web3.setProvider(nodeRpc);
         const data: any = {
           from: address,
-          // to: "0xC03033d8b833fF7ca08BF2A58C9BC9d711257249",
-          to,
-          // chainId: web3.utils.toHex(CHAINID),
+          to: TokenAddress ? TokenAddress : to,
           chainId: web3.utils.toHex(chainId),
-          // chainId: web3.utils.toHex(56), eth正式
-          // value: "1",
-          // value:
-          //   "0x" +
-          //   new BigNumber(value).multipliedBy(Math.pow(10, 18)).toString(16),
-          value: web3.utils.toHex(web3.utils.toWei(value, "ether")),
+          value: TokenAddress
+            ? "0x0"
+            : web3.utils.toHex(web3.utils.toWei(value, "ether")),
           nonce: "",
           gas: "",
           gasPrice: "",
-          data: "{}",
+          data: TokenAddress
+            ? buildTxnsData(TokenAddress, nodeRpc, to, value)
+            : "{}",
         };
         console.info("chainInfochainInfo", chainInfo);
-        web3.setProvider(chainInfo[chainId].nodeRpc);
+        console.info("chainInfo[chainId].nodeRpc", chainInfo[chainId].nodeRpc);
+        web3.setProvider(nodeRpc);
         data.nonce = await web3.eth.getTransactionCount(address);
-        data.gas = await web3.eth.estimateGas({ to: data.to });
-        data.gas = data.gas * 2;
+        data.gas = await web3.eth.estimateGas(data);
+        // data.gas = 100000;
         data.gasPrice = await web3.eth.getGasPrice();
-        data.gasPrice = Number(data.gasPrice) * 2;
+        data.gasPrice = Number(data.gasPrice);
         return data;
       },
     };
@@ -445,7 +474,12 @@ const toTxnHash = (data: any) => {
 export function useGetSign(rpc: string | undefined): {
   execute?:
     | undefined
-    | ((r: GetSignType, to: string, value: string) => Promise<any>);
+    | ((
+        r: GetSignType,
+        to: string,
+        value: string,
+        TokenAddress: string | null
+      ) => Promise<any>);
 } {
   const { globalDispatch, pollingRsv } = useModel(
     "global",
@@ -460,9 +494,9 @@ export function useGetSign(rpc: string | undefined): {
   return useMemo(() => {
     if (!account || !library || !execute) return {};
     return {
-      execute: async (r: GetSignType, to: string, value: string) => {
+      execute: async (r, to, value, TokenAddress) => {
         const { GroupID, PubKey, ThresHold, address } = r;
-        const MsgContext = await execute(to, value, address);
+        const MsgContext = await execute(to, value, address, TokenAddress);
         const Nonce = await getSignNonce(account, rpc);
         web3.setProvider(rpc);
         // to 0xC03033d8b833fF7ca08BF2A58C9BC9d711257249
@@ -481,7 +515,8 @@ export function useGetSign(rpc: string | undefined): {
           AcceptTimeOut: "604800",
           TimeStamp: Date.now().toString(),
         };
-
+        debugger;
+        web3.setProvider(rpc);
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
         let rsv = await signer.signMessage(JSON.stringify(data, null, 8));
