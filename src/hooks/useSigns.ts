@@ -5,6 +5,7 @@ const BigNumber = require("bignumber.js");
 import { ethers } from "ethers";
 import { abi } from "@/assets/js/web3";
 import web3 from "@/assets/js/web3";
+
 const Web3 = require("web3");
 // const Web3 = require("web3");
 // let web3Fn = new Web3(new Web3.providers.HttpProvider('http://81.69.176.223:5917'));
@@ -398,7 +399,8 @@ const buildTxnsData = (
   TokenAddress: string,
   nodeRpc: string,
   to: string,
-  value: string
+  value: string,
+  chainId: string
 ) => {
   let newWeb3;
   let currentProvider = new Web3.providers.HttpProvider(nodeRpc);
@@ -409,9 +411,14 @@ const buildTxnsData = (
   }
   const contract = new newWeb3.eth.Contract(abi);
   contract.options.address = TokenAddress;
-  const data = contract.methods
-    .transfer(to, Number(value) * Math.pow(10, 18))
-    .encodeABI();
+  debugger;
+  const chainDetial = chainInfo[web3.utils.hexToNumber(chainId)];
+  const valueBigNumber = ethers.utils.parseUnits(
+    value,
+    chainDetial.decimals || "18"
+  );
+  debugger;
+  const data = contract.methods.transfer(to, valueBigNumber).encodeABI();
   return data;
 };
 
@@ -433,7 +440,10 @@ function useMsgData(): {
     return {
       execute: async (to, value, address, TokenAddress) => {
         // web3.setProvider("https://rinkeby.infura.io/v3/");
-
+        console.info("chainId", chainId);
+        console.info("chainInfo", chainInfo);
+        const aa = web3.utils.hexToNumber(chainId);
+        debugger;
         const nodeRpc = chainInfo[chainId].nodeRpc;
         web3.setProvider(nodeRpc);
         const data: any = {
@@ -447,7 +457,7 @@ function useMsgData(): {
           gas: "",
           gasPrice: "",
           data: TokenAddress
-            ? buildTxnsData(TokenAddress, nodeRpc, to, value)
+            ? buildTxnsData(TokenAddress, nodeRpc, to, value, chainId)
             : "{}",
         };
         console.info("chainInfochainInfo", chainInfo);
@@ -478,7 +488,8 @@ export function useGetSign(rpc: string | undefined): {
         r: GetSignType,
         to: string,
         value: string,
-        TokenAddress: string | null
+        TokenAddress: string | null,
+        symbol: string | null
       ) => Promise<any>);
 } {
   const { globalDispatch, pollingRsv } = useModel(
@@ -494,7 +505,7 @@ export function useGetSign(rpc: string | undefined): {
   return useMemo(() => {
     if (!account || !library || !execute) return {};
     return {
-      execute: async (r, to, value, TokenAddress) => {
+      execute: async (r, to, value, TokenAddress, symbol) => {
         const { GroupID, PubKey, ThresHold, address } = r;
         const MsgContext = await execute(to, value, address, TokenAddress);
         const Nonce = await getSignNonce(account, rpc);
@@ -506,7 +517,14 @@ export function useGetSign(rpc: string | undefined): {
           Nonce,
           PubKey,
           MsgHash: [toTxnHash(MsgContext)],
-          MsgContext: [JSON.stringify(MsgContext)],
+          MsgContext: [
+            JSON.stringify({
+              ...MsgContext,
+              originValue: value,
+              TokenAddress,
+              symbol,
+            }),
+          ],
           Keytype: "EC256K1",
           GroupID,
           ThresHold,

@@ -9,6 +9,7 @@ import web3 from "@/assets/js/web3";
 import "./style.less";
 import { cutOut } from "@/utils";
 import { chainInfo } from "@/config/chainConfig";
+import { ethers } from "ethers";
 
 const Index = () => {
   const { account } = useActiveWeb3React();
@@ -37,6 +38,9 @@ const Index = () => {
   const [spinning, setSpinning] = useState(false);
 
   useEffect(() => {
+    // let nn = web3.utils.hexToNumber("0x429d069189e0000");
+    console.info(111, ethers.utils.formatUnits("0x429d069189e0000", 18));
+    // console.info("nnnn", nn);
     localStorage.setItem("pollingRsvInfo", "0");
     globalDispatch({
       pollingRsvInfo: 0,
@@ -58,8 +62,6 @@ const Index = () => {
     debugger;
     const nodeRpc = chainInfo[web3.utils.hexToNumber(chainId)].nodeRpc;
 
-    console.info("chainId", chainId);
-    console.info("nodeRpc", nodeRpc);
     web3.setProvider(nodeRpc);
     // web3.setProvider("https://rinkeby.infura.io/v3/");
     // "https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"
@@ -146,10 +148,14 @@ const Index = () => {
         });
         localStorage.setItem("sendApprovaled", JSON.stringify(newData));
       })
-      .catch((e: any) => {
+      .on("error", (e: any) => {
         setSpinning(false);
         message.error(e.message);
       });
+    // .catch((e: any) => {
+    //   setSpinning(false);
+    //   message.error(e.message);
+    // });
     // .on("receipt", function (receipt) {
     //   debugger;
     //   console.log("receipt");
@@ -214,11 +220,19 @@ const Index = () => {
       title: "Value",
       dataIndex: "MsgContext",
       render: (t: any, r: any) => {
-        const value = JSON.parse(t).value / Math.pow(10, 18);
-        console.info();
-        return (
-          value + chainInfo[web3.utils.hexToNumber(r.MsgContext[0].chainId)]
+        const { chainId, data, originValue, symbol } = JSON.parse(
+          r.MsgContext[0]
         );
+        const chainDetial = chainInfo[web3.utils.hexToNumber(chainId)];
+        // console.info("chainInfo222", chainInfo);
+        // console.info("chainDetial222", chainDetial);
+        // // ethers.utils.formatUnits(value, chainDetial.decimals)
+        // if (data === "{}") {
+        //   return originValue + chainDetial.symbol;
+        //   // return web3.utils.hexToNumber(value);
+        // }
+
+        return originValue + (symbol ? symbol : chainDetial.symbol);
       },
     },
     {
@@ -264,20 +278,15 @@ const Index = () => {
       dataIndex: "Status",
       render: (t: any, r: any, i: any) => {
         if (t !== "Success") return "--";
+        const { chainId } = JSON.parse(r.MsgContext[0]);
+        const chainDetial = chainInfo[web3.utils.hexToNumber(chainId)];
         if (!r.transactionHash) {
           return <a onClick={() => send(r, i)}>{sendToEth}</a>;
         }
         return (
           <Button
             onClick={() => {
-              const name =
-                chainInfo[
-                  web3.utils.hexToNumber(JSON.parse(r.MsgContext[0]).chainId)
-                ].name;
-
-              window.open(
-                `https://${name}.etherscan.io/tx/${r.transactionHash}`
-              );
+              window.open(`${chainDetial.explorer}/tx/${r.transactionHash}`);
               // Modal.info({
               //   title: "Transaction hash",
               //   icon: null,

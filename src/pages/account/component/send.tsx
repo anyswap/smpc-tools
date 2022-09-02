@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Modal, Form, Input, Tabs, message } from "antd";
 import { useIntl } from "umi";
 import { abi } from "@/assets/js/web3";
+import { ethers } from "ethers";
 import { useActiveWeb3React } from "@/hooks";
 import { chainInfo } from "@/config/chainConfig";
+import web3 from "@/assets/js/web3";
 const Web3 = require("web3");
 
 type Iprops = {
@@ -28,7 +30,7 @@ const Index: React.FC<Iprops> = (props) => {
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("Coin");
 
-  const tokenFinish = (v: FormParams) => {
+  const tokenFinish = async (v: FormParams) => {
     let web3;
     let currentProvider = new Web3.providers.HttpProvider(
       chainInfo[chainId].nodeRpc
@@ -40,19 +42,17 @@ const Index: React.FC<Iprops> = (props) => {
     }
     const contract = new web3.eth.Contract(abi);
     contract.options.address = v.TokenAddress;
+
+    const symbol = await contract.methods.symbol().call();
     contract.methods.balanceOf(address).call(async (e: any, r: any) => {
       if (e) return;
-      const balance = Math.pow(10, 18) / Number(r);
-      // if (!Number(r)) {
-      //   message.error(`balance: ${r}`);
-      //   return;
-      // }
-      debugger;
-      if (Number(v.value) > balance) {
+      const chainDetial = chainInfo[web3.utils.hexToNumber(chainId)];
+      const balance = ethers.utils.formatUnits(r, chainDetial.decimals);
+      if (Number(v.value) > Number(balance)) {
         message.error(`Not sufficient funds, Balance: ${balance}`);
         return;
       }
-      const res = await onSend(v.to, v.value, v.TokenAddress);
+      const res = await onSend(v.to, v.value, v.TokenAddress, symbol);
       if (res) setVisible(false);
     });
   };
@@ -141,11 +141,13 @@ const Index: React.FC<Iprops> = (props) => {
                   c();
                   return;
                 }
-
+                const chainDetial = chainInfo[web3.utils.hexToNumber(chainId)];
                 if (
                   !isNaN(v) &&
                   Number(v) > 0 &&
-                  balance / Math.pow(10, 18) >= Number(v)
+                  ethers.utils.formatUnits(balance, chainDetial.decimals) >=
+                    Number(v)
+                  // web3.utils.fromWei(balance, "ether") >= Number(v)
                 ) {
                   // if (!isNaN(v) && Number(v) > 0) {
                   console.info("balance", balance);

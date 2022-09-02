@@ -144,10 +144,11 @@ const Index = () => {
   const onSend = async (
     to: string,
     value: string,
-    TokenAddress: string | null
+    TokenAddress: string | null,
+    symbol: string | null
   ) => {
     if (!execute) return;
-    const res = await execute(active, to, value, TokenAddress);
+    const res = await execute(active, to, value, TokenAddress, symbol);
     if (!res) {
       message.info("no sign");
     }
