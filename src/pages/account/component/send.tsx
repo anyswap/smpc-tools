@@ -46,8 +46,10 @@ const Index: React.FC<Iprops> = (props) => {
     const symbol = await contract.methods.symbol().call();
     contract.methods.balanceOf(address).call(async (e: any, r: any) => {
       if (e) return;
-      const chainDetial = chainInfo[web3.utils.hexToNumber(chainId)];
-      const balance = ethers.utils.formatUnits(r, chainDetial.decimals);
+      // const chainDetial = chainInfo[web3.utils.hexToNumber(chainId)];
+
+      const decimals = await contract.methods.decimals().call();
+      const balance = ethers.utils.formatUnits(r, decimals);
       if (Number(v.value) > Number(balance)) {
         message.error(`Not sufficient funds, Balance: ${balance}`);
         return;
@@ -144,9 +146,9 @@ const Index: React.FC<Iprops> = (props) => {
                 const chainDetial = chainInfo[web3.utils.hexToNumber(chainId)];
                 if (
                   !isNaN(v) &&
-                  Number(v) > 0 &&
-                  ethers.utils.formatUnits(balance, chainDetial.decimals) >=
-                    Number(v)
+                  Number(v) > 0
+                  // && ethers.utils.formatUnits(balance, chainDetial.decimals) >=
+                  //   Number(v)
                   // web3.utils.fromWei(balance, "ether") >= Number(v)
                 ) {
                   // if (!isNaN(v) && Number(v) > 0) {

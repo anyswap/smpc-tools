@@ -5,7 +5,8 @@ import { ChainId } from "./chainId";
 const navLang = navigator.language;
 
 export const ETH_MAIN_CHAINID = ChainId.ETH;
-export const ETH_MAINNET = "https://ethmainnet.anyswap.exchange";
+// export const ETH_MAINNET = "https://ethmainnet.anyswap.exchange";
+export const ETH_MAINNET = "https://eth-rpc.gateway.pokt.network";
 export const ETH_MAIN_EXPLORER =
   navLang === "zh-CN" ? "https://cn.etherscan.com" : "https://etherscan.io";
 

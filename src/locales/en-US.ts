@@ -39,7 +39,7 @@ export default {
   tradingApproval: "Sign Approval",
   Create_confirmation: "Create a confirmation",
   initiator: "Initiator",
-  sendToEth: "Send to Ethereum",
+  sendTo: "Send to",
   createYourOwn: "Create your own",
   transactionHash: "transactionHash",
   logOut: "Log Out",

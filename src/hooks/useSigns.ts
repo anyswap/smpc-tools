@@ -307,10 +307,8 @@ export function useReqSmpcAddress(
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
         let rsv = await signer.signMessage(JSON.stringify(data, null, 8));
-        debugger;
         // 如果v是1b换成00 如果v是1c换成01
         rsv = rsv.slice(0, 130) + (rsv.slice(130) === "1b" ? "00" : "01");
-        debugger;
         let cbData = await web3.smpc.reqKeyGen(
           rsv,
           JSON.stringify(data, null, 8)
@@ -388,6 +386,20 @@ export function useApproveReqSmpcAddress(rpc: string | undefined): {
   }, [account, library]);
 }
 
+const getName = async (TokenAddress: string) => {
+  let newWeb3;
+  let currentProvider = new Web3.providers.HttpProvider(nodeRpc);
+  try {
+    newWeb3 = new Web3(currentProvider);
+  } catch (error) {
+    newWeb3 = new Web3();
+  }
+  const contract = new newWeb3.eth.Contract(abi);
+  contract.options.address = TokenAddress;
+  const name = await contract.methods.name().call();
+  return name;
+};
+
 type GetSignType = {
   GroupID: string;
   PubKey: string;
@@ -395,7 +407,7 @@ type GetSignType = {
   address: string;
 };
 
-const buildTxnsData = (
+const buildTxnsData = async (
   TokenAddress: string,
   nodeRpc: string,
   to: string,
@@ -411,13 +423,16 @@ const buildTxnsData = (
   }
   const contract = new newWeb3.eth.Contract(abi);
   contract.options.address = TokenAddress;
-  debugger;
-  const chainDetial = chainInfo[web3.utils.hexToNumber(chainId)];
-  const valueBigNumber = ethers.utils.parseUnits(
-    value,
-    chainDetial.decimals || "18"
-  );
-  debugger;
+  // const chainDetial = chainInfo[web3.utils.hexToNumber(chainId)];
+  let decimals = "18";
+  await contract.methods.decimals().call((err: any, res: any) => {
+    if (err) return;
+    console.log("err", err, "res", res);
+    decimals = res;
+  });
+  // const decimals = await contract.methods.decimals().call()
+  // debugger
+  const valueBigNumber = ethers.utils.parseUnits(value, decimals);
   const data = contract.methods.transfer(to, valueBigNumber).encodeABI();
   return data;
 };
@@ -438,13 +453,12 @@ function useMsgData(): {
   return useMemo(() => {
     if (!account || !library) return {};
     return {
-      execute: async (to, value, address, TokenAddress) => {
+      execute: async (to, value, address, TokenAddress = "") => {
         // web3.setProvider("https://rinkeby.infura.io/v3/");
-        console.info("chainId", chainId);
-        console.info("chainInfo", chainInfo);
-        const aa = web3.utils.hexToNumber(chainId);
-        debugger;
+        // const aa = web3.utils.hexToNumber(chainId);
+        // debugger;
         const nodeRpc = chainInfo[chainId].nodeRpc;
+
         web3.setProvider(nodeRpc);
         const data: any = {
           from: address,
@@ -457,15 +471,17 @@ function useMsgData(): {
           gas: "",
           gasPrice: "",
           data: TokenAddress
-            ? buildTxnsData(TokenAddress, nodeRpc, to, value, chainId)
+            ? await buildTxnsData(TokenAddress, nodeRpc, to, value, chainId)
             : "{}",
         };
-        console.info("chainInfochainInfo", chainInfo);
-        console.info("chainInfo[chainId].nodeRpc", chainInfo[chainId].nodeRpc);
         web3.setProvider(nodeRpc);
         data.nonce = await web3.eth.getTransactionCount(address);
-        data.gas = await web3.eth.estimateGas(data);
-        // data.gas = 100000;
+        console.info(33333, web3.utils.toHex(data));
+        data.gas = await web3.eth.estimateGas({
+          to,
+          data: web3.utils.toHex(data),
+        });
+        data.gas = data.gas * 2;
         data.gasPrice = await web3.eth.getGasPrice();
         data.gasPrice = Number(data.gasPrice);
         return data;
@@ -499,7 +515,7 @@ export function useGetSign(rpc: string | undefined): {
       pollingRsv,
     })
   );
-  const { account, library } = useActiveWeb3React();
+  const { account, library, chainId } = useActiveWeb3React();
   const { signMessage } = useSign();
   const { execute } = useMsgData();
   return useMemo(() => {
@@ -511,6 +527,7 @@ export function useGetSign(rpc: string | undefined): {
         const Nonce = await getSignNonce(account, rpc);
         web3.setProvider(rpc);
         // to 0xC03033d8b833fF7ca08BF2A58C9BC9d711257249
+        const chainDetial = chainInfo[web3.utils.hexToNumber(chainId)];
         const data = {
           TxType: "SIGN",
           Account: account,
@@ -523,6 +540,7 @@ export function useGetSign(rpc: string | undefined): {
               originValue: value,
               TokenAddress,
               symbol,
+              name: chainDetial.networkName,
             }),
           ],
           Keytype: "EC256K1",
@@ -533,7 +551,6 @@ export function useGetSign(rpc: string | undefined): {
           AcceptTimeOut: "604800",
           TimeStamp: Date.now().toString(),
         };
-        debugger;
         web3.setProvider(rpc);
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();

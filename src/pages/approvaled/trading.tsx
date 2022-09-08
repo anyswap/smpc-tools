@@ -46,7 +46,7 @@ const Index = () => {
       pollingRsvInfo: 0,
     });
   }, []);
-  const sendToEth = useIntl().formatHTMLMessage({ id: "sendToEth" });
+  const sendTo = useIntl().formatHTMLMessage({ id: "sendTo" });
   const operationIsSuccessful = useIntl().formatHTMLMessage({
     id: "operationIsSuccessful",
   });
@@ -140,13 +140,26 @@ const Index = () => {
         setSpinning(false);
         const newData = GsendApprovaled.map((item: any, index: number) => ({
           ...item,
-          transactionHash: index === i ? transactionHash : null,
+          transactionHash:
+            index === i ? transactionHash : item.transactionHash || null,
         }));
         setData(newData);
         globalDispatch({
           sendApprovaled: newData,
         });
         localStorage.setItem("sendApprovaled", JSON.stringify(newData));
+      })
+      .on("receipt", function (receipt) {
+        message.info("receipt", receipt);
+      })
+      .on("confirmation", function (confirmationNumber, receipt) {
+        message.info(
+          "confirmation",
+          "confirmationNumber",
+          confirmationNumber,
+          "receipt",
+          receipt
+        );
       })
       .on("error", (e: any) => {
         setSpinning(false);
@@ -278,10 +291,10 @@ const Index = () => {
       dataIndex: "Status",
       render: (t: any, r: any, i: any) => {
         if (t !== "Success") return "--";
-        const { chainId } = JSON.parse(r.MsgContext[0]);
+        const { chainId, name } = JSON.parse(r.MsgContext[0]);
         const chainDetial = chainInfo[web3.utils.hexToNumber(chainId)];
         if (!r.transactionHash) {
-          return <a onClick={() => send(r, i)}>{sendToEth}</a>;
+          return <a onClick={() => send(r, i)}>{sendTo + " " + name}</a>;
         }
         return (
           <Button

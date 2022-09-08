@@ -39,7 +39,7 @@ export default {
   tradingApproval: "交易审批",
   Create_confirmation: "创建确认",
   initiator: "发起者",
-  sendToEth: "发到链上",
+  sendTo: "发到",
   createYourOwn: "自己创建",
   transactionHash: "交易哈希",
   logOut: "退出",
