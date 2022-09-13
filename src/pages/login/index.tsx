@@ -40,11 +40,11 @@ const Index = () => {
     });
   }, []);
 
-  // useEffect(() => {
-  //   if (!account) {
-  //     history.push("/");
-  //   }
-  // }, [account]);
+  useEffect(() => {
+    if (!account) {
+      history.push("/");
+    }
+  }, [account]);
 
   const getSignEnode = () => {
     if (!execute) return;
@@ -212,7 +212,7 @@ const Index = () => {
               {useIntl().formatHTMLMessage({ id: "g.login" })}
             </Button>
           </Form.Item>
-          <Form.Item>
+          {/* <Form.Item>
             <Button type="primary" onClick={goDemo} loading={loading}>
               Demo
             </Button>
@@ -221,7 +221,7 @@ const Index = () => {
             <Button type="primary" onClick={sendTx} loading={loading}>
               SendT x
             </Button>
-          </Form.Item>
+          </Form.Item> */}
         </Form>
       </div>
     </div>

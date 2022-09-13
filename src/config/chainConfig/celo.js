@@ -1,5 +1,5 @@
-import { formatSwapTokenList, getLocalRPC } from "./methods";
-import { tokenListUrl, VERSION, USE_VERSION } from "../constant";
+import { getLocalRPC } from "./methods";
+import { VERSION, USE_VERSION } from "../constant";
 import { ChainId } from "./chainId";
 
 export const CELO_MAIN_CHAINID = ChainId.CELO;
@@ -9,7 +9,6 @@ export const CELO_MAINNET = getLocalRPC(
 );
 export const CELO_MAIN_EXPLORER = "https://explorer.celo.org";
 
-export const tokenList = [];
 export const testTokenList = [];
 
 const symbol = "CELO";
@@ -35,15 +34,11 @@ const bridgeToken = {
 
 export default {
   [CELO_MAIN_CHAINID]: {
-    tokenListUrl: tokenListUrl + CELO_MAIN_CHAINID,
-    tokenList: formatSwapTokenList(symbol, tokenList),
     ...bridgeToken[USE_VERSION],
     swapRouterToken: "",
-    swapInitToken: "",
     multicalToken: "0xC43E77E8641d41028785779Df0F3D021bD54a1d6",
     v1FactoryToken: "",
     v2FactoryToken: "",
-    timelock: "",
     nodeRpc: CELO_MAINNET,
     nodeRpcList: [CELO_MAINNET],
     chainID: CELO_MAIN_CHAINID,
@@ -56,8 +51,5 @@ export default {
     networkName: "Celo mainnet",
     type: "main",
     label: CELO_MAIN_CHAINID,
-    isSwitch: 1,
-    suffix: "CELO",
-    anyToken: "",
   },
 };

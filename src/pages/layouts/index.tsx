@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from "react";
 import Logo from "@/pages/img/logo.png";
-import { history, useModel, getLocale, setLocale, useIntl } from "umi";
+import {
+  history,
+  useModel,
+  getLocale,
+  setLocale,
+  useIntl,
+  Redirect,
+} from "umi";
 import { useActiveWeb3React } from "@/hooks";
 // import { setLocale, getLocale, history, getAllLocales, useIntl, useModel } from 'umi';
 import { ConfigProvider, Select, Modal, Button, Badge, message } from "antd";
@@ -34,14 +41,16 @@ const Index = (props: any) => {
   const { rpc = "", signEnode = "" } = JSON.parse(
     localStorage.getItem("loginAccount") || "{}"
   );
-  const { globalDispatch, pollingRsvInfo, pollingPubKeyInfo } = useModel(
-    "global",
-    ({ globalDispatch, pollingRsvInfo, pollingPubKeyInfo }) => ({
-      globalDispatch,
-      pollingRsvInfo,
-      pollingPubKeyInfo,
-    })
-  );
+  const { globalDispatch, pollingRsvInfo, pollingPubKeyInfo, Account } =
+    useModel(
+      "global",
+      ({ globalDispatch, pollingRsvInfo, pollingPubKeyInfo, Account }) => ({
+        globalDispatch,
+        pollingRsvInfo,
+        pollingPubKeyInfo,
+        Account,
+      })
+    );
   const _local: any = {
     "zh-CN": zhCN,
     "en-US": enUS,
@@ -101,6 +110,11 @@ const Index = (props: any) => {
       tradingList,
     })
   );
+
+  useEffect(() => {
+    if (Account.length === 0) history.push("/createGrounp");
+  }, [location.href]);
+
   return (
     <ConfigProvider prefixCls={prefix}>
       <div className={prefix === "custom-default" ? "layouts" : "layouts dark"}>

@@ -1,5 +1,5 @@
-import { formatSwapTokenList, getLocalRPC } from "./methods";
-import { tokenListUrl, VERSION, USE_VERSION } from "../constant";
+import { getLocalRPC } from "./methods";
+import { VERSION, USE_VERSION } from "../constant";
 import { ChainId } from "./chainId";
 
 export const CRO_MAIN_CHAINID = ChainId.CRO;
@@ -9,9 +9,6 @@ export const CRO_MAINNET = getLocalRPC(
   "https://evm.cronos.org"
 );
 export const CRO_MAIN_EXPLORER = "https://cronoscan.com";
-
-export const tokenList = [];
-export const testTokenList = [];
 
 const symbol = "CRO";
 
@@ -36,15 +33,11 @@ const bridgeToken = {
 
 export default {
   [CRO_MAIN_CHAINID]: {
-    tokenListUrl: tokenListUrl + CRO_MAIN_CHAINID,
-    tokenList: formatSwapTokenList(symbol, tokenList),
     ...bridgeToken[USE_VERSION],
     swapRouterToken: "",
-    swapInitToken: "",
     multicalToken: "0xC43E77E8641d41028785779Df0F3D021bD54a1d6",
     v1FactoryToken: "",
     v2FactoryToken: "",
-    timelock: "",
     nodeRpc: CRO_MAINNET,
     nodeRpcList: [CRO_MAINNET, "https://evm-cronos.crypto.org"],
     chainID: CRO_MAIN_CHAINID,
@@ -57,8 +50,5 @@ export default {
     networkName: "Cronos mainnet",
     type: "main",
     label: CRO_MAIN_CHAINID,
-    isSwitch: 1,
-    suffix: "CRO",
-    anyToken: "",
   },
 };

@@ -1,5 +1,5 @@
-import { formatSwapTokenList, getLocalRPC } from "./methods";
-import { tokenListUrl, VERSION, USE_VERSION } from "../constant";
+import { getLocalRPC } from "./methods";
+import { VERSION, USE_VERSION } from "../constant";
 import { ChainId } from "./chainId";
 
 export const MOVR_MAIN_CHAINID = ChainId.MOVR;
@@ -8,9 +8,6 @@ export const MOVR_MAINNET = getLocalRPC(
   "https://rpc.moonriver.moonbeam.network"
 );
 export const MOVR_MAIN_EXPLORER = "https://moonriver.moonscan.io";
-
-export const tokenList = [];
-export const testTokenList = [];
 
 const symbol = "MOVR";
 
@@ -45,16 +42,11 @@ const bridgeToken = {
 
 export default {
   [MOVR_MAIN_CHAINID]: {
-    tokenListUrl: tokenListUrl + MOVR_MAIN_CHAINID,
-    tokenList: formatSwapTokenList(symbol, tokenList),
     ...bridgeToken[USE_VERSION],
     swapRouterToken: "",
-    swapInitToken: "",
-    // multicalToken: '0x2c78f1b70ccf63cdee49f9233e9faa99d43aa07e',
     multicalToken: "0x270f2F35bED92B7A59eA5F08F6B3fd34c8D9D9b5",
     v1FactoryToken: "",
     v2FactoryToken: "",
-    timelock: "",
     nodeRpc: MOVR_MAINNET,
     nodeRpcList: [MOVR_MAINNET],
     chainID: MOVR_MAIN_CHAINID,
@@ -67,8 +59,5 @@ export default {
     networkName: "Moonriver mainnet",
     type: "main",
     label: MOVR_MAIN_CHAINID,
-    isSwitch: 1,
-    suffix: "MOVR",
-    anyToken: "",
   },
 };

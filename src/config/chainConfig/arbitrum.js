@@ -1,5 +1,5 @@
-import { formatSwapTokenList, getLocalRPC } from "./methods";
-import { tokenListUrl, VERSION, USE_VERSION } from "../constant";
+import { getLocalRPC } from "./methods";
+import { VERSION, USE_VERSION } from "../constant";
 import { ChainId } from "./chainId";
 
 export const ARBITRUM_MAIN_CHAINID = ChainId.ARBITRUM;
@@ -15,8 +15,6 @@ export const ARBITRUM_TESTNET = getLocalRPC(
   "https://rinkeby.arbitrum.io/rpc"
 );
 export const ARBITRUM_TEST_EXPLORER = "https://rinkeby-explorer.arbitrum.io/#";
-
-export const tokenList = [];
 
 const symbol = "ETH";
 
@@ -53,20 +51,21 @@ const bridgeToken = {
     nativeToken: "",
     crossBridgeInitToken: "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
   },
+  [VERSION.V7_TEST]: {
+    bridgeInitToken: "",
+    bridgeInitChain: "",
+    nativeToken: "",
+    crossBridgeInitToken: "",
+  },
 };
 
 export default {
   [ARBITRUM_MAIN_CHAINID]: {
-    tokenListUrl: tokenListUrl + ARBITRUM_MAIN_CHAINID,
-    tokenList: formatSwapTokenList(symbol, tokenList),
     ...bridgeToken[USE_VERSION],
     swapRouterToken: "",
-    swapInitToken: "",
-    // multicalToken: '0x9e73d56dd1942743ffdf055449b052a806b854be',
     multicalToken: "0x80C7DD17B01855a6D2347444a0FCC36136a314de",
     v1FactoryToken: "",
     v2FactoryToken: "",
-    timelock: "",
     nodeRpc: ARBITRUM_MAINNET,
     nodeRpcList: [ARBITRUM_MAINNET],
     chainID: ARBITRUM_MAIN_CHAINID,
@@ -80,20 +79,13 @@ export default {
     networkLogo: "ARBITRUM",
     type: "main",
     label: ARBITRUM_MAIN_CHAINID,
-    isSwitch: 1,
-    suffix: "ARBITRUM",
-    anyToken: "",
   },
   [ARBITRUM_TEST_CHAINID]: {
-    tokenListUrl: tokenListUrl + ARBITRUM_TEST_CHAINID,
-    tokenList: formatSwapTokenList(symbol, tokenList),
     ...bridgeToken[USE_VERSION],
     swapRouterToken: "",
-    swapInitToken: "",
     multicalToken: "0xf27ee99622c3c9b264583dacb2cce056e194494f",
     v1FactoryToken: "",
     v2FactoryToken: "",
-    timelock: "",
     nodeRpc: ARBITRUM_TESTNET,
     nodeRpcList: [ARBITRUM_TESTNET],
     chainID: ARBITRUM_TEST_CHAINID,
@@ -103,11 +95,9 @@ export default {
     explorer: ARBITRUM_TEST_EXPLORER,
     symbol: symbol,
     name: "Arbitrum",
-    networkName: "Arbitrum Rinkeby",
+    networkName: "Arbitrum testnet",
     networkLogo: "ARBITRUM",
-    type: "main",
+    type: "test",
     label: ARBITRUM_TEST_CHAINID,
-    isSwitch: 1,
-    suffix: "ARBITRUM",
   },
 };

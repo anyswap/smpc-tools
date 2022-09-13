@@ -1,5 +1,5 @@
-import { formatSwapTokenList, getLocalRPC } from "./methods";
-import { tokenListUrl, VERSION, USE_VERSION } from "../constant";
+import { getLocalRPC } from "./methods";
+import { VERSION, USE_VERSION } from "../constant";
 import { ChainId } from "./chainId";
 
 export const OPTIMISM_MAIN_CHAINID = ChainId.OPTIMISM;
@@ -15,8 +15,6 @@ export const OPTIMISM_TESTNET = getLocalRPC(
   "https://kovan.optimism.io"
 );
 export const OPTIMISM_TEST_EXPLORER = "https://kovan-l2-explorer.surge.sh";
-
-export const tokenList = [];
 
 const symbol = "OETH";
 
@@ -52,15 +50,11 @@ const bridgeToken = {
 
 export default {
   [OPTIMISM_MAIN_CHAINID]: {
-    tokenListUrl: tokenListUrl + OPTIMISM_MAIN_CHAINID,
-    tokenList: formatSwapTokenList(symbol, tokenList),
     ...bridgeToken[USE_VERSION],
     swapRouterToken: "",
-    swapInitToken: "",
     multicalToken: "0xFbdd194376de19a88118e84E279b977f165d01b8",
     v1FactoryToken: "",
     v2FactoryToken: "",
-    timelock: "",
     nodeRpc: OPTIMISM_MAINNET,
     nodeRpcList: [OPTIMISM_MAINNET],
     chainID: OPTIMISM_MAIN_CHAINID,
@@ -74,20 +68,13 @@ export default {
     networkLogo: "OPTIMISM",
     type: "main",
     label: OPTIMISM_MAIN_CHAINID,
-    isSwitch: 1,
-    suffix: "OPTIMISM",
-    anyToken: "",
   },
   [OPTIMISM_TEST_CHAINID]: {
-    tokenListUrl: tokenListUrl + OPTIMISM_TEST_CHAINID,
-    tokenList: formatSwapTokenList(symbol, tokenList),
     ...bridgeToken[USE_VERSION],
     swapRouterToken: "",
-    swapInitToken: "",
     multicalToken: "0x332730a4f6e03d9c55829435f10360e13cfa41ff",
     v1FactoryToken: "",
     v2FactoryToken: "",
-    timelock: "",
     nodeRpc: OPTIMISM_TESTNET,
     chainID: OPTIMISM_TEST_CHAINID,
     lookHash: OPTIMISM_TEST_EXPLORER + "/tx/",
@@ -100,7 +87,5 @@ export default {
     networkLogo: "OPTIMISM",
     type: "main",
     label: OPTIMISM_TEST_CHAINID,
-    isSwitch: 1,
-    suffix: "OPTIMISM",
   },
 };

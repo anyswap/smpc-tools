@@ -1,5 +1,5 @@
-import { formatSwapTokenList, getLocalRPC } from "./methods";
-import { tokenListUrl, VERSION, USE_VERSION } from "../constant";
+import { getLocalRPC } from "./methods";
+import { VERSION, USE_VERSION } from "../constant";
 import { ChainId } from "./chainId";
 
 export const ASTAR_MAIN_CHAINID = ChainId.ASTAR;
@@ -7,9 +7,8 @@ export const ASTAR_MAINNET = getLocalRPC(
   ASTAR_MAIN_CHAINID,
   "https://rpc.astar.bldnodes.org/"
 );
-export const ASTAR_MAIN_EXPLORER = "https://rpc.astar.network:8545";
+export const ASTAR_MAIN_EXPLORER = "https://astar.subscan.io";
 
-export const tokenList = [];
 export const testTokenList = [];
 
 const symbol = "ASTR";
@@ -35,15 +34,11 @@ const bridgeToken = {
 
 export default {
   [ASTAR_MAIN_CHAINID]: {
-    tokenListUrl: tokenListUrl + ASTAR_MAIN_CHAINID,
-    tokenList: formatSwapTokenList(symbol, tokenList),
     ...bridgeToken[USE_VERSION],
     swapRouterToken: "",
-    swapInitToken: "",
     multicalToken: "0x639A647fbe20b6c8ac19E48E2de44ea792c62c5C",
     v1FactoryToken: "",
     v2FactoryToken: "",
-    timelock: "",
     nodeRpc: ASTAR_MAINNET,
     nodeRpcList: [
       ASTAR_MAINNET,
@@ -61,8 +56,5 @@ export default {
     networkLogo: "ASTR",
     type: "main",
     label: ASTAR_MAIN_CHAINID,
-    isSwitch: 1,
-    suffix: "ASTR",
-    anyToken: "",
   },
 };

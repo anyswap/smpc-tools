@@ -78,7 +78,7 @@ const Index = () => {
       dataIndex: "PubKey",
       width: "10%",
       render: (t: string) =>
-        formatUnits(details[t]?.balance || 0, 18) + chainInfo[chainId].symbol,
+        formatUnits(details[t]?.balance || 0, 18) + chainInfo[chainId]?.symbol,
     },
     {
       title: intl_createDate,
