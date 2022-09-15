@@ -17,6 +17,7 @@ import enUS from "antd/lib/locale/en_US";
 import zhCN from "antd/lib/locale/zh_CN";
 import Sun from "@/assets/images/sun.png";
 import Moon from "@/assets/images/moon.png";
+import AccountDrawer from "@/pages/accountDrawer";
 import "antd/dist/antd.min.css";
 import "./custom-dark.css";
 import "./custom-default.css";
@@ -111,9 +112,9 @@ const Index = (props: any) => {
     })
   );
 
-  useEffect(() => {
-    if (Account.length === 0) history.push("/createGrounp");
-  }, [location.href]);
+  // useEffect(() => {
+  //   if (Account.length === 0) history.push("/createGrounp");
+  // }, [location.href]);
 
   return (
     <ConfigProvider prefixCls={prefix}>
@@ -283,6 +284,7 @@ const Index = (props: any) => {
           {props.children}
         </div>
       </div>
+      <AccountDrawer />
     </ConfigProvider>
   );
 };

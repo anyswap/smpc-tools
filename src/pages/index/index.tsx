@@ -30,7 +30,6 @@ const Index = () => {
   }, [account]);
 
   const enable = useCallback(() => {
-    debugger;
     if (!account && activate) {
       activate(injected);
     }

@@ -2,6 +2,7 @@ import { getAddress } from "@ethersproject/address";
 import { message } from "antd";
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 import { formatFixed, parseFixed } from "@ethersproject/bignumber";
+const jszzicon = require("jazzicon");
 
 const names = ["wei", "kwei", "mwei", "gwei", "szabo", "finney", "ether"];
 
@@ -72,3 +73,15 @@ export function formatUnits(
   }
   return formatFixed(value, unitName != null ? unitName : 18);
 }
+
+export const getHead = (TimeStamp: number) => {
+  return `data:image/svg+xml;base64,${window.btoa(
+    unescape(
+      encodeURIComponent(
+        new XMLSerializer().serializeToString(
+          jszzicon(100, Math.round(Number(TimeStamp) / 1000)).children[0]
+        )
+      )
+    )
+  )}`;
+};

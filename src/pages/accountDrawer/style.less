@@ -1,0 +1,58 @@
+.drawerBtn {
+  z-index: 2;
+  position: fixed;
+  left: -2px;
+  top: 30%;
+  font-size: 40px;
+  cursor: pointer;
+}
+.accountDrawer-account {
+  cursor: pointer;
+  .active {
+    color: #1b55d1;
+    font-weight: bold;
+  }
+}
+.accountDrawer-head {
+  margin-top: 50px;
+  text-align: center;
+  .img {
+    // display: block;
+    // margin: 0 auto;
+  }
+}
+.accountDrawer-head,
+.accountDrawer-account {
+  margin-bottom: 5px;
+  .img {
+    display: inline-block;
+    position: relative;
+    img {
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+    }
+    .thresHold {
+      position: absolute;
+      z-index: 3;
+      background: rgb(239, 250, 248);
+      color: rgb(0, 140, 115);
+      border-radius: 40%;
+      left: -5px;
+      top: 3px;
+      padding: 1px 3px;
+    }
+  }
+}
+.drawerBox {
+  .left {
+    .skip {
+      border-bottom: 1px solid #ccc;
+      font-size: 19px;
+      margin-bottom: 20px;
+      font-weight: bold;
+      color: #1b55d1;
+      cursor: pointer;
+    }
+  }
+}
