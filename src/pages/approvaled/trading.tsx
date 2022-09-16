@@ -1,15 +1,33 @@
 import React, { useEffect, useState } from "react";
-import { Button, message, Table, Tag, Spin, Modal } from "antd";
+import {
+  Button,
+  message,
+  Table,
+  Tag,
+  Spin,
+  Modal,
+  Collapse,
+  Timeline,
+} from "antd";
 import { useActiveWeb3React } from "@/hooks";
 import { useModel, history, useIntl } from "umi";
 import Tx from "ethereumjs-tx";
+import {
+  CopyOutlined,
+  PlusCircleOutlined,
+  FormOutlined,
+  AppstoreAddOutlined,
+  RightOutlined,
+  LoadingOutlined,
+  ShareAltOutlined,
+} from "@ant-design/icons";
 import moment from "moment";
 import web3 from "@/assets/js/web3";
-
 import "./style.less";
 import { cutOut } from "@/utils";
 import { chainInfo } from "@/config/chainConfig";
 import { ethers } from "ethers";
+import { logos } from "@/pages/accountDrawer/config";
 
 const Index = () => {
   const { account } = useActiveWeb3React();
@@ -55,17 +73,16 @@ const Index = () => {
   });
 
   const send = async (r: any, i: any) => {
+    // return;
     setSpinning(true);
     const MsgContext = JSON.parse(r.MsgContext[0]);
     const { TokenAddress, chainId, to, value } = MsgContext;
     console.info("chainInfo", chainInfo);
-    debugger;
     const nodeRpc = chainInfo[web3.utils.hexToNumber(chainId)].nodeRpc;
 
     web3.setProvider(nodeRpc);
     // web3.setProvider("https://rinkeby.infura.io/v3/");
     // "https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"
-    debugger;
     const Rsv = r.Rsv[0];
     debugger;
     const v =
@@ -212,6 +229,38 @@ const Index = () => {
     //       message.error(e.message);
     //     });
   };
+  const getTransactionStatus = (item, index) => {
+    const MsgContext = JSON.parse(item.MsgContext[0]);
+    const { TokenAddress, chainId, to, value, nonce, gas, gasPrice } =
+      MsgContext;
+    const Rsv = item.Rsv[0];
+    const txData = {
+      nonce,
+      gasLimit: web3.utils.toHex(gas),
+      gasPrice: web3.utils.toHex(gasPrice),
+      to,
+      data: "",
+      value: web3.utils.toHex(value),
+      chainId: web3.utils.hexToNumber(chainId),
+    };
+    debugger;
+    // const res = ethers.utils.serializeTransaction(txData, r.MsgHash[0]);
+    const v =
+      Number(web3.utils.hexToNumber(chainId)) * 2 +
+      35 +
+      Number(Rsv.substr(128, 2));
+    let signature = {
+      r: "0x" + Rsv.substr(0, 64),
+      s: "0x" + Rsv.substr(64, 64),
+      v,
+    };
+
+    let signedTx = ethers.utils.serializeTransaction(txData, signature);
+    debugger;
+    let txParse2 = ethers.utils.parseTransaction(signedTx);
+    debugger;
+    console.log(txParse2.hash);
+  };
 
   const createGrounpModel = useIntl().formatHTMLMessage({
     id: "createGrounp.model",
@@ -348,7 +397,7 @@ const Index = () => {
   return (
     <Spin tip="Loading..." spinning={spinning}>
       <div
-        className="approval"
+        className="approval bm20"
         onMouseMove={() => {
           if (pollingRsvInfo) {
             globalDispatch({
@@ -366,6 +415,108 @@ const Index = () => {
           pagination={false}
         />
       </div>
+      {GsendApprovaled.map((item: any, index: any) => {
+        const { TimeStamp, MsgContext, transactionHash, ThresHold, AllReply } =
+          item;
+        const { chainId, data, originValue, symbol, to, name } = JSON.parse(
+          MsgContext[0]
+        );
+        const chainDetial = chainInfo[web3.utils.hexToNumber(chainId)];
+
+        const isPrrovaling =
+          AllReply.filter((it) => it.Status === "AGREE").length <
+          Number(ThresHold.split("/")[0]);
+        return (
+          <Collapse
+            expandIconPosition="end"
+            key={TimeStamp}
+            onChange={(e) => {
+              if (e.length) getTransactionStatus(item, index);
+            }}
+          >
+            <Collapse.Panel
+              expandIconPosition="end"
+              key={index}
+              header={
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <span>
+                    <span>
+                      {index + 1} Sent &nbsp;
+                      <img
+                        src={require("./img/send.svg")}
+                        style={{ marginBottom: 2 }}
+                      />
+                    </span>
+                  </span>
+                  <span>
+                    <img width={26} src={logos[symbol || chainDetial.symbol]} />
+                    &nbsp;
+                    {originValue}
+                    {symbol || chainDetial.symbol}
+                  </span>
+                  <span>
+                    {moment(Number(TimeStamp)).format("YYYY-MM-DD HH:mm:ss")}
+                  </span>
+                  <span className="sta">Success</span>
+                </div>
+              }
+            >
+              <div className="collapse-content">
+                <div className="left">
+                  <p>
+                    Sent{" "}
+                    <b>{` ${originValue} ${symbol || chainDetial.symbol} `}</b>
+                    to:
+                    <b>{` ${to}`}</b>
+                    {!item.transactionHash && (
+                      <Button
+                        onClick={() => send(item, index)}
+                        type="primary"
+                        style={{ marginLeft: 20 }}
+                      >
+                        {sendTo + " " + name}
+                      </Button>
+                    )}
+                  </p>
+                  {item.transactionHash && (
+                    <div>
+                      Transaction hash:
+                      <ShareAltOutlined
+                        style={{ cursor: "pointer" }}
+                        onClick={() =>
+                          window.open(
+                            `${chainDetial.explorer}/tx/${item.transactionHash}`
+                          )
+                        }
+                      />
+                    </div>
+                  )}
+                </div>
+                <div className="right">
+                  <Timeline>
+                    <Timeline.Item>
+                      Create a transaction site{" "}
+                      {moment(Number(TimeStamp)).format("YYYY-MM-DD HH:mm:ss")}
+                    </Timeline.Item>
+                    <Timeline.Item dot={isPrrovaling && <LoadingOutlined />}>
+                      Prrovaling
+                    </Timeline.Item>
+                    <Timeline.Item dot={!isPrrovaling && <LoadingOutlined />}>
+                      Prrovaled
+                    </Timeline.Item>
+                    <Timeline.Item>Done</Timeline.Item>
+                  </Timeline>
+                </div>
+              </div>
+            </Collapse.Panel>
+          </Collapse>
+        );
+      })}
     </Spin>
   );
 };

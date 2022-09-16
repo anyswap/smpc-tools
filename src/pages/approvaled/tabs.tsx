@@ -19,9 +19,10 @@ const Index = () => {
   useEffect(() => {
     if (activeKey === "1") getRsv();
   }, [activeKey]);
+  console.info("activeKey", activeKey);
   return (
     <Tabs
-      defaultActiveKey={"0"}
+      defaultActiveKey={"1"}
       onChange={setActiveKey}
       tabBarExtraContent={
         activeKey === "1" && (

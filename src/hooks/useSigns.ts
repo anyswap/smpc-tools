@@ -472,11 +472,11 @@ function useMsgData(): {
           gasPrice: "",
           data: TokenAddress
             ? await buildTxnsData(TokenAddress, nodeRpc, to, value, chainId)
-            : "{}",
+            : "",
+          // "{}",
         };
         web3.setProvider(nodeRpc);
         data.nonce = await web3.eth.getTransactionCount(address);
-        console.info(33333, web3.utils.toHex(data));
         data.gas = await web3.eth.estimateGas({
           to,
           data: web3.utils.toHex(data),
@@ -562,6 +562,7 @@ export function useGetSign(rpc: string | undefined): {
           rsv,
           JSON.stringify(data, null, 8)
         );
+        debugger;
         if (cbData.Data?.result) {
           globalDispatch({
             pollingRsv: [

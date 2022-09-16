@@ -12,10 +12,11 @@ import { ethers } from "ethers";
 import { useActiveWeb3React } from "@/hooks";
 import { useModel, useIntl } from "umi";
 import classNames from "classnames";
-import { cutOut, getWeb3, formatUnits, getHead } from "@/utils";
+import { cutOut, getWeb3, formatUnits, getHead, copyTxt } from "@/utils";
 import { chainInfo } from "@/config/chainConfig";
 import CoinsList from "./coinsList";
 import Approval from "@/pages/approval/trading";
+import HistoryTransactions from "@/pages/approvaled/trading";
 import "./style.less";
 
 const jszzicon = require("jazzicon");
@@ -58,7 +59,7 @@ const Index = () => {
       setDetails(detailsObj);
     });
   }, [List, library]);
-
+  console.info("drawerVisible", drawerVisible);
   return (
     <>
       {/* <span className="drawerBtn">
@@ -116,14 +117,20 @@ const Index = () => {
                 <AppstoreAddOutlined />
               </span>
               <span>
-                <CopyOutlined />
+                <CopyOutlined
+                  onClick={() =>
+                    copyTxt(
+                      ethers.utils.computeAddress("0x" + accountSelected.PubKey)
+                    )
+                  }
+                />
               </span>
               <span>
                 <ShareAltOutlined />
               </span>
             </div>
             <div>
-              <Button type="primary">Send coin</Button>
+              <Button type="primary">Send Transaction</Button>
             </div>
           </div>
           <div style={{ maxHeight: "30vh", marginBottom: 35 }}>
@@ -208,6 +215,7 @@ const Index = () => {
         <div className="right" style={{ flex: 1, padding: "5px 20px" }}>
           {selectedKeys[0] === "Coins" && <CoinsList item={accountSelected} />}
           {selectedKeys[0] === "Approval" && <Approval />}
+          {selectedKeys[0] === "History" && <HistoryTransactions />}
         </div>
       </div>
       {/* </Drawer> */}
@@ -215,6 +223,9 @@ const Index = () => {
         visible={drawerVisible}
         placement="left"
         className="drawerBox"
+        closable={false}
+        // zIndex={drawerVisible ? 1000 : -1}
+        style={{ left: drawerVisible ? 0 : -380 }}
         onClose={() => dispatch({ drawerVisible: false })}
       >
         <div className="skip">

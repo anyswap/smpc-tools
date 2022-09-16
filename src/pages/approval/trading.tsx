@@ -4,7 +4,9 @@ import { acceptSign } from "@/hooks/useSigns";
 import { useIntl, useModel } from "umi";
 import { cutOut, copyTxt } from "@/utils";
 import moment from "moment";
+import { chainInfo } from "@/config/chainConfig";
 import { useActiveWeb3React } from "@/hooks";
+import web3 from "@/assets/js/web3";
 
 const Index = () => {
   const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
@@ -79,31 +81,53 @@ const Index = () => {
     {
       title: "Initiator",
       dataIndex: "Account",
-      render: (t: string) => cutOut(t, 6, 8),
+      render: (t: string) => <span title={t}>{cutOut(t, 6, 8)}</span>,
+    },
+    {
+      title: "To",
+      dataIndex: "MsgContext",
+      render: (t: string) => {
+        const MsgContext = JSON.parse(t[0]);
+        return <span title={MsgContext.to}>{cutOut(MsgContext.to, 6, 8)}</span>;
+      },
+    },
+    {
+      title: "Value",
+      dataIndex: "MsgContext",
+      render: (t: string) => {
+        const { chainId, originValue, symbol } = JSON.parse(t[0]);
+        const chainDetial = chainInfo[web3.utils.hexToNumber(chainId)];
+        return (
+          <span title={originValue}>
+            {originValue}
+            {symbol ? symbol : chainDetial.symbol}
+          </span>
+        );
+      },
     },
     {
       title: "Mpc Type",
       dataIndex: "KeyType",
     },
-    {
-      title: "RSV",
-      dataIndex: "Raw",
-      render: (t: string) => cutOut(JSON.parse(t).Rsv, 6, 8),
-    },
-    {
-      title: "PubKey",
-      dataIndex: "PubKey",
-      render: (t: string) => cutOut(t, 6, 8),
-    },
-    {
-      title: createGrounpModel,
-      dataIndex: "ThresHold",
-    },
-    {
-      title: "TimeStamp",
-      dataIndex: "TimeStamp",
-      render: (t: string) => moment(Number(t)).format("YYYY-MM-DD HH:mm:ss"),
-    },
+    // {
+    //   title: "RSV",
+    //   dataIndex: "Raw",
+    //   render: (t: string) => cutOut(JSON.parse(t).Rsv, 6, 8),
+    // },
+    // {
+    //   title: "PubKey",
+    //   dataIndex: "PubKey",
+    //   render: (t: string) => cutOut(t, 6, 8),
+    // },
+    // {
+    //   title: createGrounpModel,
+    //   dataIndex: "ThresHold",
+    // },
+    // {
+    //   title: "TimeStamp",
+    //   dataIndex: "TimeStamp",
+    //   render: (t: string) => moment(Number(t)).format("YYYY-MM-DD HH:mm:ss"),
+    // },
     {
       title: useIntl().formatHTMLMessage({ id: "g.action" }),
       render: (r: any, i: number) =>

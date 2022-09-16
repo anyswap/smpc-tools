@@ -278,7 +278,7 @@ const Index = (props: any) => {
           style={{
             padding: "0 15p",
             width: "100%",
-            maxWidth: 1440,
+            // maxWidth: 1440,
             // margin: "30px auto",
           }}
         >

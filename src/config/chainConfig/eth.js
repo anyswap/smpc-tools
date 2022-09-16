@@ -8,8 +8,9 @@ export const ETH_MAIN_CHAINID = ChainId.ETH;
 // export const ETH_MAINNET = process.env.NODE_ENV === 'development' ? getLocalRPC(ETH_MAIN_CHAINID, process.env.REACT_APP_NETWORK_URL) : getLocalRPC(ETH_MAIN_CHAINID, 'https://ethmainnet.anyswap.exchange')
 export const ETH_MAINNET =
   process.env.NODE_ENV === "development"
-    ? getLocalRPC(ETH_MAIN_CHAINID, "https://rpc.ankr.com/eth")
-    : getLocalRPC(ETH_MAIN_CHAINID, "https://ethmainnet.anyswap.exchange");
+    ? getLocalRPC(ETH_MAIN_CHAINID, "https://rpc.flashbots.net")
+    : // ? getLocalRPC(ETH_MAIN_CHAINID, "https://rpc.ankr.com/eth")https://cloudflare-eth.com
+      getLocalRPC(ETH_MAIN_CHAINID, "https://ethmainnet.anyswap.exchange");
 // export const ETH_MAINNET = getLocalRPC(ETH_MAIN_CHAINID, 'https://rpc.ankr.com/eth')
 // export const ETH_MAINNET = getLocalRPC(ETH_MAIN_CHAINID, 'https://ethmainnet.anyswap.exchange')
 export const ETH_MAIN_EXPLORER =

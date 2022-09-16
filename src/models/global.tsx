@@ -422,9 +422,5 @@ export default function Index() {
     });
   };
 
-  // useEffect(() => {
-  //   getRsv();
-  // }, []);
-
   return { ...state, globalDispatch: dispatch, getRsv };
 }

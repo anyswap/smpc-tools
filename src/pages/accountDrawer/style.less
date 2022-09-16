@@ -90,6 +90,46 @@
     color: #1b55d1;
     cursor: pointer;
   }
+  .collapse-content {
+    display: flex;
+    justify-content: space-between;
+  }
+  .custom-default-collapse > .custom-default-collapse-item,
+  .custom-default-collapse-item.custom-default-collapse-item-active {
+    border-radius: 8px;
+    transition: border 0.8s;
+    border: 2px solid rgb(238, 239, 240);
+  }
+  .custom-default-collapse-item {
+    border-radius: 8px !important;
+    padding-bottom: 2px;
+  }
+  .custom-default-collapse {
+    border: none;
+    padding: 8px;
+  }
+  .custom-default-collapse-item.custom-default-collapse-item-active {
+    border-radius: 8px;
+    border: 2px solid rgb(146, 201, 190);
+  }
+  .custom-default-collapse-header {
+    display: block;
+    position: relative;
+    .custom-default-collapse-expand-icon {
+      position: absolute;
+      z-index: 20;
+      right: 1px;
+      top: 12.5px;
+    }
+    .sta {
+      color: rgb(146, 201, 190);
+      font-weight: bold;
+    }
+    .custom-default-collapse-header-text {
+      width: 100%;
+      padding-right: 20px;
+    }
+  }
 }
 .accountDrawer-opr {
   span {
