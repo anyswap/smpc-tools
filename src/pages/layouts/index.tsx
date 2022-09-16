@@ -213,6 +213,7 @@ const Index = (props: any) => {
           </div>
           <div className="right">
             <Modal
+              zIndex={15}
               title={useIntl().formatHTMLMessage({ id: "account" })}
               footer={false}
               visible={visible}
@@ -278,13 +279,13 @@ const Index = (props: any) => {
             padding: "0 15p",
             width: "100%",
             maxWidth: 1440,
-            margin: "30px auto",
+            // margin: "30px auto",
           }}
         >
           {props.children}
         </div>
       </div>
-      <AccountDrawer />
+      {/* <AccountDrawer /> */}
     </ConfigProvider>
   );
 };

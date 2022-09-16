@@ -1,13 +1,19 @@
 .drawerBtn {
   z-index: 2;
   position: fixed;
-  left: -2px;
+  left: -20px;
   top: 30%;
   font-size: 40px;
+  color: #ccc;
   cursor: pointer;
+  transition: left 0.3s;
+  &:hover {
+    left: 0;
+  }
 }
 .accountDrawer-account {
   cursor: pointer;
+  margin-bottom: 12px;
   .active {
     color: #1b55d1;
     font-weight: bold;
@@ -16,6 +22,7 @@
 .accountDrawer-head {
   margin-top: 50px;
   text-align: center;
+  margin-bottom: 35px;
   .img {
     // display: block;
     // margin: 0 auto;
@@ -23,7 +30,6 @@
 }
 .accountDrawer-head,
 .accountDrawer-account {
-  margin-bottom: 5px;
   .img {
     display: inline-block;
     position: relative;
@@ -45,14 +51,52 @@
   }
 }
 .drawerBox {
+  height: calc(100vh - 70px);
   .left {
+    background-color: white;
+    overflow: hidden;
+    position: relative;
+    overflow: hidden;
     .skip {
       border-bottom: 1px solid #ccc;
       font-size: 19px;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       font-weight: bold;
       color: #1b55d1;
       cursor: pointer;
     }
+    .openBtn {
+      width: 42px;
+      height: 42px;
+      line-height: 42px;
+      padding-left: 5px;
+      background-color: #f0efee;
+      position: absolute;
+      top: 30px;
+      right: -21px;
+      border-radius: 50%;
+      z-index: 20;
+      cursor: pointer;
+    }
+  }
+}
+
+.drawerBox {
+  .skip {
+    border-bottom: 1px solid #ccc;
+    font-size: 19px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #1b55d1;
+    cursor: pointer;
+  }
+}
+.accountDrawer-opr {
+  span {
+    font-size: 18px;
+    margin: 7px;
+    display: inline-block;
+    background-color: #f6f7f8;
+    cursor: pointer;
   }
 }

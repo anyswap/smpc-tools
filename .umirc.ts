@@ -33,7 +33,7 @@ export default defineConfig({
             },
             {
               path: "/Account",
-              component: "@/pages/account",
+              component: "@/pages/accountDrawer/index.tsx",
             },
             {
               path: "/approval",
