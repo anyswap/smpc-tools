@@ -123,11 +123,11 @@ const Index = () => {
     //   title: createGrounpModel,
     //   dataIndex: "ThresHold",
     // },
-    // {
-    //   title: "TimeStamp",
-    //   dataIndex: "TimeStamp",
-    //   render: (t: string) => moment(Number(t)).format("YYYY-MM-DD HH:mm:ss"),
-    // },
+    {
+      title: "TimeStamp",
+      dataIndex: "TimeStamp",
+      render: (t: string) => moment(Number(t)).format("YYYY-MM-DD HH:mm:ss"),
+    },
     {
       title: useIntl().formatHTMLMessage({ id: "g.action" }),
       render: (r: any, i: number) =>

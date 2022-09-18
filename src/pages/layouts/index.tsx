@@ -122,7 +122,11 @@ const Index = (props: any) => {
         <div className="head">
           <div className="left">
             <div className="logo">
-              <img src={Logo} width={31} />
+              <img
+                src={Logo}
+                width={31}
+                onClick={() => history.push("/account")}
+              />
               <div className="name">
                 <span className="name1">
                   {useIntl().formatHTMLMessage({ id: "g.SMPC" })}
@@ -133,7 +137,7 @@ const Index = (props: any) => {
               </div>
             </div>
           </div>
-          <div className="nav">
+          <div className="nav" style={{ display: "none" }}>
             {/* <div onClick={() => history.push('/approvalList')}>审批</div>
             <div>创建组</div> */}
             <Badge

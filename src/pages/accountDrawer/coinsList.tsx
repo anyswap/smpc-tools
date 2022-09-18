@@ -8,7 +8,7 @@ import { abi } from "@/assets/js/web3";
 import { useModel, useIntl } from "umi";
 import { ethers } from "ethers";
 import { coins } from "./config";
-console.info("chainInfo", chainInfo);
+import SendContractRow from "./components/sendContractRow";
 
 const Index = (props: { item: any }) => {
   const { account, library, chainId }: any = useActiveWeb3React();
@@ -101,9 +101,11 @@ const Index = (props: { item: any }) => {
       title: "",
       dataIndex: "contract",
       render: (t: string) => (
-        <Button type="primary" size="small">
-          Send
-        </Button>
+        <SendContractRow TokenAddress={t}>
+          <Button type="primary" size="small">
+            Send
+          </Button>
+        </SendContractRow>
       ),
     },
   ];

@@ -51,7 +51,7 @@ const Index = () => {
       >
         <AccountList />
       </Tabs.TabPane>
-      <Tabs.TabPane
+      {/* <Tabs.TabPane
         key={"1"}
         tab={
           <Badge
@@ -65,7 +65,7 @@ const Index = () => {
         }
       >
         <TradingList />
-      </Tabs.TabPane>
+      </Tabs.TabPane> */}
     </Tabs>
   );
 };

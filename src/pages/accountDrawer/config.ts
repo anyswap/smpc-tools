@@ -1,4 +1,4 @@
-export const coins = {
+export const coins: any = {
   1: [
     {
       name: "Ether",

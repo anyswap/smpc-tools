@@ -42,12 +42,12 @@ const Index = () => {
       >
         <AccountList />
       </Tabs.TabPane>
-      <Tabs.TabPane
+      {/* <Tabs.TabPane
         key={"1"}
         tab={useIntl().formatHTMLMessage({ id: "nav.approvedTransaction" })}
       >
         <TradingList />
-      </Tabs.TabPane>
+      </Tabs.TabPane> */}
     </Tabs>
     // <TradingList />
   );

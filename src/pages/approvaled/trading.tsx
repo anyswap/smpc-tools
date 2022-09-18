@@ -40,12 +40,14 @@ const Index = () => {
     globalDispatch,
     sendApprovaled: GsendApprovaled,
     pollingRsvInfo,
+    getRsv,
   } = useModel(
     "global",
-    ({ globalDispatch, sendApprovaled, pollingRsvInfo }) => ({
+    ({ globalDispatch, sendApprovaled, pollingRsvInfo, getRsv }) => ({
       globalDispatch,
       sendApprovaled,
       pollingRsvInfo,
+      getRsv,
     })
   );
 
@@ -56,9 +58,7 @@ const Index = () => {
   const [spinning, setSpinning] = useState(false);
 
   useEffect(() => {
-    // let nn = web3.utils.hexToNumber("0x429d069189e0000");
-    console.info(111, ethers.utils.formatUnits("0x429d069189e0000", 18));
-    // console.info("nnnn", nn);
+    getRsv();
     localStorage.setItem("pollingRsvInfo", "0");
     globalDispatch({
       pollingRsvInfo: 0,
@@ -243,7 +243,6 @@ const Index = () => {
       value: web3.utils.toHex(value),
       chainId: web3.utils.hexToNumber(chainId),
     };
-    debugger;
     // const res = ethers.utils.serializeTransaction(txData, r.MsgHash[0]);
     const v =
       Number(web3.utils.hexToNumber(chainId)) * 2 +
@@ -256,10 +255,9 @@ const Index = () => {
     };
 
     let signedTx = ethers.utils.serializeTransaction(txData, signature);
-    debugger;
     let txParse2 = ethers.utils.parseTransaction(signedTx);
-    debugger;
     console.log(txParse2.hash);
+    return txParse2.hash;
   };
 
   const createGrounpModel = useIntl().formatHTMLMessage({
@@ -408,12 +406,12 @@ const Index = () => {
         }}
       >
         {/* <Button onClick={getApproveList}>get</Button>{" "} */}
-        <Table
+        {/* <Table
           columns={columns}
           rowKey="KeyID"
           dataSource={GsendApprovaled}
           pagination={false}
-        />
+        /> */}
       </div>
       {GsendApprovaled.map((item: any, index: any) => {
         const { TimeStamp, MsgContext, transactionHash, ThresHold, AllReply } =
@@ -431,6 +429,7 @@ const Index = () => {
             expandIconPosition="end"
             key={TimeStamp}
             onChange={(e) => {
+              getRsv();
               if (e.length) getTransactionStatus(item, index);
             }}
           >
@@ -488,11 +487,21 @@ const Index = () => {
                       Transaction hash:
                       <ShareAltOutlined
                         style={{ cursor: "pointer" }}
-                        onClick={() =>
+                        onClick={() => {
+                          // dataIndex: "Status",
+                          // render: (t: any, r: any, i: any) => {
+                          //   if (t !== "Success") return "--";
+                          const { chainId, name } = JSON.parse(
+                            item.MsgContext[0]
+                          );
+                          const chainDetial =
+                            chainInfo[web3.utils.hexToNumber(chainId)];
                           window.open(
-                            `${chainDetial.explorer}/tx/${item.transactionHash}`
-                          )
-                        }
+                            `${chainDetial.explorer}/tx/${getTransactionStatus(
+                              item
+                            )}`
+                          );
+                        }}
                       />
                     </div>
                   )}
@@ -507,10 +516,27 @@ const Index = () => {
                       Prrovaling
                     </Timeline.Item>
                     <Timeline.Item dot={!isPrrovaling && <LoadingOutlined />}>
-                      Prrovaled
+                      {sendTo + " " + name}
                     </Timeline.Item>
-                    <Timeline.Item>Done</Timeline.Item>
+                    <Timeline.Item color="gray">Done</Timeline.Item>
                   </Timeline>
+                  <Button
+                    onClick={() => {
+                      // dataIndex: "Status",
+                      // render: (t: any, r: any, i: any) => {
+                      //   if (t !== "Success") return "--";
+                      const { chainId, name } = JSON.parse(item.MsgContext[0]);
+                      const chainDetial =
+                        chainInfo[web3.utils.hexToNumber(chainId)];
+                      window.open(
+                        `${chainDetial.explorer}/tx/${getTransactionStatus(
+                          item
+                        )}`
+                      );
+                    }}
+                  >
+                    Transaction hash
+                  </Button>
                 </div>
               </div>
             </Collapse.Panel>
