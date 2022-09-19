@@ -36,6 +36,11 @@ const Index: React.FC = () => {
       activeAccount,
     })
   );
+  useEffect(() => {
+    if (Account.filter((item: any) => item.Status === "Success").length === 0) {
+      dispatch({ drawerVisible: true });
+    }
+  }, [Account]);
   const { Account } = useModel("global", ({ Account }: any) => ({
     Account,
   }));
