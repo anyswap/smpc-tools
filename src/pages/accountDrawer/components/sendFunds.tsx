@@ -12,6 +12,7 @@ type FormParams = {
   to: string;
   value: string;
   TokenAddress: string;
+  setTypeOpen: () => void;
 };
 interface Iprops {
   details: any;
@@ -68,6 +69,7 @@ const Index = (props: Iprops) => {
     if (res?.Status === "Success") {
       message.success("Success");
       setOpen(false);
+      props.setTypeOpen(false);
       return true;
     }
     return false;

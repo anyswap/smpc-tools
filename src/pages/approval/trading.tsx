@@ -23,14 +23,28 @@ const Index = () => {
     })
   );
 
-  const { globalDispatch } = useModel("global", ({ globalDispatch }: any) => ({
-    globalDispatch,
-  }));
+  const { globalDispatch, transactionApprovalHaveHandled } = useModel(
+    "global",
+    ({ globalDispatch, transactionApprovalHaveHandled }: any) => ({
+      globalDispatch,
+      transactionApprovalHaveHandled,
+    })
+  );
 
   const action = async (Accept: string, r: any) => {
     if (!execute) return;
     const res = await execute(Accept, r);
     if (res?.Status === "Success") {
+      localStorage.setItem(
+        "transactionApprovalHaveHandled",
+        JSON.stringify([...transactionApprovalHaveHandled, r.TimeStamp])
+      );
+      globalDispatch({
+        transactionApprovalHaveHandled: [
+          ...transactionApprovalHaveHandled,
+          r.TimeStamp,
+        ],
+      });
       message.success("Success");
       // const approvaled = JSON.parse(
       //   localStorage.getItem("tradingApprovaled") || "[]"
@@ -171,7 +185,9 @@ const Index = () => {
       />
       <Table
         columns={columns}
-        dataSource={tradingList}
+        dataSource={tradingList.filter((item) =>
+          transactionApprovalHaveHandled.every((it) => it !== item.TimeStamp)
+        )}
         loading={tradingListLoading}
         pagination={false}
         rowKey="Key"

@@ -36,15 +36,15 @@ const Index: React.FC = () => {
       activeAccount,
     })
   );
+
+  const { Account } = useModel("global", ({ Account }: any) => ({
+    Account,
+  }));
   useEffect(() => {
     if (Account.filter((item: any) => item.Status === "Success").length === 0) {
       dispatch({ drawerVisible: true });
     }
   }, [Account]);
-  const { Account } = useModel("global", ({ Account }: any) => ({
-    Account,
-  }));
-
   const List = Account.filter((item: any) => item.Status === "Success");
   const accountSelected = List.length ? activeAccount || List[0] : null;
 
@@ -258,52 +258,59 @@ const Index: React.FC = () => {
         >
           Account List
         </div>
-        {List.map((item: any) => (
-          <div
-            className="accountDrawer-account"
-            onClick={() =>
-              dispatch({ activeAccount: item, drawerVisible: false })
-            }
-            key={item.TimeStamp}
-          >
-            <div className="img">
-              <div className="thresHold">{item.ThresHold}</div>
-              <img
-                className="mr5"
-                src={getHead(item.TimeStamp)}
-                alt={ethers.utils.computeAddress("0x" + item.PubKey)}
-              />
-            </div>
+        <div
+          style={{
+            maxHeight: "calc(100vh - 250px)",
+            overflowY: List.length > 10 ? "scroll" : "auto",
+          }}
+        >
+          {List.map((item: any) => (
             <div
-              style={{
-                display: "inline-block",
-                width: 280,
-              }}
+              className="accountDrawer-account"
+              onClick={() =>
+                dispatch({ activeAccount: item, drawerVisible: false })
+              }
+              key={item.TimeStamp}
             >
-              <span
+              <div className="img">
+                <div className="thresHold">{item.ThresHold}</div>
+                <img
+                  className="mr5"
+                  src={getHead(item.TimeStamp)}
+                  alt={ethers.utils.computeAddress("0x" + item.PubKey)}
+                />
+              </div>
+              <div
                 style={{
-                  display: "flex",
-                  justifyContent: "space-between",
+                  display: "inline-block",
+                  width: 275,
                 }}
-                className={classNames({
-                  active: item.KeyID === accountSelected.KeyID,
-                })}
               >
-                <span>
-                  {cutOut(
-                    ethers.utils.computeAddress("0x" + item.PubKey),
-                    10,
-                    8
-                  )}
+                <span
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                  }}
+                  className={classNames({
+                    active: item.KeyID === accountSelected.KeyID,
+                  })}
+                >
+                  <span>
+                    {cutOut(
+                      ethers.utils.computeAddress("0x" + item.PubKey),
+                      10,
+                      8
+                    )}
+                  </span>
+                  <span className="mll0">
+                    {formatUnits(details[item.PubKey]?.balance || 0, 18) +
+                      chainInfo[chainId]?.symbol}
+                  </span>
                 </span>
-                <span className="mll0">
-                  {formatUnits(details[item.PubKey]?.balance || 0, 18) +
-                    chainInfo[chainId]?.symbol}
-                </span>
-              </span>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </Drawer>
       {/* </Drawer> */}
     </>

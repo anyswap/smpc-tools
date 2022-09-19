@@ -34,6 +34,12 @@ const initState = {
   Account: JSON.parse(localStorage.getItem("Account") || "[]"),
 
   getRsvSpin: false,
+  accountApprovalHaveHandled: JSON.parse(
+    localStorage.getItem("accountApprovalHaveHandled") || "[]"
+  ),
+  transactionApprovalHaveHandled: JSON.parse(
+    localStorage.getItem("transactionApprovalHaveHandled") || "[]"
+  ),
 };
 
 export default function Index() {

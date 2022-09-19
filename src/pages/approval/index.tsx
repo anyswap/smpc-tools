@@ -11,14 +11,21 @@ import { cutOut, copyTxt } from "@/utils";
 const Index = () => {
   const { account } = useActiveWeb3React();
 
-  const { globalDispatch, pollingPubKey, Account } = useModel(
-    "global",
-    ({ globalDispatch, pollingPubKey, Account }: any) => ({
-      globalDispatch,
-      pollingPubKey,
-      Account,
-    })
-  );
+  const { globalDispatch, pollingPubKey, Account, accountApprovalHaveHandled } =
+    useModel(
+      "global",
+      ({
+        globalDispatch,
+        pollingPubKey,
+        Account,
+        accountApprovalHaveHandled,
+      }: any) => ({
+        globalDispatch,
+        pollingPubKey,
+        Account,
+        accountApprovalHaveHandled,
+      })
+    );
   const { approveList, approveListLoading, getData } = useModel(
     "approval",
     ({ approveList, approveListLoading, getData }: any) => ({
@@ -116,6 +123,16 @@ const Index = () => {
     if (!execute) return;
     const res = await execute(r, type);
     if (res?.info === "Success") {
+      localStorage.setItem(
+        "accountApprovalHaveHandled",
+        JSON.stringify([...accountApprovalHaveHandled, r.TimeStamp])
+      );
+      globalDispatch({
+        accountApprovalHaveHandled: [
+          ...accountApprovalHaveHandled,
+          r.TimeStamp,
+        ],
+      });
       message.success(operationIsSuccessful);
       getData();
       const newPollingPubKeyItem = {
@@ -152,7 +169,9 @@ const Index = () => {
     <div className="approval">
       <Table
         columns={columns}
-        dataSource={approveList}
+        dataSource={approveList.filter((item) =>
+          accountApprovalHaveHandled.every((it) => it !== item.TimeStamp)
+        )}
         loading={approveListLoading}
         pagination={false}
         rowKey="Key"

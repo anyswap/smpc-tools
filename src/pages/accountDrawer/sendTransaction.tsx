@@ -24,7 +24,7 @@ const Index = (props: Iprops) => {
         footer={false}
       >
         <div className="sendTransaction-box-btns mb20">
-          <SendFunds details={props.details} />
+          <SendFunds details={props.details} setTypeOpen={setTypeOpen} />
           <br />
           <br />
 

@@ -483,7 +483,9 @@ const Index = () => {
                   <span>
                     {moment(Number(TimeStamp)).format("YYYY-MM-DD HH:mm:ss")}
                   </span>
-                  <span className="sta">Success</span>
+                  <span className="sta">
+                    {item.transactionHash ? "Success" : "Pending"}
+                  </span>
                 </div>
               }
             >

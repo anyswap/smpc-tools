@@ -10,10 +10,21 @@ const Index = () => {
   const { getData, approveList, tradingList } = useModel(
     "approval",
     ({ getData, approveList, tradingList }) => {
-      return { getData, approveList, tradingList };
+      return {
+        getData,
+        approveList,
+        tradingList,
+      };
     }
   );
-
+  const { accountApprovalHaveHandled } = useModel(
+    "global",
+    ({ accountApprovalHaveHandled }) => {
+      return {
+        accountApprovalHaveHandled,
+      };
+    }
+  );
   const refresh = () => {
     setSpin(true);
     getData();
@@ -21,7 +32,7 @@ const Index = () => {
       setSpin(false);
     }, 500);
   };
-
+  console.info("accountApprovalHaveHandled2", accountApprovalHaveHandled);
   return (
     <Tabs
       defaultActiveKey={"0"}
@@ -40,7 +51,11 @@ const Index = () => {
         key={"0"}
         tab={
           <Badge
-            count={approveList.length}
+            count={
+              approveList.filter((item) =>
+                accountApprovalHaveHandled.every((it) => it !== item.Key)
+              ).length
+            }
             overflowCount={100}
             offset={[8, 0]}
             showZero={false}

@@ -92,9 +92,11 @@ const Index = (props: { item: any }) => {
       title: "BALANCE",
       dataIndex: "contract",
       width: "34%",
-      render: (t: string, r) => {
-        const info = coinsInfo?.[t];
-        return `${info?.balance || ""} ${r?.symbol || ""}`;
+      render: (t: string, r: any) => {
+        const { balance } = coinsInfo?.[t] || {};
+        return `${
+          balance ? ethers.utils.formatUnits(balance, r.decimals) : ""
+        } ${r?.symbol || ""}`;
       },
     },
     {
