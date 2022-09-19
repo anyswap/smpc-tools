@@ -1,8 +1,9 @@
-import { Table, Button, message } from "antd";
-import React from "react";
+import { Table, Button, message, Breadcrumb } from "antd";
+import React, { useState } from "react";
 import { acceptSign } from "@/hooks/useSigns";
 import { useIntl, useModel } from "umi";
 import { cutOut, copyTxt } from "@/utils";
+import { RedoOutlined } from "@ant-design/icons";
 import moment from "moment";
 import { chainInfo } from "@/config/chainConfig";
 import { useActiveWeb3React } from "@/hooks";
@@ -12,6 +13,7 @@ const Index = () => {
   const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
   const { account } = useActiveWeb3React();
   const { execute } = acceptSign(rpc);
+  const [spin, setSpin] = useState(false);
   const { tradingList, tradingListLoading, getData } = useModel(
     "approval",
     ({ tradingList, tradingListLoading, getData }: any) => ({
@@ -149,14 +151,32 @@ const Index = () => {
         ),
     },
   ];
+  const refresh = () => {
+    setSpin(true);
+    getData();
+    setTimeout(() => {
+      setSpin(false);
+    }, 500);
+  };
   return (
-    <Table
-      columns={columns}
-      dataSource={tradingList}
-      loading={tradingListLoading}
-      pagination={false}
-      rowKey="Key"
-    />
+    <>
+      <Breadcrumb className="mt15">
+        <Breadcrumb.Item>Transactions</Breadcrumb.Item>
+        <Breadcrumb.Item>Approval</Breadcrumb.Item>
+      </Breadcrumb>
+      <RedoOutlined
+        spin={spin}
+        className="fs18 cursor_pointer fr mb10 mr5"
+        onClick={refresh}
+      />
+      <Table
+        columns={columns}
+        dataSource={tradingList}
+        loading={tradingListLoading}
+        pagination={false}
+        rowKey="Key"
+      />
+    </>
   );
 };
 

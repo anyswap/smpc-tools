@@ -8,6 +8,7 @@ import {
   Modal,
   Collapse,
   Timeline,
+  Breadcrumb,
 } from "antd";
 import { useActiveWeb3React } from "@/hooks";
 import { useModel, history, useIntl } from "umi";
@@ -20,6 +21,7 @@ import {
   RightOutlined,
   LoadingOutlined,
   ShareAltOutlined,
+  RedoOutlined,
 } from "@ant-design/icons";
 import moment from "moment";
 import web3 from "@/assets/js/web3";
@@ -41,13 +43,21 @@ const Index = () => {
     sendApprovaled: GsendApprovaled,
     pollingRsvInfo,
     getRsv,
+    getRsvSpin,
   } = useModel(
     "global",
-    ({ globalDispatch, sendApprovaled, pollingRsvInfo, getRsv }) => ({
+    ({
       globalDispatch,
       sendApprovaled,
       pollingRsvInfo,
       getRsv,
+      getRsvSpin,
+    }) => ({
+      globalDispatch,
+      sendApprovaled,
+      pollingRsvInfo,
+      getRsv,
+      getRsvSpin,
     })
   );
 
@@ -405,6 +415,18 @@ const Index = () => {
           }
         }}
       >
+        <Breadcrumb className="mt15">
+          <Breadcrumb.Item>Transactions</Breadcrumb.Item>
+          <Breadcrumb.Item>History</Breadcrumb.Item>
+        </Breadcrumb>
+        <div style={{ overflow: "hidden" }}>
+          <RedoOutlined
+            spin={getRsvSpin}
+            className="fs18 cursor_pointer fr mr15"
+            onClick={getRsv}
+          />
+        </div>
+
         {/* <Button onClick={getApproveList}>get</Button>{" "} */}
         {/* <Table
           columns={columns}
@@ -482,9 +504,14 @@ const Index = () => {
                       </Button>
                     )}
                   </p>
-                  {item.transactionHash && (
+                  {AllReply.map((item) => (
                     <div>
-                      Transaction hash:
+                      {item.Approver}: {item.Status}
+                    </div>
+                  ))}
+                  {item.transactionHash && (
+                    <div className="mt20">
+                      Transaction hash: {getTransactionStatus(item)}
                       <ShareAltOutlined
                         style={{ cursor: "pointer" }}
                         onClick={() => {
