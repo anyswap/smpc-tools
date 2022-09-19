@@ -19,7 +19,6 @@ interface Iprops {
   TokenAddress: any;
 }
 const Index = (props: Iprops) => {
-  console.info("propsprops", props);
   const { TokenAddress } = props;
   const [form] = Form.useForm();
   const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");

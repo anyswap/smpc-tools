@@ -2,6 +2,8 @@ import { getAddress } from "@ethersproject/address";
 import { message } from "antd";
 import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 import { formatFixed, parseFixed } from "@ethersproject/bignumber";
+import web3 from "@/assets/js/web3";
+import { ethers } from "ethers";
 const jszzicon = require("jazzicon");
 
 const names = ["wei", "kwei", "mwei", "gwei", "szabo", "finney", "ether"];
@@ -84,4 +86,33 @@ export const getHead = (TimeStamp: number) => {
       )
     )
   )}`;
+};
+
+export const getTransactionStatus = (item: any, index?: any) => {
+  if (item.Status === "Failure") return null;
+  const MsgContext = JSON.parse(item.MsgContext[0]);
+  const { chainId, to, value, nonce, gas, gasPrice } = MsgContext;
+  const Rsv = item.Rsv[0];
+  const txData = {
+    nonce,
+    gasLimit: web3.utils.toHex(gas),
+    gasPrice: web3.utils.toHex(gasPrice),
+    to,
+    data: "",
+    value: web3.utils.toHex(value),
+    chainId: web3.utils.hexToNumber(chainId),
+  };
+  const v =
+    Number(web3.utils.hexToNumber(chainId)) * 2 +
+    35 +
+    Number(Rsv.substr(128, 2));
+  let signature = {
+    r: "0x" + Rsv.substr(0, 64),
+    s: "0x" + Rsv.substr(64, 64),
+    v,
+  };
+
+  let signedTx = ethers.utils.serializeTransaction(txData, signature);
+  let txParse2 = ethers.utils.parseTransaction(signedTx);
+  return txParse2.hash;
 };

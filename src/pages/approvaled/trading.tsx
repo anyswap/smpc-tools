@@ -26,7 +26,7 @@ import {
 import moment from "moment";
 import web3 from "@/assets/js/web3";
 import "./style.less";
-import { cutOut } from "@/utils";
+import { cutOut, getTransactionStatus } from "@/utils";
 import { chainInfo } from "@/config/chainConfig";
 import { ethers } from "ethers";
 import { logos } from "@/pages/accountDrawer/config";
@@ -169,6 +169,7 @@ const Index = () => {
           ...item,
           transactionHash:
             index === i ? transactionHash : item.transactionHash || null,
+          transactionStatus: index === i ? "Success" : "Pending",
         }));
         setData(newData);
         globalDispatch({
@@ -238,36 +239,6 @@ const Index = () => {
     //       debugger;
     //       message.error(e.message);
     //     });
-  };
-  const getTransactionStatus = (item, index) => {
-    const MsgContext = JSON.parse(item.MsgContext[0]);
-    const { TokenAddress, chainId, to, value, nonce, gas, gasPrice } =
-      MsgContext;
-    const Rsv = item.Rsv[0];
-    const txData = {
-      nonce,
-      gasLimit: web3.utils.toHex(gas),
-      gasPrice: web3.utils.toHex(gasPrice),
-      to,
-      data: "",
-      value: web3.utils.toHex(value),
-      chainId: web3.utils.hexToNumber(chainId),
-    };
-    // const res = ethers.utils.serializeTransaction(txData, r.MsgHash[0]);
-    const v =
-      Number(web3.utils.hexToNumber(chainId)) * 2 +
-      35 +
-      Number(Rsv.substr(128, 2));
-    let signature = {
-      r: "0x" + Rsv.substr(0, 64),
-      s: "0x" + Rsv.substr(64, 64),
-      v,
-    };
-
-    let signedTx = ethers.utils.serializeTransaction(txData, signature);
-    let txParse2 = ethers.utils.parseTransaction(signedTx);
-    console.log(txParse2.hash);
-    return txParse2.hash;
   };
 
   const createGrounpModel = useIntl().formatHTMLMessage({
@@ -436,8 +407,14 @@ const Index = () => {
         /> */}
       </div>
       {GsendApprovaled.map((item: any, index: any) => {
-        const { TimeStamp, MsgContext, transactionHash, ThresHold, AllReply } =
-          item;
+        const {
+          TimeStamp,
+          MsgContext,
+          transactionStatus,
+          ThresHold,
+          AllReply,
+          Status,
+        } = item;
         const { chainId, data, originValue, symbol, to, name } = JSON.parse(
           MsgContext[0]
         );
@@ -445,6 +422,9 @@ const Index = () => {
 
         const isPrrovaling =
           AllReply.filter((it) => it.Status === "AGREE").length <
+          Number(ThresHold.split("/")[0]);
+        const isPrrovaled =
+          AllReply.filter((it) => it.Status === "AGREE").length ===
           Number(ThresHold.split("/")[0]);
         return (
           <Collapse
@@ -457,7 +437,7 @@ const Index = () => {
           >
             <Collapse.Panel
               expandIconPosition="end"
-              key={index}
+              key={TimeStamp}
               header={
                 <div
                   style={{
@@ -484,7 +464,10 @@ const Index = () => {
                     {moment(Number(TimeStamp)).format("YYYY-MM-DD HH:mm:ss")}
                   </span>
                   <span className="sta">
-                    {item.transactionHash ? "Success" : "Pending"}
+                    {/* {item.transactionHash ? "Success" : "Pending"} */}
+                    {Status == "Failure"
+                      ? "Failure"
+                      : transactionStatus || "Pending"}
                   </span>
                 </div>
               }
@@ -496,7 +479,7 @@ const Index = () => {
                     <b>{` ${originValue} ${symbol || chainDetial.symbol} `}</b>
                     to:
                     <b>{` ${to}`}</b>
-                    {!item.transactionHash && (
+                    {!item.transactionHash && Status == "Success" && (
                       <Button
                         onClick={() => send(item, index)}
                         type="primary"
@@ -507,7 +490,7 @@ const Index = () => {
                     )}
                   </p>
                   {AllReply.map((item) => (
-                    <div>
+                    <div key={item.Approver}>
                       {item.Approver}: {item.Status}
                     </div>
                   ))}
@@ -537,35 +520,54 @@ const Index = () => {
                 </div>
                 <div className="right">
                   <Timeline>
-                    <Timeline.Item>
+                    <Timeline.Item key={0}>
                       Create a transaction site{" "}
                       {moment(Number(TimeStamp)).format("YYYY-MM-DD HH:mm:ss")}
                     </Timeline.Item>
-                    <Timeline.Item dot={isPrrovaling && <LoadingOutlined />}>
+                    <Timeline.Item
+                      key={1}
+                      dot={isPrrovaling && <LoadingOutlined />}
+                    >
                       Prrovaling
                     </Timeline.Item>
-                    <Timeline.Item dot={!isPrrovaling && <LoadingOutlined />}>
+                    <Timeline.Item
+                      key={1}
+                      dot={
+                        transactionStatus !== "Success" &&
+                        isPrrovaled && <LoadingOutlined />
+                      }
+                      color={transactionStatus !== "Success" ? "gray" : "blue"}
+                    >
                       {sendTo + " " + name}
                     </Timeline.Item>
-                    <Timeline.Item color="gray">Done</Timeline.Item>
+                    <Timeline.Item
+                      key={1}
+                      color={transactionStatus !== "Success" ? "gray" : "blue"}
+                    >
+                      Done
+                    </Timeline.Item>
                   </Timeline>
-                  <Button
-                    onClick={() => {
-                      // dataIndex: "Status",
-                      // render: (t: any, r: any, i: any) => {
-                      //   if (t !== "Success") return "--";
-                      const { chainId, name } = JSON.parse(item.MsgContext[0]);
-                      const chainDetial =
-                        chainInfo[web3.utils.hexToNumber(chainId)];
-                      window.open(
-                        `${chainDetial.explorer}/tx/${getTransactionStatus(
-                          item
-                        )}`
-                      );
-                    }}
-                  >
-                    Transaction hash
-                  </Button>
+                  {transactionStatus === "Success" && (
+                    <Button
+                      onClick={() => {
+                        // dataIndex: "Status",
+                        // render: (t: any, r: any, i: any) => {
+                        //   if (t !== "Success") return "--";
+                        const { chainId, name } = JSON.parse(
+                          item.MsgContext[0]
+                        );
+                        const chainDetial =
+                          chainInfo[web3.utils.hexToNumber(chainId)];
+                        window.open(
+                          `${chainDetial.explorer}/tx/${getTransactionStatus(
+                            item
+                          )}`
+                        );
+                      }}
+                    >
+                      Transaction hash
+                    </Button>
+                  )}
                 </div>
               </div>
             </Collapse.Panel>

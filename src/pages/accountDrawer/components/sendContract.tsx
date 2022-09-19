@@ -39,7 +39,6 @@ const Index = (props: Iprops) => {
   const [open, setOpen] = useState(false);
   const List = Account.filter((item: any) => item.Status === "Success");
   const accountSelected = activeAccount || List[0];
-  console.info("accountSelectedaccountSelected", accountSelected);
   const address = ethers.utils.computeAddress("0x" + accountSelected.PubKey);
 
   const gRequired = useIntl().formatHTMLMessage({

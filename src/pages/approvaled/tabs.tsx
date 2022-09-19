@@ -23,6 +23,7 @@ const Index = () => {
   return (
     <Tabs
       defaultActiveKey={"1"}
+      style={{ maxWidth: 1440, width: "98%", margin: "5px auto" }}
       onChange={setActiveKey}
       tabBarExtraContent={
         activeKey === "1" && (

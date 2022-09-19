@@ -36,6 +36,7 @@ const Index = () => {
   return (
     <Tabs
       defaultActiveKey={"0"}
+      style={{ maxWidth: 1440, width: "98%", margin: "5px auto" }}
       tabBarExtraContent={
         <span className="mr5">
           <RedoOutlined
