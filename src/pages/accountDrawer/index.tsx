@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Breadcrumb, Drawer, Menu, Table, Button, Tabs } from "antd";
+import { Breadcrumb, Drawer, Menu, Table, Button, Tabs, Popover } from "antd";
 import {
   CopyOutlined,
   PlusCircleOutlined,
@@ -20,6 +20,7 @@ import CoinsList from "./coinsList";
 import Approval from "@/pages/approval/trading";
 import HistoryTransactions from "@/pages/approvaled/trading";
 import SendTransaction from "./sendTransaction";
+import QRCode from "qrcode.react";
 import "./style.less";
 
 const jszzicon = require("jazzicon");
@@ -132,7 +133,20 @@ const Index: React.FC = () => {
               </div>
               <div className="accountDrawer-opr">
                 <span>
-                  <AppstoreAddOutlined />
+                  <Popover
+                    title=""
+                    content={
+                      <div>
+                        <QRCode
+                          value={ethers.utils.computeAddress(
+                            "0x" + accountSelected.PubKey
+                          )}
+                        />
+                      </div>
+                    }
+                  >
+                    <AppstoreAddOutlined />
+                  </Popover>
                 </span>
                 <span>
                   <CopyOutlined
