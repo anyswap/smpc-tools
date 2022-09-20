@@ -434,60 +434,59 @@ export default function Index() {
       const account = window.ethereum?.selectedAddress;
       const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
       if (!rpc || !account) return;
-
-      // web3Chain.eth
-      //   .getTransaction(
-      //     "0x175298ca7e090d058cd5f1efc79d71b1f318c44ba2f5c3392d88f9f317d70f05"
-      //   )
-      //   .then((receipt) => {
-      //     debugger;
-      //     if (typeof receipt == "object" && receipt["hash"] != null) {
-      //       console.log("success");
-      //     } else {
-      //       console.log("failed or keep waiting");
-      //     }
-      //   });
       const polling = GsendApprovaled.filter((item: any) => {
-        const { MsgContext, transactionHash, ThresHold, AllReply } = item;
-        const { chainId, data, originValue, symbol, to, name } = JSON.parse(
-          MsgContext[0]
-        );
-        const chainDetial = chainInfo[web3.utils.hexToNumber(chainId)];
+        const { MsgContext, ThresHold, AllReply, transactionStatus, Status } =
+          item;
+        const { chainId } = JSON.parse(MsgContext[0]);
         const isPrrovaling =
           AllReply.filter((it) => it.Status === "AGREE").length <
           Number(ThresHold.split("/")[0]);
-        return !isPrrovaling;
+        return (
+          !isPrrovaling &&
+          transactionStatus !== "Success" &&
+          Status !== "Failure"
+        );
       });
-
       if (!polling.length) return;
-      polling.forEach((item: any) => {
+      let resArr = [];
+      polling.forEach(async (item: any) => {
         const { chainId } = JSON.parse(item.MsgContext[0]);
         const nodeRpc = chainInfo[web3.utils.hexToNumber(chainId)].nodeRpc;
         let web3Chain = new Web3(nodeRpc);
-        web3Chain.eth
-          .getTransaction(getTransactionStatus(item))
-          .then((receipt: any) => {
-            if (!receipt) return;
-            console.info("receipt", receipt);
-            if (receipt["hash"]) {
-              // sendApprovaled: JSON.parse(localStorage.getItem("sendApprovaled") || "[]"),
-              const newSendApprovaled = GsendApprovaled.map((it) => ({
-                ...it,
-                transactionStatus:
-                  item.KeyID === it.KeyID ? "Success" : it.transactionStatus,
-              }));
-              localStorage.setItem(
-                "sendApprovaled",
-                JSON.stringify(newSendApprovaled)
-              );
-              dispatch({
-                sendApprovaled: newSendApprovaled,
-              });
-            } else {
-              console.log("failed or keep waiting");
-            }
+        const receipt = await web3Chain.eth.getTransaction(
+          getTransactionStatus(item)
+        );
+        if (!receipt) return;
+        console.info("receipt", receipt);
+        if (receipt["hash"]) {
+          resArr.push({
+            ...item,
+            transactionStatus: "Success",
+            transactionHash: getTransactionStatus(it),
           });
+          // const newSendApprovaled = GsendApprovaled.map((it) => ({
+          //   ...it,
+          //   transactionStatus:
+          //     item.KeyID === it.KeyID ? "Success" : it.transactionStatus,
+          //   transactionHash:
+          //     item.KeyID === it.KeyID
+          //       ? getTransactionStatus(it)
+          //       : it.transactionHash,
+          // }));
+          // localStorage.setItem(
+          //   "sendApprovaled",
+          //   JSON.stringify(newSendApprovaled)
+          // );
+          // dispatch({
+          //   sendApprovaled: newSendApprovaled,
+          // });
+        } else {
+          console.log("failed or keep waiting");
+        }
       });
+      if (resArr.length) {
+        debugger;
+      }
     }, 10 * 1000);
     return () => {
       clearInterval(interval);

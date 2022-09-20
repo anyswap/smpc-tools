@@ -14,6 +14,7 @@ type FormParams = {
   to: string;
   value: string;
   TokenAddress: string;
+  setTypeOpen: () => void;
 };
 interface Iprops {
   details: any;
@@ -46,12 +47,41 @@ const Index = (props: Iprops) => {
   });
   const gPlaceholder1 = useIntl().formatHTMLMessage({ id: "g.placeholder1" });
   const rules2 = useIntl().formatHTMLMessage({ id: "login.rules2" });
+
   const onFinish = (v: FormParams) => {
     tokenFinish(v);
   };
   useEffect(() => {
     if (open) form.resetFields();
   }, [open]);
+
+  const onSend = async (
+    to: string,
+    value: string,
+    TokenAddress: string | null,
+    symbol: string | null
+  ) => {
+    if (!execute) return;
+    const res = await execute(
+      {
+        ...accountSelected,
+        address: ethers.utils.computeAddress("0x" + accountSelected.PubKey),
+      },
+      to,
+      value,
+      TokenAddress,
+      symbol
+    );
+    if (!res) {
+      message.info("no sign");
+    }
+    if (res?.Status === "Success") {
+      message.success("Success");
+      props.setTypeOpen(false);
+      return true;
+    }
+    return false;
+  };
 
   const tokenFinish = async (v: FormParams) => {
     let web3;
@@ -78,7 +108,7 @@ const Index = (props: Iprops) => {
         return;
       }
       const res = await onSend(v.to, v.value, v.TokenAddress, symbol);
-      if (res) setVisible(false);
+      if (res) setOpen(false);
     });
   };
 
@@ -124,7 +154,7 @@ const Index = (props: Iprops) => {
                 Contract address*
               </p>
               <Form.Item name="TokenAddress" rules={[{ required: true }]}>
-                <Input placeholder={gPlaceholder1 as string} />
+                <Input placeholder={gPlaceholder1 as string} size="large" />
               </Form.Item>
               <p style={{ color: "rgba(0, 0, 0, 0.54)", marginTop: 20 }}>
                 Recipient*
@@ -192,12 +222,7 @@ const Index = (props: Iprops) => {
               <Button size="large" type="link" onClick={() => setOpen(false)}>
                 Cancel
               </Button>
-              <Button
-                type="primary"
-                size="large"
-                onClick={form.submit}
-                htmlType="submit"
-              >
+              <Button type="primary" size="large" htmlType="submit">
                 &nbsp;Enter&nbsp;
               </Button>
             </div>

@@ -38,7 +38,6 @@ const Index = (props: Iprops) => {
   const [open, setOpen] = useState(false);
   const List = Account.filter((item: any) => item.Status === "Success");
   const accountSelected = activeAccount || List[0];
-  console.info("accountSelectedaccountSelected", accountSelected);
   const address = ethers.utils.computeAddress("0x" + accountSelected.PubKey);
 
   const gRequired = useIntl().formatHTMLMessage({
@@ -175,12 +174,7 @@ const Index = (props: Iprops) => {
               <Button size="large" type="link" onClick={() => setOpen(false)}>
                 Cancel
               </Button>
-              <Button
-                type="primary"
-                size="large"
-                onClick={form.submit}
-                htmlType="submit"
-              >
+              <Button type="primary" size="large" htmlType="submit">
                 &nbsp;Enter&nbsp;
               </Button>
             </div>

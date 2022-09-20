@@ -64,7 +64,6 @@ const Index = (props: { item: any }) => {
       const { contract } = item;
       const info = await getInfo(contract);
       obj[contract] = info;
-      console.info("obj", obj);
       if (Object.entries(obj).length === coins[chainId].length) {
         setLoading(false);
         setCoinsInfo(obj);

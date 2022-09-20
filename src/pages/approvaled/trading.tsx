@@ -83,6 +83,7 @@ const Index = () => {
   });
 
   const send = async (r: any, i: any) => {
+    debugger;
     // return;
     setSpinning(true);
     const MsgContext = JSON.parse(r.MsgContext[0]);
@@ -165,6 +166,7 @@ const Index = () => {
         console.log(transactionHash);
         message.success(operationIsSuccessful);
         setSpinning(false);
+        debugger;
         const newData = GsendApprovaled.map((item: any, index: number) => ({
           ...item,
           transactionHash:
@@ -406,99 +408,167 @@ const Index = () => {
           pagination={false}
         /> */}
       </div>
-      {GsendApprovaled.map((item: any, index: any) => {
-        const {
-          TimeStamp,
-          MsgContext,
-          transactionStatus,
-          ThresHold,
-          AllReply,
-          Status,
-        } = item;
-        const { chainId, data, originValue, symbol, to, name } = JSON.parse(
-          MsgContext[0]
-        );
-        const chainDetial = chainInfo[web3.utils.hexToNumber(chainId)];
+      {GsendApprovaled.sort((a, b) => b.TimeStamp - a.TimeStamp).map(
+        (item: any, index: any) => {
+          const {
+            TimeStamp,
+            MsgContext,
+            transactionStatus,
+            ThresHold,
+            AllReply,
+            Status,
+            KeyID,
+          } = item;
+          const { chainId, data, originValue, symbol, to, name } = JSON.parse(
+            MsgContext[0]
+          );
+          const chainDetial = chainInfo[web3.utils.hexToNumber(chainId)];
 
-        const isPrrovaling =
-          AllReply.filter((it) => it.Status === "AGREE").length <
-          Number(ThresHold.split("/")[0]);
-        const isPrrovaled =
-          AllReply.filter((it) => it.Status === "AGREE").length ===
-          Number(ThresHold.split("/")[0]);
-        return (
-          <Collapse
-            expandIconPosition="end"
-            key={TimeStamp}
-            onChange={(e) => {
-              getRsv();
-              if (e.length) getTransactionStatus(item, index);
-            }}
-          >
-            <Collapse.Panel
+          const isPrrovaling =
+            AllReply.filter((it) => it.Status === "AGREE").length <
+            Number(ThresHold.split("/")[0]);
+          const isPrrovaled =
+            AllReply.filter((it) => it.Status === "AGREE").length ===
+            Number(ThresHold.split("/")[0]);
+          return (
+            <Collapse
               expandIconPosition="end"
               key={TimeStamp}
-              header={
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <span>
-                    <span>
-                      {index + 1} Sent &nbsp;
-                      <img
-                        src={require("./img/send.svg")}
-                        style={{ marginBottom: 2 }}
-                      />
-                    </span>
-                  </span>
-                  <span>
-                    <img width={26} src={logos[symbol || chainDetial.symbol]} />
-                    &nbsp;
-                    {originValue}
-                    {symbol || chainDetial.symbol}
-                  </span>
-                  <span>
-                    {moment(Number(TimeStamp)).format("YYYY-MM-DD HH:mm:ss")}
-                  </span>
-                  <span className="sta">
-                    {/* {item.transactionHash ? "Success" : "Pending"} */}
-                    {Status == "Failure"
-                      ? "Failure"
-                      : transactionStatus || "Pending"}
-                  </span>
-                </div>
-              }
+              onChange={(e) => {
+                getRsv();
+                if (e.length) getTransactionStatus(item, index);
+              }}
             >
-              <div className="collapse-content">
-                <div className="left">
-                  <p>
-                    Sent{" "}
-                    <b>{` ${originValue} ${symbol || chainDetial.symbol} `}</b>
-                    to:
-                    <b>{` ${to}`}</b>
-                    {!item.transactionHash && Status == "Success" && (
-                      <Button
-                        onClick={() => send(item, index)}
-                        type="primary"
-                        style={{ marginLeft: 20 }}
+              <Collapse.Panel
+                expandIconPosition="end"
+                key={TimeStamp}
+                header={
+                  <div>
+                    <span style={{ display: "inline-block", width: "28%" }}>
+                      <span>
+                        {index + 1} Sent &nbsp;KeyID:{KeyID}
+                        <img
+                          src={require("./img/send.svg")}
+                          style={{ marginBottom: 2 }}
+                        />
+                      </span>
+                    </span>
+                    <span style={{ display: "inline-block", width: "28%" }}>
+                      <img
+                        width={26}
+                        src={logos[symbol || chainDetial.symbol]}
+                      />
+                      &nbsp;
+                      {originValue}
+                      {symbol || chainDetial.symbol}
+                    </span>
+                    <span style={{ display: "inline-block", width: "28%" }}>
+                      {moment(Number(TimeStamp)).format("YYYY-MM-DD HH:mm:ss")}
+                    </span>
+                    <span className="sta">
+                      {/* {item.transactionHash ? "Success" : "Pending"} */}
+                      {Status == "Failure"
+                        ? "Failure"
+                        : transactionStatus || "Pending"}
+                    </span>
+                  </div>
+                }
+              >
+                <div className="collapse-content">
+                  <div className="left">
+                    <p>
+                      Sent{" "}
+                      <b>{` ${originValue} ${
+                        symbol || chainDetial.symbol
+                      } `}</b>
+                      to:
+                      <b>{` ${to}`}</b>
+                      {!item.transactionHash && Status == "Success" && (
+                        <Button
+                          onClick={() => send(item, index)}
+                          type="primary"
+                          style={{ marginLeft: 20 }}
+                        >
+                          {sendTo + " " + name}
+                        </Button>
+                      )}
+                    </p>
+                    {AllReply.map((item) => (
+                      <div key={item.Approver}>
+                        {item.Approver}: {item.Status}
+                      </div>
+                    ))}
+                    {item.transactionHash && (
+                      <div className="mt20">
+                        Transaction hash: {getTransactionStatus(item)}
+                        <ShareAltOutlined
+                          style={{ cursor: "pointer" }}
+                          onClick={() => {
+                            // dataIndex: "Status",
+                            // render: (t: any, r: any, i: any) => {
+                            //   if (t !== "Success") return "--";
+                            const { chainId, name } = JSON.parse(
+                              item.MsgContext[0]
+                            );
+                            const chainDetial =
+                              chainInfo[web3.utils.hexToNumber(chainId)];
+                            window.open(
+                              `${
+                                chainDetial.explorer
+                              }/tx/${getTransactionStatus(item)}`
+                            );
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                  <div className="right">
+                    <Timeline>
+                      <Timeline.Item key={0}>
+                        Create a transaction site{" "}
+                        {moment(Number(TimeStamp)).format(
+                          "YYYY-MM-DD HH:mm:ss"
+                        )}
+                      </Timeline.Item>
+                      <Timeline.Item
+                        key={1}
+                        dot={
+                          isPrrovaling &&
+                          !["Failure"].includes(Status) && <LoadingOutlined />
+                        }
+                        color={isPrrovaled ? "blue" : "gray"}
+                        // color={
+                        //   !["Failure"].includes(Status) ||
+                        //   transactionStatus !== "Success"
+                        //     ? "gray"
+                        //     : "blue"
+                        // }
+                      >
+                        Prrovaling
+                      </Timeline.Item>
+                      <Timeline.Item
+                        key={2}
+                        dot={
+                          transactionStatus !== "Success" &&
+                          isPrrovaled && <LoadingOutlined />
+                        }
+                        color={
+                          transactionStatus !== "Success" ? "gray" : "blue"
+                        }
                       >
                         {sendTo + " " + name}
-                      </Button>
-                    )}
-                  </p>
-                  {AllReply.map((item) => (
-                    <div key={item.Approver}>
-                      {item.Approver}: {item.Status}
-                    </div>
-                  ))}
-                  {item.transactionHash && (
-                    <div className="mt20">
-                      Transaction hash: {getTransactionStatus(item)}
-                      <ShareAltOutlined
-                        style={{ cursor: "pointer" }}
+                      </Timeline.Item>
+                      <Timeline.Item
+                        key={3}
+                        color={
+                          transactionStatus !== "Success" ? "gray" : "blue"
+                        }
+                      >
+                        Done
+                      </Timeline.Item>
+                    </Timeline>
+                    {transactionStatus === "Success" && (
+                      <Button
                         onClick={() => {
                           // dataIndex: "Status",
                           // render: (t: any, r: any, i: any) => {
@@ -514,66 +584,17 @@ const Index = () => {
                             )}`
                           );
                         }}
-                      />
-                    </div>
-                  )}
+                      >
+                        Transaction detail
+                      </Button>
+                    )}
+                  </div>
                 </div>
-                <div className="right">
-                  <Timeline>
-                    <Timeline.Item key={0}>
-                      Create a transaction site{" "}
-                      {moment(Number(TimeStamp)).format("YYYY-MM-DD HH:mm:ss")}
-                    </Timeline.Item>
-                    <Timeline.Item
-                      key={1}
-                      dot={isPrrovaling && <LoadingOutlined />}
-                    >
-                      Prrovaling
-                    </Timeline.Item>
-                    <Timeline.Item
-                      key={1}
-                      dot={
-                        transactionStatus !== "Success" &&
-                        isPrrovaled && <LoadingOutlined />
-                      }
-                      color={transactionStatus !== "Success" ? "gray" : "blue"}
-                    >
-                      {sendTo + " " + name}
-                    </Timeline.Item>
-                    <Timeline.Item
-                      key={1}
-                      color={transactionStatus !== "Success" ? "gray" : "blue"}
-                    >
-                      Done
-                    </Timeline.Item>
-                  </Timeline>
-                  {transactionStatus === "Success" && (
-                    <Button
-                      onClick={() => {
-                        // dataIndex: "Status",
-                        // render: (t: any, r: any, i: any) => {
-                        //   if (t !== "Success") return "--";
-                        const { chainId, name } = JSON.parse(
-                          item.MsgContext[0]
-                        );
-                        const chainDetial =
-                          chainInfo[web3.utils.hexToNumber(chainId)];
-                        window.open(
-                          `${chainDetial.explorer}/tx/${getTransactionStatus(
-                            item
-                          )}`
-                        );
-                      }}
-                    >
-                      Transaction hash
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </Collapse.Panel>
-          </Collapse>
-        );
-      })}
+              </Collapse.Panel>
+            </Collapse>
+          );
+        }
+      )}
     </Spin>
   );
 };

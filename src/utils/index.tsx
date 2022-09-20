@@ -91,14 +91,20 @@ export const getHead = (TimeStamp: number) => {
 export const getTransactionStatus = (item: any, index?: any) => {
   if (item.Status === "Failure") return null;
   const MsgContext = JSON.parse(item.MsgContext[0]);
-  const { chainId, to, value, nonce, gas, gasPrice } = MsgContext;
+  const { chainId, to, value, nonce, gas, gasPrice, data = "" } = MsgContext;
   const Rsv = item.Rsv[0];
+  if (
+    item.KeyID ===
+    "0xb79b6c3ec9bc1d715be3af87d479ba0ae1b3d929a24c6e60f07a9a805e0889c9"
+  ) {
+    debugger;
+  }
   const txData = {
     nonce,
     gasLimit: web3.utils.toHex(gas),
     gasPrice: web3.utils.toHex(gasPrice),
     to,
-    data: "",
+    data,
     value: web3.utils.toHex(value),
     chainId: web3.utils.hexToNumber(chainId),
   };

@@ -38,7 +38,6 @@ const Index = (props: Iprops) => {
   const [open, setOpen] = useState(false);
   const List = Account.filter((item: any) => item.Status === "Success");
   const accountSelected = activeAccount || List[0];
-  console.info("accountSelectedaccountSelected", accountSelected);
   const address = ethers.utils.computeAddress("0x" + accountSelected.PubKey);
 
   const gRequired = useIntl().formatHTMLMessage({
@@ -52,6 +51,32 @@ const Index = (props: Iprops) => {
   useEffect(() => {
     if (open) form.resetFields();
   }, [open]);
+  const onSend = async (
+    to: string,
+    value: string,
+    TokenAddress: string | null,
+    symbol: string | null
+  ) => {
+    if (!execute) return;
+    const res = await execute(
+      {
+        ...accountSelected,
+        address: ethers.utils.computeAddress("0x" + accountSelected.PubKey),
+      },
+      to,
+      value,
+      TokenAddress,
+      symbol
+    );
+    if (!res) {
+      message.info("no sign");
+    }
+    if (res?.Status === "Success") {
+      message.success("Success");
+      return true;
+    }
+    return false;
+  };
 
   const tokenFinish = async (v: FormParams) => {
     let web3;
@@ -78,7 +103,7 @@ const Index = (props: Iprops) => {
         return;
       }
       const res = await onSend(v.to, v.value, v.TokenAddress, symbol);
-      if (res) setVisible(false);
+      if (res) setOpen(false);
     });
   };
 
@@ -129,7 +154,11 @@ const Index = (props: Iprops) => {
                 rules={[{ required: true }]}
                 initialValue={TokenAddress}
               >
-                <Input placeholder={gPlaceholder1 as string} disabled />
+                <Input
+                  placeholder={gPlaceholder1 as string}
+                  disabled
+                  size="large"
+                />
               </Form.Item>
               <p style={{ color: "rgba(0, 0, 0, 0.54)", marginTop: 20 }}>
                 Recipient*
@@ -189,12 +218,7 @@ const Index = (props: Iprops) => {
               <Button size="large" type="link" onClick={() => setOpen(false)}>
                 Cancel
               </Button>
-              <Button
-                type="primary"
-                size="large"
-                onClick={form.submit}
-                htmlType="submit"
-              >
+              <Button type="primary" size="large" htmlType="submit">
                 &nbsp;Enter&nbsp;
               </Button>
             </div>

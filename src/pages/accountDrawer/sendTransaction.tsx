@@ -28,7 +28,7 @@ const Index = (props: Iprops) => {
           <br />
           <br />
 
-          <SendContract details={props.details} />
+          <SendContract details={props.details} setTypeOpen={setTypeOpen} />
         </div>
       </Modal>
     </div>
