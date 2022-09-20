@@ -18,7 +18,10 @@ import { cutOut, getWeb3, formatUnits, getHead, copyTxt } from "@/utils";
 import { chainInfo } from "@/config/chainConfig";
 import CoinsList from "./coinsList";
 import Approval from "@/pages/approval/trading";
+import AccountApproval from "@/pages/approval/index";
+import AccountApprovaled from "@/pages/approvaled/index";
 import HistoryTransactions from "@/pages/approvaled/trading";
+import CreateGrounp from "@/pages/createGrounp/index";
 import SendTransaction from "./sendTransaction";
 import QRCode from "qrcode.react";
 import "./style.less";
@@ -28,13 +31,13 @@ const jszzicon = require("jazzicon");
 const Index: React.FC = () => {
   const { account, library, chainId }: any = useActiveWeb3React();
   const [details, setDetails] = useState<any>({});
-  const [selectedKeys, setSelectedKeys] = useState<string[]>(["Coins"]);
-  const { drawerVisible, dispatch, activeAccount } = useModel(
+  const { drawerVisible, dispatch, activeAccount, selectedKeys } = useModel(
     "accountDrawer",
-    ({ drawerVisible, dispatch, activeAccount }: any) => ({
+    ({ drawerVisible, dispatch, activeAccount, selectedKeys }: any) => ({
       drawerVisible,
       dispatch,
       activeAccount,
+      selectedKeys,
     })
   );
 
@@ -84,15 +87,15 @@ const Index: React.FC = () => {
         style={{ top: 70 }}
         zIndex={10}
       > */}
-      {accountSelected && (
-        <div
-          style={{
-            display: "flex",
-            background: "#f6f7f8",
-          }}
-          className="drawerBox"
-        >
-          {/* <Drawer
+
+      <div
+        style={{
+          display: "flex",
+          background: "#f6f7f8",
+        }}
+        className="drawerBox"
+      >
+        {/* <Drawer
           placement="left"
           open={drawerVisible}
           onClose={() => dispatch({ drawerVisible: false })}
@@ -100,128 +103,132 @@ const Index: React.FC = () => {
           dsdsdsdds
         </Drawer> */}
 
-          <div className="left" style={{ width: 340 }}>
-            <div
-              className="openBtn"
-              onClick={() => dispatch({ drawerVisible: true })}
-            >
-              <RightOutlined />
-            </div>
+        <div className="left" style={{ width: 340 }}>
+          <div
+            className="openBtn"
+            onClick={() => dispatch({ drawerVisible: true })}
+          >
+            <RightOutlined />
+          </div>
+          {accountSelected && (
+            <>
+              <div className="accountDrawer-head">
+                <div className="img">
+                  <div className="thresHold">{accountSelected.ThresHold}</div>
+                  <img
+                    src={getHead(accountSelected.TimeStamp)}
+                    alt={ethers.utils.computeAddress(
+                      "0x" + accountSelected.PubKey
+                    )}
+                  />
 
-            <div className="accountDrawer-head">
-              <div className="img">
-                <div className="thresHold">{accountSelected.ThresHold}</div>
-                <img
-                  src={getHead(accountSelected.TimeStamp)}
-                  alt={ethers.utils.computeAddress(
-                    "0x" + accountSelected.PubKey
-                  )}
-                />
-
+                  <div>
+                    {ethers.utils
+                      .computeAddress("0x" + accountSelected.PubKey)
+                      .slice(0, 6)}
+                  </div>
+                </div>
                 <div>
-                  {ethers.utils
-                    .computeAddress("0x" + accountSelected.PubKey)
-                    .slice(0, 6)}
+                  {cutOut(
+                    ethers.utils.computeAddress("0x" + accountSelected.PubKey),
+                    10,
+                    6
+                  )}
+                </div>
+                <div className="accountDrawer-opr">
+                  <span>
+                    <Popover
+                      title=""
+                      content={
+                        <div>
+                          <QRCode
+                            value={ethers.utils.computeAddress(
+                              "0x" + accountSelected.PubKey
+                            )}
+                          />
+                        </div>
+                      }
+                    >
+                      <AppstoreAddOutlined />
+                    </Popover>
+                  </span>
+                  <span>
+                    <CopyOutlined
+                      onClick={() =>
+                        copyTxt(
+                          ethers.utils.computeAddress(
+                            "0x" + accountSelected.PubKey
+                          )
+                        )
+                      }
+                    />
+                  </span>
+                  <span>
+                    <ShareAltOutlined
+                      onClick={() => {
+                        const chainDetial =
+                          chainInfo[web3.utils.hexToNumber(chainId)];
+                        window.open(
+                          `${
+                            chainDetial.explorer
+                          }/address/${ethers.utils.computeAddress(
+                            "0x" + accountSelected.PubKey
+                          )}`
+                        );
+                      }}
+                    />
+                  </span>
+                </div>
+                <div>
+                  <SendTransaction details={details} />
                 </div>
               </div>
-              <div>
-                {cutOut(
-                  ethers.utils.computeAddress("0x" + accountSelected.PubKey),
-                  10,
-                  6
-                )}
-              </div>
-              <div className="accountDrawer-opr">
-                <span>
-                  <Popover
-                    title=""
-                    content={
-                      <div>
-                        <QRCode
-                          value={ethers.utils.computeAddress(
-                            "0x" + accountSelected.PubKey
-                          )}
-                        />
-                      </div>
-                    }
-                  >
-                    <AppstoreAddOutlined />
-                  </Popover>
-                </span>
-                <span>
-                  <CopyOutlined
-                    onClick={() =>
-                      copyTxt(
-                        ethers.utils.computeAddress(
-                          "0x" + accountSelected.PubKey
-                        )
-                      )
-                    }
-                  />
-                </span>
-                <span>
-                  <ShareAltOutlined
-                    onClick={() => {
-                      const chainDetial =
-                        chainInfo[web3.utils.hexToNumber(chainId)];
-                      window.open(
-                        `${
-                          chainDetial.explorer
-                        }/address/${ethers.utils.computeAddress(
-                          "0x" + accountSelected.PubKey
-                        )}`
-                      );
-                    }}
-                  />
-                </span>
-              </div>
-              <div>
-                <SendTransaction details={details} />
-              </div>
-            </div>
-            <div style={{ maxHeight: "30vh", marginBottom: 35 }}></div>
-            <Menu
-              mode="inline"
-              defaultOpenKeys={["Assets"]}
-              selectedKeys={selectedKeys}
-              onClick={(e) => setSelectedKeys([e.key])}
-              items={[
-                {
-                  key: "Assets",
-                  label: "Assets",
-                  children: [
-                    {
-                      key: "Coins",
-                      label: "Coins",
-                    },
-                  ],
-                },
-                {
-                  key: "Transactions",
-                  label: "Transactions",
-                  children: [
-                    {
-                      key: "Approval",
-                      label: "Approval",
-                    },
-                    {
-                      key: "History",
-                      label: "History",
-                    },
-                  ],
-                },
-              ]}
-            />
-          </div>
-          <div className="right" style={{ flex: 1, padding: "5px 20px" }}>
-            {selectedKeys[0] === "Coins" && (
-              <CoinsList item={accountSelected} />
-            )}
-            {selectedKeys[0] === "Approval" && <Approval />}
-            {selectedKeys[0] === "History" && <HistoryTransactions />}
-          </div>
+              <div style={{ maxHeight: "30vh", marginBottom: 35 }}></div>
+              <Menu
+                mode="inline"
+                defaultOpenKeys={["Assets"]}
+                selectedKeys={selectedKeys}
+                onClick={(e) => dispatch({ selectedKeys: [e.key] })}
+                items={[
+                  {
+                    key: "Assets",
+                    label: "Assets",
+                    children: [
+                      {
+                        key: "Coins",
+                        label: "Coins",
+                      },
+                    ],
+                  },
+                  {
+                    key: "Transactions",
+                    label: "Transactions",
+                    children: [
+                      {
+                        key: "Approval",
+                        label: "Approval",
+                      },
+                      {
+                        key: "History",
+                        label: "History",
+                      },
+                    ],
+                  },
+                ]}
+              />
+            </>
+          )}
         </div>
-      )}
+        <div className="right" style={{ flex: 1, padding: "5px 20px" }}>
+          {selectedKeys[0] === "Coins" && <CoinsList item={accountSelected} />}
+          {selectedKeys[0] === "Approval" && <Approval />}
+          {selectedKeys[0] === "History" && <HistoryTransactions />}
+          {selectedKeys[0] === "AccountApproval" && <AccountApproval />}
+          {selectedKeys[0] === "AccountApprovaled" && <AccountApprovaled />}
+          {selectedKeys[0] === "CreateGrounp" && <CreateGrounp />}
+        </div>
+      </div>
+
       <Drawer
         visible={drawerVisible}
         placement="left"
@@ -234,7 +241,12 @@ const Index: React.FC = () => {
       >
         <div
           className="account-List-Skip"
-          onClick={() => history.push("/createGrounp")}
+          onClick={() =>
+            dispatch({
+              selectedKeys: ["CreateGrounp"],
+              drawerVisible: false,
+            })
+          }
         >
           <span>
             <PlusCircleOutlined />
@@ -243,7 +255,12 @@ const Index: React.FC = () => {
         </div>
         <div
           className="account-List-Skip"
-          onClick={() => history.push("/approval")}
+          onClick={() =>
+            dispatch({
+              selectedKeys: ["AccountApproval"],
+              drawerVisible: false,
+            })
+          }
         >
           <span>
             <FormOutlined />
@@ -252,7 +269,12 @@ const Index: React.FC = () => {
         </div>
         <div
           className="account-List-Skip"
-          onClick={() => history.push("/approvaled")}
+          onClick={() =>
+            dispatch({
+              selectedKeys: ["AccountApprovaled"],
+              drawerVisible: false,
+            })
+          }
           style={{ marginBottom: 50 }}
         >
           <span>

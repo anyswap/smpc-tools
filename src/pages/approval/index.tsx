@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Button, message, Table } from "antd";
+import { Button, message, Table, Breadcrumb } from "antd";
 import { useActiveWeb3React } from "@/hooks";
+import { RedoOutlined } from "@ant-design/icons";
 import { useApproveReqSmpcAddress } from "@/hooks/useSigns";
 import { useModel, useIntl } from "umi";
 import moment from "moment";
@@ -10,7 +11,7 @@ import { cutOut, copyTxt } from "@/utils";
 
 const Index = () => {
   const { account } = useActiveWeb3React();
-
+  const [spin, setSpin] = useState(false);
   const { globalDispatch, pollingPubKey, Account, accountApprovalHaveHandled } =
     useModel(
       "global",
@@ -63,6 +64,14 @@ const Index = () => {
     id: "approval.disagree",
   });
   const createYourOwn = useIntl().formatHTMLMessage({ id: "createYourOwn" });
+
+  const refresh = () => {
+    setSpin(true);
+    getData();
+    setTimeout(() => {
+      setSpin(false);
+    }, 500);
+  };
 
   const columns: any = [
     {
@@ -167,6 +176,15 @@ const Index = () => {
 
   return (
     <div className="approval">
+      <Breadcrumb className="mt15">
+        <Breadcrumb.Item>Account</Breadcrumb.Item>
+        <Breadcrumb.Item>Approval</Breadcrumb.Item>
+      </Breadcrumb>
+      <RedoOutlined
+        spin={spin}
+        className="fs18 cursor_pointer fr mb10 mr5"
+        onClick={refresh}
+      />
       <Table
         columns={columns}
         dataSource={approveList.filter((item) =>
