@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Breadcrumb, Drawer, Menu, Table, Button, Tabs, Popover } from "antd";
+import {
+  Breadcrumb,
+  Drawer,
+  Menu,
+  Table,
+  Button,
+  Tabs,
+  Popover,
+  Badge,
+} from "antd";
 import {
   CopyOutlined,
   PlusCircleOutlined,
@@ -41,9 +50,32 @@ const Index: React.FC = () => {
     })
   );
 
-  const { Account } = useModel("global", ({ Account }: any) => ({
+  const {
     Account,
-  }));
+    transactionApprovalHaveHandled,
+    accountApprovalHaveHandled,
+  } = useModel(
+    "global",
+    ({
+      Account,
+      transactionApprovalHaveHandled,
+      accountApprovalHaveHandled,
+    }: any) => ({
+      Account,
+      transactionApprovalHaveHandled,
+
+      accountApprovalHaveHandled,
+    })
+  );
+
+  const { tradingList, approveList } = useModel(
+    "approval",
+    ({ tradingList, approveList }: any) => ({
+      tradingList,
+      approveList,
+    })
+  );
+
   useEffect(() => {
     if (Account.filter((item: any) => item.Status === "Success").length === 0) {
       dispatch({ drawerVisible: true });
@@ -52,7 +84,7 @@ const Index: React.FC = () => {
   const List = Account.filter((item: any) => item.Status === "Success");
   const accountSelected = List.length ? activeAccount || List[0] : null;
 
-  useEffect(() => {
+  const getAccountBalance = () => {
     const provider = library ? library?.provider : "";
     const newWeb3 = getWeb3("", provider);
     const batch = new newWeb3.BatchRequest();
@@ -70,6 +102,16 @@ const Index: React.FC = () => {
       });
       setDetails(detailsObj);
     });
+  };
+
+  useEffect(() => {
+    getAccountBalance();
+    const interval = setInterval(() => {
+      getAccountBalance;
+    }, 5 * 1000);
+    return () => {
+      clearInterval(interval);
+    };
   }, [Account, library]);
   return (
     <>
@@ -206,7 +248,23 @@ const Index: React.FC = () => {
                     children: [
                       {
                         key: "Approval",
-                        label: "Approval",
+                        label: (
+                          <Badge
+                            count={
+                              tradingList.filter((item) =>
+                                transactionApprovalHaveHandled.every(
+                                  (it) => it !== item.TimeStamp
+                                )
+                              ).length
+                            }
+                            key={"Approval"}
+                            overflowCount={100}
+                            offset={[12, -1]}
+                            showZero={false}
+                          >
+                            Approval
+                          </Badge>
+                        ),
                       },
                       {
                         key: "History",
@@ -262,10 +320,22 @@ const Index: React.FC = () => {
             })
           }
         >
-          <span>
-            <FormOutlined />
-            &nbsp; Account Approval
-          </span>
+          <Badge
+            count={
+              approveList.filter((item) =>
+                accountApprovalHaveHandled.every((it) => it !== item.TimeStamp)
+              ).length
+            }
+            key={"AccountApproval"}
+            overflowCount={100}
+            offset={[12, -1]}
+            showZero={false}
+          >
+            <span className="text">
+              <FormOutlined />
+              &nbsp; Account Approval
+            </span>
+          </Badge>
         </div>
         <div
           className="account-List-Skip"

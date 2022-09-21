@@ -175,7 +175,7 @@ const Index = (props: Iprops) => {
                 Cancel
               </Button>
               <Button type="primary" size="large" htmlType="submit">
-                &nbsp;Enter&nbsp;
+                &nbsp;Review&nbsp;
               </Button>
             </div>
           </Form>

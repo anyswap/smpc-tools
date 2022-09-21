@@ -93,12 +93,12 @@ export const getTransactionStatus = (item: any, index?: any) => {
   const MsgContext = JSON.parse(item.MsgContext[0]);
   const { chainId, to, value, nonce, gas, gasPrice, data = "" } = MsgContext;
   const Rsv = item.Rsv[0];
-  if (
-    item.KeyID ===
-    "0xb79b6c3ec9bc1d715be3af87d479ba0ae1b3d929a24c6e60f07a9a805e0889c9"
-  ) {
-    debugger;
-  }
+  // if (
+  //   item.KeyID ===
+  //   "0xb79b6c3ec9bc1d715be3af87d479ba0ae1b3d929a24c6e60f07a9a805e0889c9"
+  // ) {
+  //   debugger;
+  // }
   const txData = {
     nonce,
     gasLimit: web3.utils.toHex(gas),

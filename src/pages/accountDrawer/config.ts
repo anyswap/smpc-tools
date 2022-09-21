@@ -110,6 +110,44 @@ export const coins: any = {
       decimals: "18",
     },
   ],
+  250: [
+    {
+      name: "Ethereum",
+      symbol: "ETH",
+      logo: require("@/assets/images/coin/source/ETH.svg"),
+      contract: "0x74b23882a30290451A17c44f4F05243b6b58C76d",
+      decimals: "18",
+    },
+
+    {
+      name: "Bitcoin",
+      symbol: "BTC",
+      logo: require("@/assets/images/coin/source/BTC.png"),
+      contract: "0x321162cd933e2be498cd2267a90534a804051b11",
+      decimals: "8",
+    },
+    {
+      name: "USD Coin",
+      symbol: "USDC",
+      logo: require("@/assets/images/coin/source/USDC.png"),
+      contract: "0x04068DA6C83AFCFA0e13ba15A6696662335D5B75",
+      decimals: "6",
+    },
+    {
+      name: "Tether USD",
+      symbol: "USDT",
+      logo: require("@/assets/images/coin/source/USDT.png"),
+      contract: "0x1B27A9dE6a775F98aaA5B90B62a4e2A0B84DbDd9",
+      decimals: "6",
+    },
+    {
+      name: "Dai Stablecoin",
+      symbol: "DAI",
+      logo: require("@/assets/images/coin/source/DAI.png"),
+      contract: "0x8D11eC38a3EB5E956B052f67Da8Bdc9bef8Abf3E",
+      decimals: "18",
+    },
+  ],
 };
 export const logos = {
   ETH: require("@/assets/images/coin/source/ETH.svg"),

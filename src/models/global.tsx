@@ -448,45 +448,55 @@ export default function Index() {
         );
       });
       if (!polling.length) return;
-      let resArr = [];
-      polling.forEach(async (item: any) => {
-        const { chainId } = JSON.parse(item.MsgContext[0]);
-        const nodeRpc = chainInfo[web3.utils.hexToNumber(chainId)].nodeRpc;
-        let web3Chain = new Web3(nodeRpc);
-        const receipt = await web3Chain.eth.getTransaction(
-          getTransactionStatus(item)
-        );
-        if (!receipt) return;
-        console.info("receipt", receipt);
-        if (receipt["hash"]) {
-          resArr.push({
-            ...item,
-            transactionStatus: "Success",
-            transactionHash: getTransactionStatus(it),
+      Promise.all(
+        polling.map((item) => {
+          return new Promise((resolve, reject) => {
+            const { chainId } = JSON.parse(item.MsgContext[0]);
+            const nodeRpc = chainInfo[web3.utils.hexToNumber(chainId)].nodeRpc;
+            let web3Chain = new Web3(nodeRpc);
+            const receipt = web3Chain.eth.getTransaction(
+              getTransactionStatus(item)
+            );
+            resolve(receipt);
           });
-          // const newSendApprovaled = GsendApprovaled.map((it) => ({
-          //   ...it,
-          //   transactionStatus:
-          //     item.KeyID === it.KeyID ? "Success" : it.transactionStatus,
-          //   transactionHash:
-          //     item.KeyID === it.KeyID
-          //       ? getTransactionStatus(it)
-          //       : it.transactionHash,
-          // }));
-          // localStorage.setItem(
-          //   "sendApprovaled",
-          //   JSON.stringify(newSendApprovaled)
-          // );
-          // dispatch({
-          //   sendApprovaled: newSendApprovaled,
-          // });
-        } else {
-          console.log("failed or keep waiting");
-        }
-      });
-      if (resArr.length) {
-        debugger;
-      }
+        })
+      )
+        .then((r) => {
+          r.forEach((receipt, index) => {
+            if (receipt && receipt["hash"]) {
+              polling[index].transactionStatus = "Success";
+              polling[index].transactionHash = getTransactionStatus(
+                polling[index]
+              );
+            }
+          });
+
+          const newSendApprovaled = GsendApprovaled.map((it) => {
+            const findItem = polling.find(
+              (record) => record?.KeyID === it.KeyID
+            );
+
+            return {
+              ...it,
+              transactionStatus: findItem
+                ? findItem.transactionStatus
+                : it.transactionStatus,
+              transactionHash: findItem
+                ? findItem.transactionHash
+                : it.transactionHash,
+            };
+          });
+          localStorage.setItem(
+            "sendApprovaled",
+            JSON.stringify(newSendApprovaled)
+          );
+          dispatch({
+            sendApprovaled: newSendApprovaled,
+          });
+        })
+        .catch((e) => {
+          console.info(e);
+        });
     }, 10 * 1000);
     return () => {
       clearInterval(interval);

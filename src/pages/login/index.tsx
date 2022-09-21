@@ -5,6 +5,7 @@ import { history, useModel, getLocale, setLocale, useIntl } from "umi";
 import web3 from "@/assets/js/web3";
 import { useActiveWeb3React } from "@/hooks";
 import { useSignEnode, useSendTxDemo } from "@/hooks/useSigns";
+import { nodeListService } from "./service";
 import Logo_png from "@/pages/img/logo.svg";
 import "./style.less";
 import { nodeListItem } from "./d";
@@ -31,6 +32,13 @@ const Index = () => {
   const { execute } = useSignEnode(loginAccount.enode);
   const { execute: sendTx } = useSendTxDemo();
 
+  const getNodeList = async () => {
+    const res = await nodeListService();
+    globalDispatch({
+      nodeList: res?.info || [],
+    });
+  };
+
   useEffect(() => {
     localStorage.removeItem("node");
     message.config({
@@ -38,6 +46,7 @@ const Index = () => {
       maxCount: 1,
       rtl: true,
     });
+    getNodeList();
   }, []);
 
   useEffect(() => {
@@ -71,8 +80,7 @@ const Index = () => {
           signEnode: loginAccount.enode + res,
         },
       });
-      console.info("createGrounp", "createGrounp");
-      history.push("/createGrounp");
+      history.push("/account");
     });
   };
 
@@ -111,7 +119,6 @@ const Index = () => {
   const goDemo = () => {
     history.push("/demo");
   };
-
   return (
     <div className={isDay ? "login" : "login dark"}>
       <Select

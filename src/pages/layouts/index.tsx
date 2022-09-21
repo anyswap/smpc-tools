@@ -122,11 +122,7 @@ const Index = (props: any) => {
         <div className="head">
           <div className="left">
             <div className="logo">
-              <img
-                src={Logo}
-                width={31}
-                onClick={() => history.push("/account")}
-              />
+              <img src={Logo} width={31} />
               <div className="name">
                 <span className="name1">
                   {useIntl().formatHTMLMessage({ id: "g.SMPC" })}

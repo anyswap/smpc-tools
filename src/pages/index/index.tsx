@@ -26,12 +26,17 @@ const Index = () => {
   useEffect(() => {
     if (account) {
       history.push("/login");
+    } else {
+      history.push("/");
     }
   }, [account]);
 
   const enable = useCallback(() => {
+    console.info("activate", activate);
+    console.info("account", account);
     if (!account && activate) {
       activate(injected);
+    } else {
     }
   }, [account, activate]);
 
