@@ -193,6 +193,7 @@ const Index = () => {
         loading={approveListLoading}
         pagination={false}
         rowKey="Key"
+        scroll={{ y: "calc(100vh - 220px)" }}
       />
     </div>
   );

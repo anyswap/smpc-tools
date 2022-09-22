@@ -58,17 +58,22 @@ const Index = (props: { item: any }) => {
     // });
   };
   useEffect(() => {
-    let obj: any = {};
-    coins[chainId].forEach(async (item) => {
-      setLoading(true);
-      const { contract } = item;
-      const info = await getInfo(contract);
-      obj[contract] = info;
-      if (Object.entries(obj).length === coins[chainId].length) {
-        setLoading(false);
-        setCoinsInfo(obj);
-      }
-    });
+    const interval = setInterval(() => {
+      let obj: any = {};
+      coins[chainId].forEach(async (item) => {
+        setLoading(true);
+        const { contract } = item;
+        const info = await getInfo(contract);
+        obj[contract] = info;
+        if (Object.entries(obj).length === coins[chainId].length) {
+          setLoading(false);
+          setCoinsInfo(obj);
+        }
+      });
+    }, 5000);
+    return () => {
+      clearInterval(interval);
+    };
   }, [props.item, chainId]);
 
   const columns = [

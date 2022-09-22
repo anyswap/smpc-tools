@@ -76,11 +76,11 @@ const Index: React.FC = () => {
     })
   );
 
-  useEffect(() => {
-    if (Account.filter((item: any) => item.Status === "Success").length === 0) {
-      dispatch({ drawerVisible: true });
-    }
-  }, [Account]);
+  // useEffect(() => {
+  //   if (Account.filter((item: any) => item.Status === "Success").length === 0) {
+  //     dispatch({ drawerVisible: true });
+  //   }
+  // }, [Account]);
   const List = Account.filter((item: any) => item.Status === "Success");
   const accountSelected = List.length ? activeAccount || List[0] : null;
 
@@ -88,6 +88,7 @@ const Index: React.FC = () => {
     const provider = library ? library?.provider : "";
     const newWeb3 = getWeb3("", provider);
     const batch = new newWeb3.BatchRequest();
+    console.info("List", List);
     List.forEach((item: any) => {
       const address = ethers.utils.computeAddress("0x" + item.PubKey);
       batch.add(newWeb3.eth.getBalance.request(address));
@@ -95,8 +96,13 @@ const Index: React.FC = () => {
     batch.requestManager.sendBatch(batch.requests, (e: any, resArr: any) => {
       if (e) return;
       const detailsObj: any = {};
+      console.info(resArr);
+
+      // formatUnits(details[item.PubKey]?.balance || 0, 10) +
+      //   chainInfo[chainId]?.symbol;
+
       resArr.forEach((item: any, i: number) => {
-        detailsObj[Account[i].PubKey] = {
+        detailsObj[List[i].PubKey] = {
           balance: item.result,
         };
       });
@@ -105,14 +111,14 @@ const Index: React.FC = () => {
   };
 
   useEffect(() => {
-    getAccountBalance();
     const interval = setInterval(() => {
-      getAccountBalance;
+      getAccountBalance();
     }, 5 * 1000);
     return () => {
       clearInterval(interval);
     };
   }, [Account, library]);
+  console.info("detailsdetails", details);
   return (
     <>
       {/* <span className="drawerBtn">
@@ -145,14 +151,21 @@ const Index: React.FC = () => {
           dsdsdsdds
         </Drawer> */}
 
-        <div className="left" style={{ width: 340 }}>
-          <div
-            className="openBtn"
-            onClick={() => dispatch({ drawerVisible: true })}
-          >
-            <RightOutlined />
-          </div>
+        <div className="left" style={{ minWidth: 340 }}>
           {accountSelected && (
+            <div
+              className="openBtn"
+              onClick={() =>
+                dispatch({
+                  drawerVisible: true,
+                  selectedKeys: ["CreateGrounp"],
+                })
+              }
+            >
+              <RightOutlined />
+            </div>
+          )}
+          {accountSelected ? (
             <>
               <div className="accountDrawer-head">
                 <div className="img">
@@ -244,7 +257,23 @@ const Index: React.FC = () => {
                   },
                   {
                     key: "Transactions",
-                    label: "Transactions",
+                    label: (
+                      <Badge
+                        count={
+                          tradingList.filter((item) =>
+                            transactionApprovalHaveHandled.every(
+                              (it) => it !== item.TimeStamp
+                            )
+                          ).length
+                        }
+                        key={"Transactions"}
+                        overflowCount={100}
+                        offset={[12, -1]}
+                        showZero={false}
+                      >
+                        Transactions
+                      </Badge>
+                    ),
                     children: [
                       {
                         key: "Approval",
@@ -275,6 +304,66 @@ const Index: React.FC = () => {
                 ]}
               />
             </>
+          ) : (
+            <div style={{ padding: 24, marginTop: 5 }}>
+              <div
+                className="account-List-Skip"
+                onClick={() =>
+                  dispatch({
+                    selectedKeys: ["CreateGrounp"],
+                    drawerVisible: false,
+                  })
+                }
+              >
+                <span>
+                  <PlusCircleOutlined />
+                  &nbsp; Create MPC
+                </span>
+              </div>
+              <div
+                className="account-List-Skip"
+                onClick={() =>
+                  dispatch({
+                    selectedKeys: ["AccountApproval"],
+                    drawerVisible: false,
+                  })
+                }
+              >
+                <Badge
+                  count={
+                    approveList.filter((item) =>
+                      accountApprovalHaveHandled.every(
+                        (it) => it !== item.TimeStamp
+                      )
+                    ).length
+                  }
+                  key={"AccountApproval"}
+                  overflowCount={100}
+                  offset={[12, -1]}
+                  showZero={false}
+                >
+                  <span className="text">
+                    <FormOutlined />
+                    &nbsp; Account Approval
+                  </span>
+                </Badge>
+              </div>
+              <div
+                className="account-List-Skip"
+                onClick={() =>
+                  dispatch({
+                    selectedKeys: ["AccountApprovaled"],
+                    drawerVisible: false,
+                  })
+                }
+                style={{ marginBottom: 50 }}
+              >
+                <span>
+                  <HistoryOutlined />
+                  &nbsp; Account History
+                </span>
+              </div>
+            </div>
           )}
         </div>
         <div className="right" style={{ flex: 1, padding: "5px 20px" }}>
@@ -292,17 +381,31 @@ const Index: React.FC = () => {
         placement="left"
         closable={false}
         zIndex={2}
+        width={340}
+        style={{ boxShadow: "none" }}
+        bodyStyle={{ top: 30 }}
+        mask={false}
         classNames={{ drawerShow: drawerVisible }}
         zIndex={drawerVisible ? 1000 : -1}
         style={{ left: drawerVisible ? 0 : -380 }}
         onClose={() => dispatch({ drawerVisible: false })}
       >
+        {accountSelected && (
+          <div
+            className="openBtn"
+            onClick={() =>
+              dispatch({ drawerVisible: false, selectedKeys: ["Coins"] })
+            }
+          >
+            <RightOutlined />
+          </div>
+        )}
         <div
           className="account-List-Skip"
           onClick={() =>
             dispatch({
               selectedKeys: ["CreateGrounp"],
-              drawerVisible: false,
+              // drawerVisible: false,
             })
           }
         >
@@ -316,7 +419,7 @@ const Index: React.FC = () => {
           onClick={() =>
             dispatch({
               selectedKeys: ["AccountApproval"],
-              drawerVisible: false,
+              // drawerVisible: false,
             })
           }
         >
@@ -342,7 +445,7 @@ const Index: React.FC = () => {
           onClick={() =>
             dispatch({
               selectedKeys: ["AccountApprovaled"],
-              drawerVisible: false,
+              // drawerVisible: false,
             })
           }
           style={{ marginBottom: 50 }}
@@ -389,7 +492,7 @@ const Index: React.FC = () => {
               <div
                 style={{
                   display: "inline-block",
-                  width: 275,
+                  width: 245,
                 }}
               >
                 <span

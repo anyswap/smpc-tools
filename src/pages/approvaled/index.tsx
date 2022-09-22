@@ -88,6 +88,7 @@ const Index = () => {
         rowKey="KeyID"
         dataSource={Account}
         pagination={false}
+        scroll={{ y: "calc(100vh - 220px)" }}
       />
     </div>
   );

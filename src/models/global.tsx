@@ -317,16 +317,27 @@ export default function Index() {
             );
           });
 
+          const pollingRes = resArr.map((item: any) =>
+            JSON.parse(item?.result?.Data?.result || "{}")
+          );
+
           const newAccound = [
-            ...successArr
-              .map((item: any) =>
-                JSON.parse(item?.result?.Data?.result || "{}")
-              )
-              .filter((item: any) =>
-                GAccount.every((it: any) => item.KeyID !== it.KeyID)
-              ),
-            ...GAccount,
-          ].sort((a: any, b: any) => b.TimeStamp - a.TimeStamp);
+            ...pollingRes,
+            ...GAccount.filter((record) =>
+              pollingRes.every((it: any) => it.KeyID !== record.KeyID)
+            ),
+          ].sort((a: any, b: any) => Number(b.TimeStamp) - Number(a.TimeStamp));
+
+          // const newAccound = [
+          //   ...successArr
+          //     .map((item: any) =>
+          //       JSON.parse(item?.result?.Data?.result || "{}")
+          //     )
+          //     .filter((item: any) =>
+          //       GAccount.every((it: any) => item.KeyID !== it.KeyID)
+          //     ),
+          //   ...GAccount,
+          // ].sort((a: any, b: any) => b.TimeStamp - a.TimeStamp);
           const addAccountLength = resArr.filter((item: any, i: any) => {
             const res = item.result;
             const result = JSON.parse(res?.Data?.result || "{}");

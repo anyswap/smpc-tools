@@ -89,6 +89,7 @@ export const getHead = (TimeStamp: number) => {
 };
 
 export const getTransactionStatus = (item: any, index?: any) => {
+  debugger;
   if (item.Status === "Failure") return null;
   const MsgContext = JSON.parse(item.MsgContext[0]);
   const { chainId, to, value, nonce, gas, gasPrice, data = "" } = MsgContext;
