@@ -77,8 +77,8 @@ const Index: React.FC = () => {
   );
 
   // useEffect(() => {
-  //   if (Account.filter((item: any) => item.Status === "Success").length === 0) {
-  //     dispatch({ drawerVisible: true });
+  //   if (Account.filter((item: any) => item.Status === "Success").length == 1) {
+  //     dispatch({ drawerVisible: false });
   //   }
   // }, [Account]);
   const List = Account.filter((item: any) => item.Status === "Success");
@@ -88,7 +88,6 @@ const Index: React.FC = () => {
     const provider = library ? library?.provider : "";
     const newWeb3 = getWeb3("", provider);
     const batch = new newWeb3.BatchRequest();
-    console.info("List", List);
     List.forEach((item: any) => {
       const address = ethers.utils.computeAddress("0x" + item.PubKey);
       batch.add(newWeb3.eth.getBalance.request(address));
@@ -96,7 +95,6 @@ const Index: React.FC = () => {
     batch.requestManager.sendBatch(batch.requests, (e: any, resArr: any) => {
       if (e) return;
       const detailsObj: any = {};
-      console.info(resArr);
 
       // formatUnits(details[item.PubKey]?.balance || 0, 10) +
       //   chainInfo[chainId]?.symbol;
@@ -118,7 +116,6 @@ const Index: React.FC = () => {
       clearInterval(interval);
     };
   }, [Account, library]);
-  console.info("detailsdetails", details);
   return (
     <>
       {/* <span className="drawerBtn">

@@ -187,9 +187,9 @@ const Index = () => {
                 }
                 setTimeout(() => {
                   form.setFieldsValue({
-                    node: inputNode,
+                    node: inputNode.trim(),
                   });
-                  setValue(inputNode as string);
+                  setValue(inputNode.trim() as string);
                 }, 100);
 
                 return;

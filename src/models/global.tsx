@@ -208,7 +208,6 @@ export default function Index() {
           }
         }),
       });
-      localStorage.setItem("");
       if (count > 40) {
         // const newPollingPubKey = pollingPubKey.filter(
         //   (item: any, index: number) => index !== i
@@ -317,9 +316,19 @@ export default function Index() {
             );
           });
 
-          const pollingRes = resArr.map((item: any) =>
-            JSON.parse(item?.result?.Data?.result || "{}")
-          );
+          const pollingRes = resArr
+            .map((item: any) => JSON.parse(item?.result?.Data?.result || "{}"))
+            .filter(
+              (item) =>
+                item &&
+                item["Key"] &&
+                item["Account"] &&
+                item["Cointype"] &&
+                item["GroupId"] &&
+                item["Nonce"] &&
+                item["ThresHold"] &&
+                item["Mode"]
+            );
 
           const newAccound = [
             ...pollingRes,
@@ -407,11 +416,25 @@ export default function Index() {
       //   }
       // });
       const endResArr = resArr.filter((item) => {
-        if (item.result.Status !== "Success") {
+        if (item.result?.Status !== "Success") {
           return false;
         }
         const result = JSON.parse(item.result.Data.result);
-        if (["Success", "Failure", "Timeout"].includes(result.Status)) {
+
+        if (
+          ["Success", "Failure", "Timeout"].includes(result.Status) &&
+          result["Raw"] &&
+          result["Key"] &&
+          result["Account"] &&
+          result["PubKey"] &&
+          result["MsgHash"] &&
+          result["MsgContext"] &&
+          result["KeyType"] &&
+          result["GroupId"] &&
+          result["Nonce"] &&
+          result["ThresHold"] &&
+          result["Mode"]
+        ) {
           return true;
         }
       });
@@ -446,8 +469,14 @@ export default function Index() {
       const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
       if (!rpc || !account) return;
       const polling = GsendApprovaled.filter((item: any) => {
-        const { MsgContext, ThresHold, AllReply, transactionStatus, Status } =
-          item;
+        const {
+          MsgContext,
+          ThresHold,
+          AllReply,
+          transactionStatus,
+          Status,
+          Rsv = [],
+        } = item;
         const { chainId } = JSON.parse(MsgContext[0]);
         const isPrrovaling =
           AllReply.filter((it) => it.Status === "AGREE").length <
@@ -455,7 +484,8 @@ export default function Index() {
         return (
           !isPrrovaling &&
           transactionStatus !== "Success" &&
-          Status !== "Failure"
+          Status !== "Failure" &&
+          Rsv[0]
         );
       });
       if (!polling.length) return;
