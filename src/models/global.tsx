@@ -319,7 +319,7 @@ export default function Index() {
           const pollingRes = resArr
             .map((item: any) => JSON.parse(item?.result?.Data?.result || "{}"))
             .filter(
-              (item) =>
+              (item: any) =>
                 item &&
                 item["Key"] &&
                 item["Account"] &&
@@ -421,20 +421,7 @@ export default function Index() {
         }
         const result = JSON.parse(item.result.Data.result);
 
-        if (
-          ["Success", "Failure", "Timeout"].includes(result.Status) &&
-          result["Raw"] &&
-          result["Key"] &&
-          result["Account"] &&
-          result["PubKey"] &&
-          result["MsgHash"] &&
-          result["MsgContext"] &&
-          result["KeyType"] &&
-          result["GroupId"] &&
-          result["Nonce"] &&
-          result["ThresHold"] &&
-          result["Mode"]
-        ) {
+        if (["Success", "Failure", "Timeout"].includes(result.Status)) {
           return true;
         }
       });

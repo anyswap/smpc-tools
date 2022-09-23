@@ -31,7 +31,22 @@ export default function Index() {
       tradingListLoading: true,
     });
     dispatch({
-      tradingList: res?.Data || [],
+      tradingList:
+        res?.Data.filter(
+          (item: any) =>
+            item["Key"] &&
+            item["Raw"] &&
+            item["Key"] &&
+            item["Account"] &&
+            item["PubKey"] &&
+            item["MsgHash"] &&
+            item["MsgContext"] &&
+            item["KeyType"] &&
+            item["GroupId"] &&
+            item["Nonce"] &&
+            item["ThresHold"] &&
+            item["Mode"]
+        ) || [],
       tradingListLoading: false,
     });
   };
