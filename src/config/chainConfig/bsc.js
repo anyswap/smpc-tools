@@ -11,7 +11,8 @@ import { ChainId } from "./chainId";
 
 // const useNode = 'https://bsc-dataseed1.ninicoin.io/'
 // const useNode = 'https://bsc-dataseed2.ninicoin.io/'
-const useNode = "https://bsc-dataseed3.ninicoin.io/";
+// const useNode = "https://bsc-dataseed3.ninicoin.io/";
+const useNode = "https://rpc.ankr.com/bsc/";
 // const useNode = 'https://bsc-dataseed4.ninicoin.io/'
 
 // const useNode = 'https://bsc-dataseed1.binance.org/'
@@ -23,7 +24,7 @@ export const BNB_MAIN_CHAINID = ChainId.BNB;
 export const BNB_MAINNET =
   process.env.NODE_ENV === "development"
     ? getLocalRPC(BNB_MAIN_CHAINID, useNode)
-    : getLocalRPC(BNB_MAIN_CHAINID, "https://bscnode1.anyswap.exchange");
+    : getLocalRPC(BNB_MAIN_CHAINID, "https://rpc.ankr.com/bsc/");
 export const BNB_MAIN_EXPLORER = "https://bscscan.com";
 // console.log(BNB_MAINNET)
 export const BNB_TEST_CHAINID = ChainId.BNB_TEST;

@@ -173,7 +173,6 @@ const Index: React.FC = () => {
                       "0x" + accountSelected.PubKey
                     )}
                   />
-
                   <div>
                     {ethers.utils
                       .computeAddress("0x" + accountSelected.PubKey)
@@ -186,7 +185,17 @@ const Index: React.FC = () => {
                     10,
                     6
                   )}
+                  <br />
+                  <b>
+                    {formatUnits(
+                      details[accountSelected.PubKey]?.balance || 0,
+                      details[accountSelected.PubKey]?.decimals || 18
+                    ) +
+                      " " +
+                      chainInfo[chainId]?.symbol}
+                  </b>
                 </div>
+                <div></div>
                 <div className="accountDrawer-opr">
                   <span>
                     <Popover
@@ -257,10 +266,11 @@ const Index: React.FC = () => {
                     label: (
                       <Badge
                         count={
-                          tradingList.filter((item) =>
-                            transactionApprovalHaveHandled.every(
-                              (it) => it !== item.TimeStamp
-                            )
+                          tradingList.filter(
+                            (item) =>
+                              transactionApprovalHaveHandled.every(
+                                (it) => it !== item.TimeStamp
+                              ) && item.PubKey === accountSelected.PubKey
                           ).length
                         }
                         key={"Transactions"}
@@ -277,10 +287,11 @@ const Index: React.FC = () => {
                         label: (
                           <Badge
                             count={
-                              tradingList.filter((item) =>
-                                transactionApprovalHaveHandled.every(
-                                  (it) => it !== item.TimeStamp
-                                )
+                              tradingList.filter(
+                                (item) =>
+                                  transactionApprovalHaveHandled.every(
+                                    (it) => it !== item.TimeStamp
+                                  ) && item.PubKey === accountSelected.PubKey
                               ).length
                             }
                             key={"Approval"}
@@ -474,7 +485,11 @@ const Index: React.FC = () => {
             <div
               className="accountDrawer-account"
               onClick={() =>
-                dispatch({ activeAccount: item, drawerVisible: false })
+                dispatch({
+                  activeAccount: item,
+                  drawerVisible: false,
+                  selectedKeys: ["Coins"],
+                })
               }
               key={item.TimeStamp}
             >
@@ -509,8 +524,10 @@ const Index: React.FC = () => {
                     )}
                   </span>
                   <span className="mll0">
-                    {formatUnits(details[item.PubKey]?.balance || 0, 18) +
-                      chainInfo[chainId]?.symbol}
+                    {formatUnits(
+                      details[item.PubKey]?.balance || 0,
+                      details[item.PubKey]?.decimals || 18
+                    ) + chainInfo[chainId]?.symbol}
                   </span>
                 </span>
               </div>

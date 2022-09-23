@@ -21,11 +21,12 @@ const initState = {
 
 const Index = () => {
   const [form] = Form.useForm();
-  const { globalDispatch, pollingRsv } = useModel(
+  const { globalDispatch, pollingRsv, Account } = useModel(
     "global",
-    ({ globalDispatch, pollingRsv }: any) => ({
+    ({ globalDispatch, pollingRsv, Account }: any) => ({
       globalDispatch,
       pollingRsv,
+      Account,
     })
   );
   const loginAccount = JSON.parse(localStorage.getItem("loginAccount") || "{}");
@@ -97,6 +98,25 @@ const Index = () => {
           ...JSON.parse(localStorage.getItem("pollingPubKey") || "[]"),
         ])
       );
+
+      const { data, info } = res;
+      const { GroupID, TimeStamp, ThresHold } = res.data;
+      const newAccount = [
+        {
+          From: res.data.Account,
+          GroupID,
+          KeyID: info,
+          TimeStamp,
+          Status: "Pending",
+          ThresHold,
+          AllReply: [{ Approver: res.data.Account, Status: "AGREE" }],
+        },
+        ...Account,
+      ];
+      localStorage.setItem("Account", JSON.stringify(newAccount));
+      globalDispatch({
+        Account: newAccount,
+      });
     } else {
       message.error(res.msg);
     }

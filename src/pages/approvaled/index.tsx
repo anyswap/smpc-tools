@@ -39,19 +39,7 @@ const Index = () => {
       dataIndex: "From",
       render: (t: string) => cutOut(t, 6, 4),
     },
-    {
-      title: "Status",
-      dataIndex: "Status",
-      width: "25%",
-      render: (t: any, r: any) => {
-        return (
-          <div>
-            {t}
-            {r.Error && <p>Reason: {r.Error}</p>}
-          </div>
-        );
-      },
-    },
+
     {
       title: "TimeStamp",
       dataIndex: "TimeStamp",
@@ -73,6 +61,19 @@ const Index = () => {
             {item.Status}
           </p>
         )),
+    },
+    {
+      title: "Status",
+      dataIndex: "Status",
+      width: "25%",
+      render: (t: any, r: any) => {
+        return (
+          <div>
+            {t}
+            {r.Error && <p>Reason: {r.Error}</p>}
+          </div>
+        );
+      },
     },
   ];
 

@@ -14,6 +14,12 @@ const Index = () => {
   const { account } = useActiveWeb3React();
   const { execute } = acceptSign(rpc);
   const [spin, setSpin] = useState(false);
+  const { activeAccount } = useModel(
+    "accountDrawer",
+    ({ activeAccount }: any) => ({
+      activeAccount,
+    })
+  );
   const { tradingList, tradingListLoading, getData } = useModel(
     "approval",
     ({ tradingList, tradingListLoading, getData }: any) => ({
@@ -23,14 +29,27 @@ const Index = () => {
     })
   );
 
-  const { globalDispatch, transactionApprovalHaveHandled } = useModel(
+  const {
+    globalDispatch,
+    transactionApprovalHaveHandled,
+    sendApprovaled,
+    Account,
+  } = useModel(
     "global",
-    ({ globalDispatch, transactionApprovalHaveHandled }: any) => ({
+    ({
       globalDispatch,
       transactionApprovalHaveHandled,
+      sendApprovaled,
+      Account,
+    }: any) => ({
+      globalDispatch,
+      transactionApprovalHaveHandled,
+      sendApprovaled,
+      Account,
     })
   );
-
+  const List = Account.filter((item: any) => item.Status === "Success");
+  const accountSelected = List.length ? activeAccount || List[0] : null;
   const action = async (Accept: string, r: any) => {
     if (!execute) return;
     const res = await execute(Accept, r);
@@ -74,6 +93,26 @@ const Index = () => {
           ...historyPollingRsv,
         ])
       );
+
+      const newSendApprovaled = [
+        {
+          AllReply: [{ Approver: account, Status: "AGREE" }],
+          From: account,
+          GroupID: r.TimeStamp,
+          KeyID: r.Key,
+          MsgContext: r.MsgContext,
+          MsgHash: r.MsgHash,
+          Rsv: [],
+          Status: "Pending",
+          ThresHold: r.ThresHold,
+          TimeStamp: r.TimeStamp,
+        },
+        ...sendApprovaled,
+      ];
+      localStorage.setItem("sendApprovaled", JSON.stringify(newSendApprovaled));
+      globalDispatch({
+        sendApprovaled: newSendApprovaled,
+      });
       return;
     }
     message.error("Error");
@@ -172,6 +211,7 @@ const Index = () => {
       setSpin(false);
     }, 500);
   };
+  console.info("tradingList", tradingList);
   return (
     <>
       <Breadcrumb className="mt15">
@@ -185,8 +225,11 @@ const Index = () => {
       />
       <Table
         columns={columns}
-        dataSource={tradingList.filter((item) =>
-          transactionApprovalHaveHandled.every((it) => it !== item.TimeStamp)
+        dataSource={tradingList.filter(
+          (item) =>
+            transactionApprovalHaveHandled.every(
+              (it) => it !== item.TimeStamp
+            ) && item.PubKey === accountSelected.PubKey
         )}
         loading={tradingListLoading}
         pagination={false}

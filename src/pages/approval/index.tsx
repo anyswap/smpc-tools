@@ -169,6 +169,31 @@ const Index = () => {
           ),
         ])
       );
+
+      const newAccount = [
+        {
+          AllReply: [
+            {
+              Approver: account,
+              Status: type,
+            },
+          ],
+          From: account,
+          GroupID: r.GroupID,
+          KeyID: r.Key,
+          PubKey: "",
+          Status: "Pending",
+          ThresHold: r.ThresHold,
+          TimeStamp: r.TimeStamp,
+        },
+        ...Account,
+      ];
+      localStorage.setItem("Account", JSON.stringify(Account));
+      globalDispatch({
+        Account: newAccount,
+      });
+
+      debugger;
     } else if (res?.msg) {
       message.error(res.msg);
     }

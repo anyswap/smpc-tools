@@ -306,30 +306,28 @@ export default function Index() {
             const { count = 0 } = item;
             return !needRemovePollingPubKeyItem.includes(i) && count < 40;
           });
-          const successArr = resArr.filter((item: any, i: any) => {
-            const result = JSON.parse(item.result?.Data?.result || "{}");
-            const { count = 0 } = item;
-            return (
-              result.Status === "Success" ||
-              needRemovePollingPubKeyItem.includes(i) ||
-              count > 40
-            );
-          });
-
+          // const successArr = resArr.filter((item: any, i: any) => {
+          //   const result = JSON.parse(item.result?.Data?.result || "{}");
+          //   const { count = 0 } = item;
+          //   return (
+          //     result.Status === "Success" ||
+          //     needRemovePollingPubKeyItem.includes(i) ||
+          //     count > 40
+          //   );
+          // });
           const pollingRes = resArr
             .map((item: any) => JSON.parse(item?.result?.Data?.result || "{}"))
             .filter(
               (item: any) =>
                 item &&
-                item["Key"] &&
-                item["Account"] &&
-                item["Cointype"] &&
-                item["GroupId"] &&
-                item["Nonce"] &&
-                item["ThresHold"] &&
-                item["Mode"]
+                item["AllReply"] &&
+                item["From"] &&
+                item["GroupID"] &&
+                item["KeyID"] &&
+                item["Status"] &&
+                item["ThresHold"]
             );
-
+          console.info("pollingRes", pollingRes);
           const newAccound = [
             ...pollingRes,
             ...GAccount.filter((record) =>

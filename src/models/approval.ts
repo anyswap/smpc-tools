@@ -30,19 +30,19 @@ export default function Index() {
     dispatch({
       tradingListLoading: true,
     });
+    debugger;
     dispatch({
       tradingList:
         res?.Data.filter(
           (item: any) =>
             item["Key"] &&
             item["Raw"] &&
-            item["Key"] &&
             item["Account"] &&
             item["PubKey"] &&
             item["MsgHash"] &&
             item["MsgContext"] &&
             item["KeyType"] &&
-            item["GroupId"] &&
+            item["GroupID"] &&
             item["Nonce"] &&
             item["ThresHold"] &&
             item["Mode"]

@@ -313,12 +313,13 @@ export function useReqSmpcAddress(
           rsv,
           JSON.stringify(data, null, 8)
         );
+        debugger;
         let resultData: any = {};
         if (cbData && typeof cbData === "string") {
           cbData = JSON.parse(cbData);
         }
         if (cbData.Status !== "Error") {
-          resultData = { msg: "Success", info: cbData.Data.result };
+          resultData = { msg: "Success", info: cbData.Data.result, data };
         } else {
           resultData = { msg: cbData.Error || "Error", error: cbData.Tip };
         }
@@ -454,9 +455,6 @@ function useMsgData(): {
     if (!account || !library) return {};
     return {
       execute: async (to, value, address, TokenAddress = "") => {
-        // web3.setProvider("https://rinkeby.infura.io/v3/");
-        // const aa = web3.utils.hexToNumber(chainId);
-        // debugger;
         const nodeRpc = chainInfo[chainId].nodeRpc;
 
         web3.setProvider(nodeRpc);
@@ -484,6 +482,19 @@ function useMsgData(): {
         data.gas = data.gas * 2;
         data.gasPrice = await web3.eth.getGasPrice();
         data.gasPrice = Number(data.gasPrice);
+        // const data = {
+        //   chainId: "0x38",
+        //   data: "",
+        //   from: "0xDdfDb8Cd51506f327A73E1805A55108f597e9a4A",
+        //   gas: 48048,
+        //   gasPrice: 5000000000,
+        //   // name: "BNB CHAIN mainnet",
+        //   nonce: 0,
+        //   // originValue: "0.0012",
+        //   to: "0x59cdF153f1c467E323Cf55bF8d974F5B276467F5",
+        //   value: "0x44364c5bb0000",
+        // };
+        debugger;
         return data;
       },
     };
@@ -551,6 +562,7 @@ export function useGetSign(rpc: string | undefined): {
           AcceptTimeOut: "604800",
           TimeStamp: Date.now().toString(),
         };
+        debugger;
         web3.setProvider(rpc);
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();

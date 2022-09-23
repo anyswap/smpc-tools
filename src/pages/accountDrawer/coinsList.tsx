@@ -99,7 +99,7 @@ const Index = (props: { item: any }) => {
       render: (t: string, r: any) => {
         const { balance } = coinsInfo?.[t] || {};
         return `${
-          balance ? ethers.utils.formatUnits(balance, r.decimals) : ""
+          balance ? ethers.utils.formatUnits(balance, r.decimals) : "0.0"
         } ${r?.symbol || ""}`;
       },
     },
@@ -122,7 +122,7 @@ const Index = (props: { item: any }) => {
         <Breadcrumb.Item>Coins</Breadcrumb.Item>
       </Breadcrumb>
       <Table
-        loading={loading}
+        // loading={loading}
         pagination={false}
         dataSource={coins[chainId]}
         columns={columns}
