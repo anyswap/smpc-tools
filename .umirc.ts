@@ -23,10 +23,15 @@ export default defineConfig({
           path: "/login",
           component: "@/pages/login/index.tsx",
         },
+
         {
           path: "/",
           component: "@/pages/layouts/index",
           routes: [
+            {
+              path: "/CreateNewSMPC",
+              component: "@/pages/CreateNewSMPC/index.tsx",
+            },
             {
               path: "/demo",
               component: "@/pages/demo/index.tsx",

@@ -69,7 +69,7 @@ export default function Index() {
     const { rpc } = JSON.parse(localStorage.getItem("loginAccount") || "{}");
     if (!rpc) return;
     // '/nodes/list'
-    // getNodeList();
+    getNodeList();
   }, []);
 
   //获取 发起交易的审批结果轮询
