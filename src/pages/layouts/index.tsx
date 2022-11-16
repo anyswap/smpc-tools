@@ -10,9 +10,17 @@ import {
 } from "umi";
 import { useActiveWeb3React } from "@/hooks";
 // import { setLocale, getLocale, history, getAllLocales, useIntl, useModel } from 'umi';
-import { ConfigProvider, Select, Modal, Button, Badge, message } from "antd";
-import { CopyOutlined } from "@ant-design/icons";
-import { cutOut, copyTxt } from "@/utils";
+import {
+  ConfigProvider,
+  Select,
+  Modal,
+  Button,
+  Badge,
+  message,
+  Drawer,
+  Popover,
+} from "antd";
+import { ethers } from "ethers";
 import enUS from "antd/lib/locale/en_US";
 import zhCN from "antd/lib/locale/zh_CN";
 import Sun from "@/assets/images/sun.png";
@@ -22,6 +30,19 @@ import "antd/dist/antd.min.css";
 import "./custom-dark.css";
 import "./custom-default.css";
 import "./style.less";
+import classNames from "classnames";
+import { cutOut, getWeb3, formatUnits, getHead, copyTxt } from "@/utils";
+import QRCode from "qrcode.react";
+import { chainInfo } from "@/config/chainConfig";
+import {
+  CopyOutlined,
+  PlusCircleOutlined,
+  FormOutlined,
+  AppstoreAddOutlined,
+  RightOutlined,
+  ShareAltOutlined,
+  HistoryOutlined,
+} from "@ant-design/icons";
 
 const Index = (props: any) => {
   useEffect(() => {
@@ -35,87 +56,26 @@ const Index = (props: any) => {
   const [prefix, setPrefix] = useState(
     localStorage.getItem("prefix") || "custom-default"
   );
-  // const { account, library, activate } = useActiveWeb3React();
-  const { library, activate } = useActiveWeb3React();
-  // const account = window.ethereum?.selectedAddress;
+  const { library, activate, chainId } = useActiveWeb3React();
   const { account } = useActiveWeb3React();
-  const { rpc = "", signEnode = "" } = JSON.parse(
-    localStorage.getItem("loginAccount") || "{}"
-  );
-  const { globalDispatch, pollingRsvInfo, pollingPubKeyInfo, Account } =
-    useModel(
-      "global",
-      ({ globalDispatch, pollingRsvInfo, pollingPubKeyInfo, Account }) => ({
-        globalDispatch,
-        pollingRsvInfo,
-        pollingPubKeyInfo,
-        Account,
-      })
-    );
-  const _local: any = {
-    "zh-CN": zhCN,
-    "en-US": enUS,
-  };
-  const [local, SetLocalAntd] = useState(
-    _local[localStorage.getItem("umi_locale") || "en-US"]
-  );
-  const [visible, setVisible] = useState(false);
-  const nav = [
-    // {
-    //   name: useIntl().formatHTMLMessage({ id: "nav.accountList" }),
-    //   url: "/account",
-    // },
-    {
-      name: useIntl().formatHTMLMessage({ id: "nav.createAccount" }),
-      url: "/createGrounp",
-    },
-    // {
-    //   name: "获取enode",
-    //   url: "/getEnode",
-    // },
-    // {
-    //   name: useIntl().formatHTMLMessage({ id: "nav.approval" }),
-    //   url: "/approval",
-    // },
-  ];
 
   const localChange = (type: "en-Us" | "zh-CN") => {
     setLocale(type, false);
-    SetLocalAntd({ "en-Us": enUS, "zh-CN": zhCN }[type]);
+    // SetLocalAntd({ "en-Us": enUS, "zh-CN": zhCN }[type]);
   };
-  // useEffect(() => {
-  //   if (!loginAccount.enode) history.push("/");
-  // }, []);
 
-  useEffect(() => {
-    if (!account || !library) {
-      history.push("/");
-      return;
-    }
-    if (!rpc || !signEnode) {
-      history.push("/login");
-    }
-  }, [account, rpc, signEnode]);
-
-  const cutOutSign = cutOut("0x" + signEnode.split("0x")[1], 6, 4);
-
-  const logout = () => {
-    localStorage.removeItem("loginAccount");
-    setVisible(false);
+  const accountSelected = {
+    From: "0x83ABC4B3000507f5488907c68234c0F457376776",
+    GroupID:
+      "e2e4277ce116b672f1cc8cb75d7cb687921aeba13b7560b9ca13da2e65106b544b5d684e577781525de037e190fbebd2b1bda7cc2c2bf607e197ce3897901c9f",
+    KeyID: "0x551382d9d86380edd9ceb5f03366faebe92e7d7b53c60912c1eb63a7d5f340d3",
+    PubKey:
+      "0457d34e178f6e2accc4ffec5e4195d87e30acc3de4152762e2a3a27faa9c7eff22178537d207e9c11b9eee34f996eeb05117f3de61d25a1c73a2c6e5e892fa654",
+    Status: "Success",
+    ThresHold: "2/2",
+    TimeStamp: "1661255125790",
+    Tip: "",
   };
-  const { ethereum }: any = window;
-  const { approveList, tradingList } = useModel(
-    "approval",
-    ({ approveList, tradingList }) => ({
-      approveList,
-      tradingList,
-    })
-  );
-
-  // useEffect(() => {
-  //   if (Account.length === 0) history.push("/createGrounp");
-  // }, [location.href]);
-
   return (
     <ConfigProvider prefixCls={prefix}>
       <div className={prefix === "custom-default" ? "layouts" : "layouts dark"}>
@@ -133,113 +93,17 @@ const Index = (props: any) => {
               </div>
             </div>
           </div>
-          <div className="nav" style={{ display: "none" }}>
-            {/* <div onClick={() => history.push('/approvalList')}>审批</div>
-            <div>创建组</div> */}
-            <Badge
-              count={pollingPubKeyInfo}
-              key={pollingPubKeyInfo}
-              overflowCount={100}
-              offset={[0, 10]}
-              showZero={false}
-            >
-              <div
-                key="/account"
-                className={
-                  history.location.pathname === "/account"
-                    ? "item active"
-                    : "item"
-                }
-                onClick={() => history.push("/account")}
-              >
-                {useIntl().formatHTMLMessage({ id: "nav.accountList" })}
-              </div>
-            </Badge>
-            {nav.map((item) => {
-              return (
-                <div
-                  key={item.url}
-                  className={
-                    history.location.pathname === item.url
-                      ? "item active"
-                      : "item"
-                  }
-                  onClick={() => history.push(item.url)}
-                >
-                  {item.name}
-                </div>
-              );
-            })}
-            {/* {
-      name: useIntl().formatHTMLMessage({ id: "nav.approvaled" }),
-      url: "/approvaled",
-    }, */}
-            <Badge
-              count={approveList.length + tradingList.length}
-              overflowCount={100}
-              offset={[0, 10]}
-              showZero={false}
-            >
-              <div
-                key="/approval"
-                className={
-                  history.location.pathname === "/approval"
-                    ? "item active"
-                    : "item"
-                }
-                onClick={() => history.push("/approval")}
-              >
-                {useIntl().formatHTMLMessage({ id: "nav.approval" })}
-              </div>
-            </Badge>
-            <Badge
-              count={pollingRsvInfo}
-              overflowCount={100}
-              offset={[0, 10]}
-              showZero={false}
-            >
-              <div
-                key="/approvaled"
-                className={
-                  history.location.pathname === "/approvaled"
-                    ? "item active"
-                    : "item"
-                }
-                onClick={() => history.push("/approvaled")}
-              >
-                {useIntl().formatHTMLMessage({ id: "approval.history" })}
-              </div>
-            </Badge>
-          </div>
+
           <div className="right">
-            <Modal
-              zIndex={15}
-              title={useIntl().formatHTMLMessage({ id: "account" })}
-              footer={false}
-              visible={visible}
-              onCancel={() => setVisible(false)}
-              getContainer={
-                document.getElementsByClassName("layouts")[0] as HTMLElement
-              }
-            >
-              <div className="flex_SB">
-                <span>{rpc}</span>
-                <Button type="link" onClick={logout}>
-                  {useIntl().formatHTMLMessage({ id: "logOut" })}
-                </Button>
+            {
+              <div
+                className={classNames("loginInfo", {
+                  visibility_hidden: !account,
+                })}
+              >
+                {account && cutOut(account, 6, 4)}
               </div>
-              <div>
-                {/* {signEnode} */}
-                <span className="mr10">{cutOut(signEnode, 30, 8)}</span>
-                <CopyOutlined
-                  onClick={() => copyTxt(signEnode)}
-                  style={{ fontSize: 17, cursor: "pointer" }}
-                />
-              </div>
-            </Modal>
-            <div className="loginInfo" onClick={() => setVisible(true)}>
-              {cutOut(ethereum?.selectedAddress, 6, 4)}
-            </div>
+            }
             <Select
               className="mr8"
               defaultValue={getLocale()}
@@ -269,23 +133,155 @@ const Index = (props: any) => {
                   "prefix",
                   prefix === "custom-default" ? "custom-dark" : "custom-default"
                 );
-                // globalDispatch({ isDay: !isDay })
               }}
             />
           </div>
         </div>
         <div
           style={{
-            padding: "0 15p",
+            padding: "0 15px",
             width: "100%",
-            // maxWidth: 1440,
-            // margin: "30px auto",
           }}
         >
+          <Drawer
+            open
+            mask={false}
+            placement="left"
+            closable={false}
+            width={320}
+          >
+            <>
+              <div className="accountDrawer-head">
+                <div className="img">
+                  <div className="thresHold">{accountSelected.ThresHold}</div>
+                  <img
+                    src={getHead(accountSelected.TimeStamp)}
+                    alt={ethers.utils.computeAddress(
+                      "0x" + accountSelected.PubKey
+                    )}
+                  />
+                  <div>
+                    {ethers.utils
+                      .computeAddress("0x" + accountSelected.PubKey)
+                      .slice(0, 6)}
+                  </div>
+                </div>
+                <div>
+                  {cutOut(
+                    ethers.utils.computeAddress("0x" + accountSelected.PubKey),
+                    10,
+                    6
+                  )}
+                  <br />
+                  <b>{"xxx" + " " + chainInfo[chainId]?.symbol}</b>
+                </div>
+                <div></div>
+                <div className="accountDrawer-opr">
+                  <span>
+                    <Popover
+                      title=""
+                      content={
+                        <div>
+                          <QRCode
+                            value={ethers.utils.computeAddress(
+                              "0x" + accountSelected.PubKey
+                            )}
+                          />
+                        </div>
+                      }
+                    >
+                      <AppstoreAddOutlined />
+                    </Popover>
+                  </span>
+                  <span>
+                    <CopyOutlined
+                      onClick={() =>
+                        copyTxt(
+                          ethers.utils.computeAddress(
+                            "0x" + accountSelected.PubKey
+                          )
+                        )
+                      }
+                    />
+                  </span>
+                  <span>
+                    <ShareAltOutlined />
+                  </span>
+                </div>
+                <div>{/* <SendTransaction details={details} /> */}111</div>
+              </div>
+              <div style={{ maxHeight: "30vh", marginBottom: 35 }}></div>
+              {/* <Menu
+                mode="inline"
+                defaultOpenKeys={["Assets"]}
+                selectedKeys={selectedKeys}
+                onClick={(e) => dispatch({ selectedKeys: [e.key] })}
+                items={[
+                  {
+                    key: "Assets",
+                    label: "Assets",
+                    children: [
+                      {
+                        key: "Coins",
+                        label: "Coins",
+                      },
+                    ],
+                  },
+                  {
+                    key: "Transactions",
+                    label: (
+                      <Badge
+                        count={
+                          tradingList.filter(
+                            (item) =>
+                              transactionApprovalHaveHandled.every(
+                                (it) => it !== item.TimeStamp
+                              ) && item.PubKey === accountSelected.PubKey
+                          ).length
+                        }
+                        key={"Transactions"}
+                        overflowCount={100}
+                        offset={[12, -1]}
+                        showZero={false}
+                      >
+                        Transactions
+                      </Badge>
+                    ),
+                    children: [
+                      {
+                        key: "Approval",
+                        label: (
+                          <Badge
+                            count={
+                              tradingList.filter(
+                                (item) =>
+                                  transactionApprovalHaveHandled.every(
+                                    (it) => it !== item.TimeStamp
+                                  ) && item.PubKey === accountSelected.PubKey
+                              ).length
+                            }
+                            key={"Approval"}
+                            overflowCount={100}
+                            offset={[12, -1]}
+                            showZero={false}
+                          >
+                            Approval
+                          </Badge>
+                        ),
+                      },
+                      {
+                        key: "History",
+                        label: "History",
+                      },
+                    ],
+                  },
+                ]}
+              /> */}
+            </>
+          </Drawer>
           {props.children}
         </div>
       </div>
-      {/* <AccountDrawer /> */}
     </ConfigProvider>
   );
 };

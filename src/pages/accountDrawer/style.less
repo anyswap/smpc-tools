@@ -154,7 +154,8 @@
     font-size: 19px;
   }
 }
-.custom-default-drawer-content-wrapper {
+.custom-default-drawer-content-wrapper,
+.custom-dark-drawer-content-wrapper {
   top: 70px;
   box-shadow: none;
 }
@@ -172,9 +173,13 @@
   cursor: pointer;
 }
 .custom-default-drawer-left.custom-default-drawer-open
-  .custom-default-drawer-content-wrapper {
+  .custom-default-drawer-content-wrapper,
+.custom-dark-drawer-left.custom-dark-drawer-open
+  .custom-dark-drawer-content-wrapper {
+  border-inline-end: #f1f1f1 1px solid;
   box-shadow: none;
 }
-.custom-default-drawer-left.custom-default-drawer-open {
+.custom-default-drawer-left.custom-default-drawer-open,
+.custom-dark-drawer-left.custom-dark-drawer-open {
   width: 1px;
 }

@@ -30,7 +30,6 @@ export default function Index() {
     dispatch({
       tradingListLoading: true,
     });
-    debugger;
     dispatch({
       tradingList:
         res?.Data.filter(

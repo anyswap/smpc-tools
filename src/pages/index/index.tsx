@@ -7,7 +7,12 @@ import { useActiveWeb3React } from "@/hooks";
 import { injected } from "@/connectors";
 import "./index.less";
 
-const Index = () => {
+interface Iprops {
+  style?: {};
+}
+
+const Index = (props: Iprops) => {
+  const { style = {} } = props;
   // const { account, activate } = useActiveWeb3React();
   const { activate } = useActiveWeb3React();
   // const account = window.ethereum?.selectedAddress;
@@ -23,13 +28,13 @@ const Index = () => {
     });
   }, []);
 
-  useEffect(() => {
-    if (account) {
-      history.push("/login");
-    } else {
-      history.push("/");
-    }
-  }, [account]);
+  // useEffect(() => {
+  //   if (account) {
+  //     history.push("/login");
+  //   } else {
+  //     history.push("/");
+  //   }
+  // }, [account]);
 
   const enable = useCallback(() => {
     console.info("activate", activate);
@@ -43,9 +48,9 @@ const Index = () => {
   return (
     <div
       className={isDay ? "index" : "index dark"}
-      style={{ background: isDay ? "none" : "#152131" }}
+      style={{ background: isDay ? "none" : "#152131", ...style }}
     >
-      <Select
+      {/* <Select
         className="language"
         defaultValue={getLocale()}
         onChange={(v) => setLocale(v, false)}
@@ -61,7 +66,7 @@ const Index = () => {
             key: "en-US",
           },
         ]}
-      />
+      /> */}
       <div>
         <img src={isDay ? LogoB : LogoW} width={69} height={100} />
         <div className="name">

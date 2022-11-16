@@ -6,15 +6,18 @@ import { DeleteOutlined } from "@ant-design/icons";
 import { nodeListService } from "@/api";
 
 const initialState = { nodeList: [] };
-const Index = () => {
+interface Iprops {
+  style?: {};
+}
+const Index = (props: Iprops) => {
+  const { style = {} } = props;
   const { account } = useActiveWeb3React();
   const [state, dispatch] = useReducer(
-    (s, a) => ({ ...s, ...a }),
+    (s: any, a: any) => ({ ...s, ...a }),
     initialState
   );
   const { nodeList } = state;
   const [form] = Form.useForm();
-  console.info("nodeList", nodeList);
   const getNodeList = async () => {
     const res = await nodeListService();
     dispatch({
@@ -31,7 +34,7 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="box">
+    <div className="box" style={style}>
       <br />
       <Form size="large" name="smpc" form={form}>
         {/* <Form.Item name="b" label="审批模式" initialValue="随机模式">
@@ -51,18 +54,29 @@ const Index = () => {
             />
           </Form.Item> */}
         <Row>
-          <Col span={15}>
+          <Col span={3}>
+            Name<span className="red">*</span>
+          </Col>
+          <Col span={12} offset={1}>
             Address<span className="red">*</span>
           </Col>
           <Col span={6} offset={1}>
             RPC/Node Name<span className="red">*</span>
           </Col>
         </Row>
-        <Row className="mt5 mb35">
-          <Col span={15}>
-            <Input value={account} />
+        <Row className="mt5">
+          <Col span={3}>
+            <Form.Item
+              name={"aa"}
+              rules={[{ required: true, message: "Missing first name" }]}
+            >
+              <Input placeholder="name" />
+            </Form.Item>
           </Col>
-          <Col span={6} offset={1}>
+          <Col span={12} offset={1}>
+            <Input value={account} disabled />
+          </Col>
+          <Col span={5} offset={1}>
             <Form.Item
               name="b"
               rules={[{ required: true, message: "Missing last name" }]}
@@ -74,7 +88,7 @@ const Index = () => {
                 placeholder="RPC/Node Name"
               >
                 {nodeList.map((r: any) => (
-                  <Select.Option value={r.name} label={r.name}>
+                  <Select.Option value={r.name} label={r.name} key={r._id}>
                     <div className="flex_SB">
                       <span>{r.name}</span>
                       <span>{`${(
@@ -98,10 +112,21 @@ const Index = () => {
                     name,
                     ...restField,
                   })}
-                  <Col span={15}>
+                  <Col span={3}>
                     <Form.Item
                       {...restField}
-                      name={[name, "first"]}
+                      name={[name, "name"]}
+                      rules={[
+                        { required: true, message: "Missing first name" },
+                      ]}
+                    >
+                      <Input placeholder="name" />
+                    </Form.Item>
+                  </Col>
+                  <Col offset={1} span={12}>
+                    <Form.Item
+                      {...restField}
+                      name={[name, "address"]}
                       rules={[
                         { required: true, message: "Missing first name" },
                       ]}
@@ -109,10 +134,10 @@ const Index = () => {
                       <Input />
                     </Form.Item>
                   </Col>
-                  <Col span={6} offset={1}>
+                  <Col span={5} offset={1}>
                     <Form.Item
                       {...restField}
-                      name={[name, "last"]}
+                      name={[name, "node"]}
                       rules={[{ required: true, message: "Missing last name" }]}
                     >
                       <Select
@@ -122,14 +147,32 @@ const Index = () => {
                         placeholder="RPC/Node Name"
                       >
                         {nodeList.map((r: any) => (
-                          <Select.Option value={r.name} label={r.name}>
+                          <Select.Option
+                            value={r.name}
+                            label={r.name}
+                            key={r._id}
+                          >
                             <div className="flex_SB">
-                              <span>{r.name}</span>
-                              <span>{`${(
-                                ((r.createNum - r.createFailNum) /
-                                  r.createNum) *
-                                100
-                              ).toFixed(2)}%`}</span>
+                              <span
+                                title={r.name}
+                                style={{
+                                  display: "inline-block",
+                                  width: "60%",
+                                  textOverflow: "ellipsis",
+                                  overflow: "hidden",
+                                }}
+                              >
+                                {r.name}
+                              </span>
+                              <span>
+                                {r.createNum === 0
+                                  ? "-"
+                                  : `${(
+                                      ((r.createNum - r.createFailNum) /
+                                        r.createNum) *
+                                      100
+                                    ).toFixed(2)}%`}
+                              </span>
                             </div>
                           </Select.Option>
                         ))}
@@ -146,7 +189,12 @@ const Index = () => {
                   )}
                 </Row>
               ))}
-              <Button type="link" onClick={add} className="btn_center">
+              <Button
+                disabled={fields.length === 6}
+                type="link"
+                onClick={add}
+                className="btn_center"
+              >
                 + Add another owner
               </Button>
             </>
@@ -157,7 +205,6 @@ const Index = () => {
           <span>
             <Form.Item name="ThresHold" initialValue={"2/2"}>
               <Select
-                initialValue="2/2"
                 style={{ width: 100 }}
                 options={[{ value: "2/2", label: "2/2" }]}
               />
