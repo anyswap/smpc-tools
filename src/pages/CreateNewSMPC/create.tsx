@@ -36,23 +36,14 @@ const Index = (props: Iprops) => {
   return (
     <div className="box" style={style}>
       <br />
-      <Form size="large" name="smpc" form={form}>
-        {/* <Form.Item name="b" label="审批模式" initialValue="随机模式">
-            <Select
-              options={[
-                {
-                  value: "随机模式",
-                },
-                {
-                  value: "先到先得",
-                },
-                {
-                  value: "固定审批",
-                },
-              ]}
-              style={{ width: "50%" }}
-            />
-          </Form.Item> */}
+      <Form
+        size="large"
+        name="smpc"
+        form={form}
+        onFinish={(v) => {
+          debugger;
+        }}
+      >
         <Row>
           <Col span={3}>
             Name<span className="red">*</span>
@@ -61,25 +52,42 @@ const Index = (props: Iprops) => {
             Address<span className="red">*</span>
           </Col>
           <Col span={6} offset={1}>
-            RPC/Node Name<span className="red">*</span>
+            RPC/Node Name
           </Col>
         </Row>
         <Row className="mt5">
           <Col span={3}>
             <Form.Item
               name={"aa"}
-              rules={[{ required: true, message: "Missing first name" }]}
+              rules={[
+                { required: true, whitespace: true, message: "Missing name" },
+                {
+                  max: 20,
+                  min: 1,
+                  whitespace: true,
+                  message: "1 to 20 lengths",
+                },
+              ]}
             >
               <Input placeholder="name" />
             </Form.Item>
           </Col>
           <Col span={12} offset={1}>
-            <Input value={account} disabled />
+            <Input value={account || ""} disabled />
           </Col>
           <Col span={5} offset={1}>
             <Form.Item
               name="b"
-              rules={[{ required: true, message: "Missing last name" }]}
+              rules={[
+                {
+                  validator: (_, value) => {
+                    if (value?.length > 5) {
+                      return Promise.reject(new Error("Up to 5"));
+                    }
+                    return Promise.resolve();
+                  },
+                },
+              ]}
             >
               <Select
                 mode="tags"
@@ -102,7 +110,7 @@ const Index = (props: Iprops) => {
             </Form.Item>
           </Col>
         </Row>
-        <Form.List name="accouts">
+        <Form.List name="accouts" initialValue={[{}]}>
           {(fields, { add, remove }) => (
             <>
               {fields.map(({ key, name, ...restField }) => (
@@ -213,6 +221,7 @@ const Index = (props: Iprops) => {
           <span>
             <Button
               type="primary"
+              htmlType="submit"
               onClick={() => console.info(form.getFieldsValue())}
             >
               Create SMPC

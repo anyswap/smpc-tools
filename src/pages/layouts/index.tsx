@@ -19,6 +19,7 @@ import {
   message,
   Drawer,
   Popover,
+  Menu,
 } from "antd";
 import { ethers } from "ethers";
 import enUS from "antd/lib/locale/en_US";
@@ -143,12 +144,25 @@ const Index = (props: any) => {
             width: "100%",
           }}
         >
+          {/* <Drawer
+            closable={false}
+            mask={false}
+            open
+            placement="left"
+            width={322}
+            zIndex={40}
+            key={44}
+          >
+            <div className="text_center" style={{ marginTop: 280 }}>
+              Please create an account first
+            </div>
+          </Drawer> */}
           <Drawer
             open
-            mask={false}
             placement="left"
             closable={false}
             width={320}
+            zIndex={30}
           >
             <>
               <div className="accountDrawer-head">
@@ -211,11 +225,9 @@ const Index = (props: any) => {
                 <div>{/* <SendTransaction details={details} /> */}111</div>
               </div>
               <div style={{ maxHeight: "30vh", marginBottom: 35 }}></div>
-              {/* <Menu
+              <Menu
                 mode="inline"
                 defaultOpenKeys={["Assets"]}
-                selectedKeys={selectedKeys}
-                onClick={(e) => dispatch({ selectedKeys: [e.key] })}
                 items={[
                   {
                     key: "Assets",
@@ -229,45 +241,11 @@ const Index = (props: any) => {
                   },
                   {
                     key: "Transactions",
-                    label: (
-                      <Badge
-                        count={
-                          tradingList.filter(
-                            (item) =>
-                              transactionApprovalHaveHandled.every(
-                                (it) => it !== item.TimeStamp
-                              ) && item.PubKey === accountSelected.PubKey
-                          ).length
-                        }
-                        key={"Transactions"}
-                        overflowCount={100}
-                        offset={[12, -1]}
-                        showZero={false}
-                      >
-                        Transactions
-                      </Badge>
-                    ),
+                    label: "Transactions",
                     children: [
                       {
                         key: "Approval",
-                        label: (
-                          <Badge
-                            count={
-                              tradingList.filter(
-                                (item) =>
-                                  transactionApprovalHaveHandled.every(
-                                    (it) => it !== item.TimeStamp
-                                  ) && item.PubKey === accountSelected.PubKey
-                              ).length
-                            }
-                            key={"Approval"}
-                            overflowCount={100}
-                            offset={[12, -1]}
-                            showZero={false}
-                          >
-                            Approval
-                          </Badge>
-                        ),
+                        label: "Approval",
                       },
                       {
                         key: "History",
@@ -276,9 +254,10 @@ const Index = (props: any) => {
                     ],
                   },
                 ]}
-              /> */}
+              />
             </>
           </Drawer>
+
           {props.children}
         </div>
       </div>
