@@ -205,31 +205,37 @@ const Index = (props: Iprops) => {
               >
                 + Add another owner
               </Button>
+
+              <div className="flex_SB">
+                <span>
+                  <Form.Item
+                    key={fields.length}
+                    name="ThresHold"
+                    initialValue={`2/${fields.length + 1}`}
+                  >
+                    <Select
+                      style={{ width: 100 }}
+                      options={fields.map((item, i) => ({
+                        value: `${i + 2}/${fields.length + 1}`,
+                      }))}
+                    />
+                  </Form.Item>
+                </span>
+                <span>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    onClick={() => console.info(form.getFieldsValue())}
+                  >
+                    Create SMPC
+                  </Button>
+                  &nbsp;
+                  <Button>Reset</Button>
+                </span>
+              </div>
             </>
           )}
         </Form.List>
-
-        <div className="flex_SB">
-          <span>
-            <Form.Item name="ThresHold" initialValue={"2/2"}>
-              <Select
-                style={{ width: 100 }}
-                options={[{ value: "2/2", label: "2/2" }]}
-              />
-            </Form.Item>
-          </span>
-          <span>
-            <Button
-              type="primary"
-              htmlType="submit"
-              onClick={() => console.info(form.getFieldsValue())}
-            >
-              Create SMPC
-            </Button>
-            &nbsp;
-            <Button>Reset</Button>
-          </span>
-        </div>
       </Form>
     </div>
   );
