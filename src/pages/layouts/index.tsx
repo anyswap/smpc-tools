@@ -31,6 +31,7 @@ import "antd/dist/antd.min.css";
 import "./custom-dark.css";
 import "./custom-default.css";
 import "./style.less";
+import "./style1.less";
 import classNames from "classnames";
 import { cutOut, getWeb3, formatUnits, getHead, copyTxt } from "@/utils";
 import QRCode from "qrcode.react";
@@ -228,6 +229,10 @@ const Index = (props: any) => {
               <Menu
                 mode="inline"
                 defaultOpenKeys={["Assets"]}
+                onClick={(e) => {
+                  history.push(e.key);
+                  console.info("e--==", e);
+                }}
                 items={[
                   {
                     key: "Assets",
@@ -257,7 +262,6 @@ const Index = (props: any) => {
               />
             </>
           </Drawer>
-
           {props.children}
         </div>
       </div>
