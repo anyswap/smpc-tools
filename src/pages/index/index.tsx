@@ -44,11 +44,14 @@ const Index = (props: Iprops) => {
     } else {
     }
   }, [account, activate]);
-
+  // marginTop: "calc((100vh - 280px)/2)",
   return (
     <div
       className={isDay ? "index" : "index dark"}
-      style={{ background: isDay ? "none" : "#152131", ...style }}
+      style={{
+        background: isDay ? "none" : "#152131",
+        ...style,
+      }}
     >
       {/* <Select
         className="language"

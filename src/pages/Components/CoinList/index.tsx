@@ -8,7 +8,8 @@ import { abi } from "@/assets/js/web3";
 import { useModel, useIntl } from "umi";
 import { ethers } from "ethers";
 import { coins } from "./config";
-import SendContractRow from "./components/sendContractRow";
+import SendContractRow from "./sendContractRow";
+import { PageContainer, ProCard } from "@ant-design/pro-components";
 
 const Index = (props: { item: any }) => {
   const { account, library, chainId }: any = useActiveWeb3React();
@@ -57,24 +58,24 @@ const Index = (props: { item: any }) => {
     //   if (res) setVisible(false);
     // });
   };
-  useEffect(() => {
-    const interval = setInterval(() => {
-      let obj: any = {};
-      coins[chainId].forEach(async (item) => {
-        setLoading(true);
-        const { contract } = item;
-        const info = await getInfo(contract);
-        obj[contract] = info;
-        if (Object.entries(obj).length === coins[chainId].length) {
-          setLoading(false);
-          setCoinsInfo(obj);
-        }
-      });
-    }, 5000);
-    return () => {
-      clearInterval(interval);
-    };
-  }, [props.item, chainId]);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     let obj: any = {};
+  //     coins[chainId].forEach(async (item) => {
+  //       setLoading(true);
+  //       const { contract } = item;
+  //       const info = await getInfo(contract);
+  //       obj[contract] = info;
+  //       if (Object.entries(obj).length === coins[chainId].length) {
+  //         setLoading(false);
+  //         setCoinsInfo(obj);
+  //       }
+  //     });
+  //   }, 5000);
+  //   return () => {
+  //     clearInterval(interval);
+  //   };
+  // }, [props.item, chainId]);
 
   const columns = [
     {
@@ -107,28 +108,38 @@ const Index = (props: { item: any }) => {
       title: "",
       dataIndex: "contract",
       render: (t: string) => (
-        <SendContractRow TokenAddress={t}>
-          <Button type="primary" size="small">
-            Send
-          </Button>
-        </SendContractRow>
+        <Button type="primary" size="small">
+          Send
+        </Button>
+        // <SendContractRow TokenAddress={t}>
+        //   <Button type="primary" size="small">
+        //     Send
+        //   </Button>
+        // </SendContractRow>
       ),
     },
   ];
   return (
-    <>
-      <Breadcrumb>
-        <Breadcrumb.Item>Assets</Breadcrumb.Item>
-        <Breadcrumb.Item>Coins</Breadcrumb.Item>
-      </Breadcrumb>
-      <Table
-        // loading={loading}
-        pagination={false}
-        dataSource={coins[chainId]}
-        columns={columns}
-        rowKey="contract"
-      />
-    </>
+    <PageContainer
+      style={{ marginLeft: 320 }}
+      header={{
+        title: "Create SMPC",
+      }}
+    >
+      <ProCard>
+        <Breadcrumb>
+          <Breadcrumb.Item>Assets</Breadcrumb.Item>
+          <Breadcrumb.Item>Coins</Breadcrumb.Item>
+        </Breadcrumb>
+        <Table
+          // loading={loading}
+          pagination={false}
+          dataSource={coins[chainId]}
+          columns={columns}
+          rowKey="contract"
+        />
+      </ProCard>
+    </PageContainer>
   );
 };
 
