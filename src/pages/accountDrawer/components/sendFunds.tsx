@@ -123,7 +123,7 @@ const Index = (props: Iprops) => {
                 <Input size="large" />
               </Form.Item>
               <p style={{ color: "rgba(0, 0, 0, 0.54)", marginTop: 20 }}>
-                Amount
+                Amount*
               </p>
               <Form.Item
                 name="value"
@@ -138,6 +138,14 @@ const Index = (props: Iprops) => {
                   {
                     required: true,
                     validator: (r, v, c) => {
+                      console.info("detailsdetailsdetails", details);
+                      console.info(
+                        formatUnits(
+                          details[accountSelected.PubKey]?.balance || 0,
+                          18
+                        )
+                      );
+
                       if (!v || !v.trim()) {
                         c(gRequired as string);
                         return;
@@ -145,10 +153,12 @@ const Index = (props: Iprops) => {
                       if (
                         !isNaN(v) &&
                         Number(v) > 0 &&
-                        v <
-                          formatUnits(
-                            details[accountSelected.PubKey]?.balance || 0,
-                            18
+                        Number(v) <
+                          Number(
+                            formatUnits(
+                              details[accountSelected.PubKey]?.balance || 0,
+                              18
+                            )
                           )
                       ) {
                         c();
@@ -159,7 +169,7 @@ const Index = (props: Iprops) => {
                   },
                 ]}
               >
-                <Input placeholder="Amount*" size="large" />
+                <Input placeholder="Amount" size="large" />
               </Form.Item>
             </div>
             <div

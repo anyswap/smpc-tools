@@ -8,7 +8,7 @@ export const MATIC_MAIN_CHAINID = ChainId.MATIC;
 export const MATIC_MAINNET =
   process.env.NODE_ENV === "development"
     ? getLocalRPC(MATIC_MAIN_CHAINID, "https://polygon-rpc.com/")
-    : getLocalRPC(MATIC_MAIN_CHAINID, "https://maticnode1.anyswap.exchange");
+    : getLocalRPC(MATIC_MAIN_CHAINID, "https://polygon-rpc.com/");
 // export const MATIC_MAIN_EXPLORER = 'https://explorer-mainnet.maticvigil.com'
 export const MATIC_MAIN_EXPLORER = "https://polygonscan.com";
 
