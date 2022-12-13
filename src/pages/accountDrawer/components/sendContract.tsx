@@ -118,7 +118,7 @@ const Index = (props: Iprops) => {
         <img src={Icon1} />
         Send funds
       </Button> */}
-      <Button size="large" size="large" onClick={() => setOpen(true)}>
+      <Button size="large" onClick={() => setOpen(true)}>
         <img src={Icon2} />
         Contract interaction
       </Button>
