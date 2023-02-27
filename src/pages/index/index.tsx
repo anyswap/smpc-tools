@@ -24,13 +24,14 @@ const Index = () => {
   }, []);
 
   useEffect(() => {
+    debugger;
     if (account) {
       history.push("/login");
     } else {
       history.push("/");
     }
   }, [account]);
-
+  console.info("account", account);
   const enable = useCallback(() => {
     console.info("activate", activate);
     console.info("account", account);

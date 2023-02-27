@@ -4,6 +4,7 @@ import Icon1 from "./img/icon1.svg";
 import Icon2 from "./img/icon2.svg";
 import SendFunds from "./components/sendFunds";
 import SendContract from "./components/sendContract";
+import ContractABI from "./components/ContractABI";
 import { Interface } from "@ethersproject/abi";
 
 interface Iprops {
@@ -29,6 +30,9 @@ const Index = (props: Iprops) => {
           <br />
 
           <SendContract details={props.details} setTypeOpen={setTypeOpen} />
+          <br />
+          <br />
+          <ContractABI details={props.details} />
         </div>
       </Modal>
     </div>
